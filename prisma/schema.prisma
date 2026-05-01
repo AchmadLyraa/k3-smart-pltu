@@ -1,0 +1,684 @@
+generator client {
+  provider = "prisma-client"
+  output="./generated"
+  engineType= "client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+// ============================================================================
+// ORGANIZATIONAL STRUCTURE
+// ============================================================================
+
+model Unit {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  code      String   @unique
+  address   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  divisions Division[]
+  users     User[]
+
+  @@map("units")
+}
+
+model Division {
+  id        String   @id @default(cuid())
+  unitId    String
+  name      String
+  code      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  unit   Unit   @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  shifts Shift[]
+  users  User[]
+
+  @@unique([unitId, code])
+  @@map("divisions")
+}
+
+model Shift {
+  id        String   @id @default(cuid())
+  divisionId String
+  name      String
+  code      String
+  startTime String
+  endTime   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  division Division @relation(fields: [divisionId], references: [id], onDelete: Cascade)
+  users    User[]
+
+  @@unique([divisionId, code])
+  @@map("shifts")
+}
+
+// ============================================================================
+// USERS & AUTHENTICATION
+// ============================================================================
+
+enum UserRole {
+  SUPER_ADMIN
+  HSE_ADMIN
+  SUPERVISOR
+  WORKER
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+model User {
+  id                String     @id @default(cuid())
+  email             String     @unique
+  emailVerified     DateTime?
+  name              String?
+  image             String?
+  password          String?
+  nip               String?    @unique
+  role              UserRole   @default(WORKER)
+  status            UserStatus @default(ACTIVE)
+  unitId            String?
+  divisionId        String?
+  shiftId           String?
+  lastLogin         DateTime?
+  isEmailVerified   Boolean    @default(false)
+  emailVerifiedAt   DateTime?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
+  accounts                   Account[]
+  sessions                   Session[]
+  unit                       Unit?                  @relation(fields: [unitId], references: [id], onDelete: SetNull)
+  division                   Division?              @relation(fields: [divisionId], references: [id], onDelete: SetNull)
+  shift                      Shift?                 @relation(fields: [shiftId], references: [id], onDelete: SetNull)
+  materialProgress           MaterialProgress[]
+  quizSessions               QuizSession[]
+  userAnswers                UserAnswer[]
+  dailyCheckins              DailyCheckin[]
+  pointTransactions          PointTransaction[]
+  userBadges                 UserBadge[]
+  redemptions                Redemption[]
+  notificationLogs           NotificationLog[]
+  monthlyPointSummaries      MonthlyPointSummary[]
+  semesterSummaries          SemesterSummary[]
+  userStreaks                UserStreak[]
+
+  @@index([email])
+  @@index([unitId])
+  @@index([divisionId])
+  @@index([shiftId])
+  @@map("users")
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ============================================================================
+// CONTENT MANAGEMENT
+// ============================================================================
+
+model Topic {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  icon      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  materials Material[]
+
+  @@map("topics")
+}
+
+enum MaterialType {
+  VIDEO
+  INFOGRAPHIC
+  ARTICLE
+}
+
+enum MaterialStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Material {
+  id              String         @id @default(cuid())
+  topicId         String
+  title           String
+  description     String?
+  type            MaterialType   @default(VIDEO)
+  duration        Int            @default(0) // dalam detik
+  thumbnail       String?
+  status          MaterialStatus @default(DRAFT)
+  publishedAt     DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  topic              Topic                    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  mediaFiles         MediaFile[]
+  assignments        MaterialAssignment[]
+  progress           MaterialProgress[]
+  quizConfigs        QuizConfig[]
+  notificationLogs   NotificationLog[]
+
+  @@index([topicId])
+  @@index([status])
+  @@map("materials")
+}
+
+model MaterialAssignment {
+  id         String   @id @default(cuid())
+  materialId String
+  unitId     String?
+  divisionId String?
+  shiftId    String?
+  startDate  DateTime
+  endDate    DateTime
+  isRequired Boolean  @default(true)
+  priority   Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  material Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+
+  @@unique([materialId, unitId, divisionId, shiftId])
+  @@index([materialId])
+  @@index([startDate, endDate])
+  @@map("material_assignments")
+}
+
+model MediaFile {
+  id         String   @id @default(cuid())
+  materialId String
+  url        String
+  type       String   @default("video") // video, image, etc
+  fileName   String
+  size       Int      @default(0)
+  duration   Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  material Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+
+  @@index([materialId])
+  @@map("media_files")
+}
+
+// ============================================================================
+// QUIZ SYSTEM
+// ============================================================================
+
+enum QuestionType {
+  MULTIPLE_CHOICE
+  TRUE_FALSE
+  SHORT_ANSWER
+}
+
+model QuestionBank {
+  id            String       @id @default(cuid())
+  text          String
+  type          QuestionType @default(MULTIPLE_CHOICE)
+  correctAnswer String
+  points        Int          @default(10)
+  difficulty    String       @default("medium") // easy, medium, hard
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  answerOptions         AnswerOption[]
+  quizConfigs           QuizConfig[]
+  quizSessionQuestions  QuizSessionQuestion[]
+
+  @@index([type])
+  @@map("question_banks")
+}
+
+model AnswerOption {
+  id           String  @id @default(cuid())
+  questionId   String
+  text         String
+  isCorrect    Boolean @default(false)
+  orderIndex   Int     @default(0)
+
+  question QuestionBank @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([questionId])
+  @@map("answer_options")
+}
+
+model QuizConfig {
+  id               String   @id @default(cuid())
+  materialId       String
+  name             String
+  description      String?
+  totalQuestions   Int      @default(5)
+  passingScore     Int      @default(70)
+  timeLimit        Int      @default(600) // dalam detik
+  allowRetake      Boolean  @default(true)
+  maxRetries       Int      @default(3)
+  showCorrectAns   Boolean  @default(true)
+  shuffleQuestions Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  material             Material                @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  questions            QuestionBank[]
+  quizSessions         QuizSession[]
+
+  @@index([materialId])
+  @@map("quiz_configs")
+}
+
+enum QuizStatus {
+  IN_PROGRESS
+  SUBMITTED
+  GRADED
+}
+
+model QuizSession {
+  id              String      @id @default(cuid())
+  userId          String
+  quizConfigId    String
+  status          QuizStatus  @default(IN_PROGRESS)
+  startedAt       DateTime    @default(now())
+  submittedAt     DateTime?
+  score           Int?
+  totalQuestions  Int
+  correctAnswers  Int?
+  passed          Boolean?
+  attemptNumber   Int         @default(1)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  user              User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quizConfig        QuizConfig               @relation(fields: [quizConfigId], references: [id], onDelete: Cascade)
+  questions         QuizSessionQuestion[]
+  userAnswers       UserAnswer[]
+
+  @@index([userId])
+  @@index([quizConfigId])
+  @@index([status])
+  @@map("quiz_sessions")
+}
+
+model QuizSessionQuestion {
+  id             String   @id @default(cuid())
+  quizSessionId  String
+  questionId     String
+  orderIndex     Int
+  createdAt      DateTime @default(now())
+
+  quizSession QuizSession  @relation(fields: [quizSessionId], references: [id], onDelete: Cascade)
+  question    QuestionBank @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([quizSessionId, questionId])
+  @@index([quizSessionId])
+  @@index([questionId])
+  @@map("quiz_session_questions")
+}
+
+model UserAnswer {
+  id             String   @id @default(cuid())
+  quizSessionId  String
+  userId         String
+  questionId     String?
+  answer         String
+  isCorrect      Boolean  @default(false)
+  pointsEarned   Int      @default(0)
+  createdAt      DateTime @default(now())
+
+  quizSession QuizSession   @relation(fields: [quizSessionId], references: [id], onDelete: Cascade)
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([quizSessionId])
+  @@index([userId])
+  @@map("user_answers")
+}
+
+// ============================================================================
+// PROGRESS TRACKING
+// ============================================================================
+
+enum ProgressStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+model MaterialProgress {
+  id         String           @id @default(cuid())
+  userId     String
+  materialId String
+  status     ProgressStatus   @default(NOT_STARTED)
+  startedAt  DateTime?
+  completedAt DateTime?
+  lastAccessed DateTime?
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  material Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, materialId])
+  @@index([userId])
+  @@index([materialId])
+  @@index([status])
+  @@map("material_progress")
+}
+
+model DailyCheckin {
+  id        String   @id @default(cuid())
+  userId    String
+  date      DateTime
+  checkedIn Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId])
+  @@index([date])
+  @@map("daily_checkins")
+}
+
+// ============================================================================
+// GAMIFICATION
+// ============================================================================
+
+enum TransactionType {
+  QUIZ_COMPLETION
+  MATERIAL_COMPLETION
+  DAILY_CHECKIN
+  STREAK_BONUS
+  BADGE_ACHIEVEMENT
+  MANUAL_ADJUSTMENT
+}
+
+model PointTransaction {
+  id            String          @id @default(cuid())
+  userId        String
+  points        Int
+  transactionType TransactionType
+  reference     String?
+  description   String?
+  createdAt     DateTime        @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([transactionType])
+  @@index([createdAt])
+  @@map("point_transactions")
+}
+
+model MonthlyPointSummary {
+  id        String   @id @default(cuid())
+  userId    String
+  year      Int
+  month     Int
+  totalPoints Int
+  rank      Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, year, month])
+  @@index([userId])
+  @@index([year, month])
+  @@map("monthly_point_summaries")
+}
+
+model SemesterSummary {
+  id        String   @id @default(cuid())
+  userId    String
+  year      Int
+  semester  Int
+  totalPoints Int
+  rank      Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, year, semester])
+  @@index([userId])
+  @@map("semester_summaries")
+}
+
+model UserStreak {
+  id              String   @id @default(cuid())
+  userId          String
+  currentStreak   Int      @default(0)
+  maxStreak       Int      @default(0)
+  lastStreakDate  DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId])
+  @@index([userId])
+  @@map("user_streaks")
+}
+
+model BadgeDefinition {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  icon        String?
+  criteria    String
+  createdAt   DateTime @default(now())
+
+  userBadges UserBadge[]
+
+  @@map("badge_definitions")
+}
+
+model UserBadge {
+  id        String   @id @default(cuid())
+  userId    String
+  badgeId   String
+  earnedAt  DateTime @default(now())
+
+  user  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge BadgeDefinition @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@index([userId])
+  @@index([badgeId])
+  @@map("user_badges")
+}
+
+// ============================================================================
+// REWARDS & REDEMPTION
+// ============================================================================
+
+enum RewardStatus {
+  AVAILABLE
+  DISCONTINUED
+}
+
+enum RedemptionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
+model Reward {
+  id          String        @id @default(cuid())
+  name        String
+  description String?
+  pointCost   Int
+  quantity    Int
+  status      RewardStatus  @default(AVAILABLE)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  redemptions Redemption[]
+
+  @@map("rewards")
+}
+
+model Redemption {
+  id        String             @id @default(cuid())
+  userId    String
+  rewardId  String
+  status    RedemptionStatus   @default(PENDING)
+  pointsUsed Int
+  approvedBy String?
+  approvedAt DateTime?
+  completedAt DateTime?
+  notes     String?
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reward Reward @relation(fields: [rewardId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@map("redemptions")
+}
+
+// ============================================================================
+// NOTIFICATIONS
+// ============================================================================
+
+model NotificationTemplate {
+  id        String   @id @default(cuid())
+  type      String
+  subject   String
+  message   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  notificationLogs NotificationLog[]
+
+  @@unique([type])
+  @@map("notification_templates")
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model NotificationLog {
+  id                String               @id @default(cuid())
+  userId            String
+  templateId        String?
+  materialId        String?
+  type              String
+  subject           String
+  message           String
+  status            NotificationStatus   @default(PENDING)
+  sentAt            DateTime?
+  createdAt         DateTime             @default(now())
+
+  user      User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  template  NotificationTemplate?  @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  material  Material?              @relation(fields: [materialId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([status])
+  @@map("notification_logs")
+}
+
+// ============================================================================
+// AUDIT & LOGGING
+// ============================================================================
+
+enum AuditAction {
+  CREATE
+  READ
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  SUBMIT_QUIZ
+  COMPLETE_MATERIAL
+}
+
+model AuditLog {
+  id          String      @id @default(cuid())
+  userId      String?
+  action      AuditAction
+  entity      String
+  entityId    String
+  unitId      String?
+  changes     String?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime    @default(now())
+
+  @@index([userId])
+  @@index([entity])
+  @@index([entityId])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// SYSTEM CONFIG
+// ============================================================================
+
+model SystemConfig {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  description String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("system_configs")
+}
