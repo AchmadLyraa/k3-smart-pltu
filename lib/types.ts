@@ -4,7 +4,7 @@ import { Prisma } from "@/prisma/generated/client";
 // USER TYPES
 // ============================================================================
 
-export type UserRole = "SUPER_ADMIN" | "HSE_ADMIN" | "SUPERVISOR" | "WORKER";
+export type UserRole = "SUPER_ADMIN" | "HSE_ADMIN" | "REWARD_ADMIN" | "WORKER";
 export type UserStatus = "ACTIVE" | "INACTIVE" | "SUSPENDED";
 
 export interface UserWithRelations extends Prisma.UserGetPayload<{

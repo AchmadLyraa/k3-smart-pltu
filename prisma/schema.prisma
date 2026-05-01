@@ -65,7 +65,7 @@ model Shift {
 enum UserRole {
   SUPER_ADMIN
   HSE_ADMIN
-  SUPERVISOR
+  REWARD_ADMIN
   WORKER
 }
 

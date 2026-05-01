@@ -12,7 +12,7 @@
 export const UserRole = {
   SUPER_ADMIN: 'SUPER_ADMIN',
   HSE_ADMIN: 'HSE_ADMIN',
-  SUPERVISOR: 'SUPERVISOR',
+  REWARD_ADMIN: 'REWARD_ADMIN',
   WORKER: 'WORKER'
 } as const
 

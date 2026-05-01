@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { signOut } from 'next-auth/react';
-import { Button } from '@/components/ui/button';
+import { signOut } from "next-auth/react";
+import { Button } from "@/components/ui/button";
 
 export function LogoutButton() {
   return (
@@ -10,7 +10,7 @@ export function LogoutButton() {
       onClick={() =>
         signOut({
           redirect: true,
-          redirectTo: '/login',
+          redirectTo: "/login",
         })
       }
     >

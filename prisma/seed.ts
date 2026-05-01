@@ -28,20 +28,6 @@ async function main() {
     },
   });
 
-  // USER SUPERVISOR
-  await prisma.user.upsert({
-    where: { email: "supervisor@mail.com" },
-    update: {},
-    create: {
-      email: "supervisor@mail.com",
-      name: "Supervisor",
-      password,
-      role: "SUPERVISOR",
-      status: "ACTIVE",
-      unitId: unit.id,
-    },
-  });
-
   // USER WORKER
   await prisma.user.upsert({
     where: { email: "worker@mail.com" },

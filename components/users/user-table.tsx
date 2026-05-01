@@ -1,12 +1,22 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { updateUserRole, updateUserStatus, deleteUser } from '@/app/actions/users';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Edit, Trash2 } from 'lucide-react';
-import UserEditDialog from './user-edit-dialog';
-import UserDeleteDialog from './user-delete-dialog';
+import { useState } from "react";
+import {
+  updateUserRole,
+  updateUserStatus,
+  deleteUser,
+} from "@/app/actions/users";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Edit, Trash2 } from "lucide-react";
+import UserEditDialog from "./user-edit-dialog";
+import UserDeleteDialog from "./user-delete-dialog";
 
 interface UserTableProps {
   users: any[];
@@ -67,25 +77,36 @@ export default function UserTable({ users, onRefresh }: UserTableProps) {
           </thead>
           <tbody>
             {users.map((user) => (
-              <tr key={user.id} className="border-b hover:bg-muted/50 transition-colors">
-                <td className="py-3 px-4 font-medium">{user.name || '—'}</td>
+              <tr
+                key={user.id}
+                className="border-b hover:bg-muted/50 transition-colors"
+              >
+                <td className="py-3 px-4 font-medium">{user.name || "—"}</td>
                 <td className="py-3 px-4 text-sm">{user.email}</td>
-                <td className="py-3 px-4 text-sm text-muted-foreground">{user.nip || '—'}</td>
+                <td className="py-3 px-4 text-sm text-muted-foreground">
+                  {user.nip || "—"}
+                </td>
                 <td className="py-3 px-4">
-                  <Select value={user.role} onValueChange={(val) => handleRoleChange(user.id, val)}>
+                  <Select
+                    value={user.role}
+                    onValueChange={(val) => handleRoleChange(user.id, val)}
+                  >
                     <SelectTrigger className="w-32 h-8">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="WORKER">Worker</SelectItem>
-                      <SelectItem value="SUPERVISOR">Supervisor</SelectItem>
                       <SelectItem value="HSE_ADMIN">HSE Admin</SelectItem>
+                      <SelectItem value="REWARD_ADMIN">Reward Admin</SelectItem>
                       <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
                     </SelectContent>
                   </Select>
                 </td>
                 <td className="py-3 px-4">
-                  <Select value={user.status} onValueChange={(val) => handleStatusChange(user.id, val)}>
+                  <Select
+                    value={user.status}
+                    onValueChange={(val) => handleStatusChange(user.id, val)}
+                  >
                     <SelectTrigger className="w-28 h-8">
                       <SelectValue />
                     </SelectTrigger>
@@ -98,8 +119,8 @@ export default function UserTable({ users, onRefresh }: UserTableProps) {
                 </td>
                 <td className="py-3 px-4 text-xs text-muted-foreground">
                   {user.lastLogin
-                    ? new Date(user.lastLogin).toLocaleDateString('id-ID')
-                    : 'Never'}
+                    ? new Date(user.lastLogin).toLocaleDateString("id-ID")
+                    : "Never"}
                 </td>
                 <td className="py-3 px-4">
                   <div className="flex gap-2">

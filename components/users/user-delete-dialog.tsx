@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   AlertDialog,
@@ -8,7 +8,7 @@ import {
   AlertDialogDescription,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from "@/components/ui/alert-dialog";
 
 interface UserDeleteDialogProps {
   user: any;
@@ -31,7 +31,8 @@ export default function UserDeleteDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Delete User</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete {user.name || user.email}? This action cannot be undone.
+            Are you sure you want to delete {user.name || user.email}? This
+            action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="flex gap-2 justify-end">

@@ -1,32 +1,44 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { createUser } from '@/app/actions/users';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useState } from "react";
+import { createUser } from "@/app/actions/users";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface CreateUserFormProps {
   onSuccess?: () => void;
 }
 
 export default function CreateUserForm({ onSuccess }: CreateUserFormProps) {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [nip, setNip] = useState('');
-  const [password, setPassword] = useState('');
-  const [role, setRole] = useState('WORKER');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [nip, setNip] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("WORKER");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     try {
       const result = await createUser({
@@ -38,18 +50,18 @@ export default function CreateUserForm({ onSuccess }: CreateUserFormProps) {
       });
 
       if (result.success) {
-        setSuccess('User created successfully');
-        setName('');
-        setEmail('');
-        setPassword('');
-        setNip('');
-        setRole('WORKER');
+        setSuccess("User created successfully");
+        setName("");
+        setEmail("");
+        setPassword("");
+        setNip("");
+        setRole("WORKER");
         onSuccess?.();
       } else {
-        setError(result.error || 'Failed to create user');
+        setError(result.error || "Failed to create user");
       }
     } catch (err) {
-      setError('An error occurred');
+      setError("An error occurred");
     } finally {
       setLoading(false);
     }
@@ -59,9 +71,7 @@ export default function CreateUserForm({ onSuccess }: CreateUserFormProps) {
     <Card>
       <CardHeader>
         <CardTitle>Create New User</CardTitle>
-        <CardDescription>
-          Add a new user to the system
-        </CardDescription>
+        <CardDescription>Add a new user to the system</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -120,18 +130,22 @@ export default function CreateUserForm({ onSuccess }: CreateUserFormProps) {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="WORKER">Worker</SelectItem>
-                <SelectItem value="SUPERVISOR">Supervisor</SelectItem>
-                <SelectItem value="HSE_ADMIN">HSE Admin</SelectItem>
-                <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
+                <SelectItem value="WORKER">Worker (Peserta Belajar)</SelectItem>
+                <SelectItem value="HSE_ADMIN">
+                  HSE Admin (Materi & Quiz)
+                </SelectItem>
+                <SelectItem value="REWARD_ADMIN">
+                  Reward Admin (Reward & Redeem)
+                </SelectItem>
+                <SelectItem value="SUPER_ADMIN">
+                  Super Admin (Full Access)
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded">
-              {error}
-            </div>
+            <div className="bg-red-50 text-red-600 p-3 rounded">{error}</div>
           )}
 
           {success && (
@@ -141,7 +155,7 @@ export default function CreateUserForm({ onSuccess }: CreateUserFormProps) {
           )}
 
           <Button type="submit" disabled={loading} className="w-full">
-            {loading ? 'Creating...' : 'Create User'}
+            {loading ? "Creating..." : "Create User"}
           </Button>
         </form>
       </CardContent>

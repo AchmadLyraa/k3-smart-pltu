@@ -1,8 +1,7 @@
-import "server-only";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 
-export type UserRole = "SUPER_ADMIN" | "HSE_ADMIN" | "SUPERVISOR" | "WORKER";
+export type UserRole = "SUPER_ADMIN" | "HSE_ADMIN" | "REWARD_ADMIN" | "WORKER";
 
 /**
  * Verify user is authenticated and has required role(s)
@@ -61,15 +60,8 @@ export async function getCurrentUser() {
 }
 
 /**
- * Check if user is admin (SUPER_ADMIN or HSE_ADMIN)
+ * Check if user is admin (SUPER_ADMIN, HSE_ADMIN, or REWARD_ADMIN)
  */
 export async function isAdmin(): Promise<boolean> {
-  return hasRole(["SUPER_ADMIN", "HSE_ADMIN"]);
-}
-
-/**
- * Check if user is supervisor or above
- */
-export async function isSupervisor(): Promise<boolean> {
-  return hasRole(["SUPER_ADMIN", "HSE_ADMIN", "SUPERVISOR"]);
+  return hasRole(["SUPER_ADMIN", "HSE_ADMIN", "REWARD_ADMIN"]);
 }

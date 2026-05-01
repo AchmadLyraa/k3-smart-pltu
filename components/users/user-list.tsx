@@ -1,18 +1,29 @@
-'use client';
+"use client";
 
-import { useState, useCallback, useEffect } from 'react';
-import { getAllUsers } from '@/app/actions/users';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import UserTable from './user-table';
-import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
+import { useState, useCallback, useEffect } from "react";
+import { getAllUsers } from "@/app/actions/users";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import UserTable from "./user-table";
+import { ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 
 export default function UserList() {
   const [users, setUsers] = useState<any[]>([]);
-  const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0, pages: 0 });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    pages: 0,
+  });
   const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   const loadUsers = useCallback(async (page: number = 1) => {
     setLoading(true);
@@ -23,7 +34,7 @@ export default function UserList() {
         setPagination(result.pagination);
       }
     } catch (error) {
-      console.error('Failed to load users:', error);
+      console.error("Failed to load users:", error);
     } finally {
       setLoading(false);
     }
@@ -33,10 +44,11 @@ export default function UserList() {
     loadUsers(1);
   }, [loadUsers]);
 
-  const filteredUsers = users.filter((user) =>
-    searchQuery === '' ||
-    user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredUsers = users.filter(
+    (user) =>
+      searchQuery === "" ||
+      user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (
@@ -45,9 +57,7 @@ export default function UserList() {
         <div className="flex justify-between items-start">
           <div>
             <CardTitle>Users Management</CardTitle>
-            <CardDescription>
-              Total Users: {pagination.total}
-            </CardDescription>
+            <CardDescription>Total Users: {pagination.total}</CardDescription>
           </div>
           <Button
             variant="outline"
@@ -70,7 +80,10 @@ export default function UserList() {
           />
         </div>
 
-        <UserTable users={filteredUsers} onRefresh={() => loadUsers(pagination.page)} />
+        <UserTable
+          users={filteredUsers}
+          onRefresh={() => loadUsers(pagination.page)}
+        />
 
         <div className="flex justify-between items-center mt-4">
           <p className="text-sm text-muted-foreground">

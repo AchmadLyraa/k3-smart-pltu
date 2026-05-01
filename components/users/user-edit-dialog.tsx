@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { updateUserProfile } from '@/app/actions/users';
+import { useState } from "react";
+import { updateUserProfile } from "@/app/actions/users";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface UserEditDialogProps {
   user: any;
@@ -26,16 +26,16 @@ export default function UserEditDialog({
   onOpenChange,
   onSuccess,
 }: UserEditDialogProps) {
-  const [name, setName] = useState(user?.name || '');
-  const [email, setEmail] = useState(user?.email || '');
-  const [nip, setNip] = useState(user?.nip || '');
+  const [name, setName] = useState(user?.name || "");
+  const [email, setEmail] = useState(user?.email || "");
+  const [nip, setNip] = useState(user?.nip || "");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
       const result = await updateUserProfile(user.id, {
@@ -47,10 +47,10 @@ export default function UserEditDialog({
       if (result.success) {
         onSuccess();
       } else {
-        setError(result.error || 'Failed to update user');
+        setError(result.error || "Failed to update user");
       }
     } catch (err) {
-      setError('An error occurred');
+      setError("An error occurred");
     } finally {
       setLoading(false);
     }
@@ -63,9 +63,7 @@ export default function UserEditDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit User</DialogTitle>
-          <DialogDescription>
-            Update user information
-          </DialogDescription>
+          <DialogDescription>Update user information</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -101,9 +99,7 @@ export default function UserEditDialog({
           </div>
 
           {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded">
-              {error}
-            </div>
+            <div className="bg-red-50 text-red-600 p-3 rounded">{error}</div>
           )}
 
           <div className="flex gap-2 justify-end">
@@ -116,7 +112,7 @@ export default function UserEditDialog({
               Cancel
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? 'Saving...' : 'Save Changes'}
+              {loading ? "Saving..." : "Save Changes"}
             </Button>
           </div>
         </form>
