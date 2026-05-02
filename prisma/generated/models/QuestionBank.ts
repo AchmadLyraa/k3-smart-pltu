@@ -243,6 +243,7 @@ export type QuestionBankWhereInput = {
   answerOptions?: Prisma.AnswerOptionListRelationFilter
   quizConfigs?: Prisma.QuizConfigListRelationFilter
   quizSessionQuestions?: Prisma.QuizSessionQuestionListRelationFilter
+  userAnswers?: Prisma.UserAnswerListRelationFilter
 }
 
 export type QuestionBankOrderByWithRelationInput = {
@@ -257,6 +258,7 @@ export type QuestionBankOrderByWithRelationInput = {
   answerOptions?: Prisma.AnswerOptionOrderByRelationAggregateInput
   quizConfigs?: Prisma.QuizConfigOrderByRelationAggregateInput
   quizSessionQuestions?: Prisma.QuizSessionQuestionOrderByRelationAggregateInput
+  userAnswers?: Prisma.UserAnswerOrderByRelationAggregateInput
 }
 
 export type QuestionBankWhereUniqueInput = Prisma.AtLeast<{
@@ -274,6 +276,7 @@ export type QuestionBankWhereUniqueInput = Prisma.AtLeast<{
   answerOptions?: Prisma.AnswerOptionListRelationFilter
   quizConfigs?: Prisma.QuizConfigListRelationFilter
   quizSessionQuestions?: Prisma.QuizSessionQuestionListRelationFilter
+  userAnswers?: Prisma.UserAnswerListRelationFilter
 }, "id">
 
 export type QuestionBankOrderByWithAggregationInput = {
@@ -318,6 +321,7 @@ export type QuestionBankCreateInput = {
   answerOptions?: Prisma.AnswerOptionCreateNestedManyWithoutQuestionInput
   quizConfigs?: Prisma.QuizConfigCreateNestedManyWithoutQuestionsInput
   quizSessionQuestions?: Prisma.QuizSessionQuestionCreateNestedManyWithoutQuestionInput
+  userAnswers?: Prisma.UserAnswerCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionBankUncheckedCreateInput = {
@@ -332,6 +336,7 @@ export type QuestionBankUncheckedCreateInput = {
   answerOptions?: Prisma.AnswerOptionUncheckedCreateNestedManyWithoutQuestionInput
   quizConfigs?: Prisma.QuizConfigUncheckedCreateNestedManyWithoutQuestionsInput
   quizSessionQuestions?: Prisma.QuizSessionQuestionUncheckedCreateNestedManyWithoutQuestionInput
+  userAnswers?: Prisma.UserAnswerUncheckedCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionBankUpdateInput = {
@@ -346,6 +351,7 @@ export type QuestionBankUpdateInput = {
   answerOptions?: Prisma.AnswerOptionUpdateManyWithoutQuestionNestedInput
   quizConfigs?: Prisma.QuizConfigUpdateManyWithoutQuestionsNestedInput
   quizSessionQuestions?: Prisma.QuizSessionQuestionUpdateManyWithoutQuestionNestedInput
+  userAnswers?: Prisma.UserAnswerUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionBankUncheckedUpdateInput = {
@@ -360,6 +366,7 @@ export type QuestionBankUncheckedUpdateInput = {
   answerOptions?: Prisma.AnswerOptionUncheckedUpdateManyWithoutQuestionNestedInput
   quizConfigs?: Prisma.QuizConfigUncheckedUpdateManyWithoutQuestionsNestedInput
   quizSessionQuestions?: Prisma.QuizSessionQuestionUncheckedUpdateManyWithoutQuestionNestedInput
+  userAnswers?: Prisma.UserAnswerUncheckedUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionBankCreateManyInput = {
@@ -451,6 +458,11 @@ export type QuestionBankOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type QuestionBankNullableScalarRelationFilter = {
+  is?: Prisma.QuestionBankWhereInput | null
+  isNot?: Prisma.QuestionBankWhereInput | null
+}
+
 export type EnumQuestionTypeFieldUpdateOperationsInput = {
   set?: $Enums.QuestionType
 }
@@ -521,6 +533,22 @@ export type QuestionBankUpdateOneRequiredWithoutQuizSessionQuestionsNestedInput 
   update?: Prisma.XOR<Prisma.XOR<Prisma.QuestionBankUpdateToOneWithWhereWithoutQuizSessionQuestionsInput, Prisma.QuestionBankUpdateWithoutQuizSessionQuestionsInput>, Prisma.QuestionBankUncheckedUpdateWithoutQuizSessionQuestionsInput>
 }
 
+export type QuestionBankCreateNestedOneWithoutUserAnswersInput = {
+  create?: Prisma.XOR<Prisma.QuestionBankCreateWithoutUserAnswersInput, Prisma.QuestionBankUncheckedCreateWithoutUserAnswersInput>
+  connectOrCreate?: Prisma.QuestionBankCreateOrConnectWithoutUserAnswersInput
+  connect?: Prisma.QuestionBankWhereUniqueInput
+}
+
+export type QuestionBankUpdateOneWithoutUserAnswersNestedInput = {
+  create?: Prisma.XOR<Prisma.QuestionBankCreateWithoutUserAnswersInput, Prisma.QuestionBankUncheckedCreateWithoutUserAnswersInput>
+  connectOrCreate?: Prisma.QuestionBankCreateOrConnectWithoutUserAnswersInput
+  upsert?: Prisma.QuestionBankUpsertWithoutUserAnswersInput
+  disconnect?: Prisma.QuestionBankWhereInput | boolean
+  delete?: Prisma.QuestionBankWhereInput | boolean
+  connect?: Prisma.QuestionBankWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.QuestionBankUpdateToOneWithWhereWithoutUserAnswersInput, Prisma.QuestionBankUpdateWithoutUserAnswersInput>, Prisma.QuestionBankUncheckedUpdateWithoutUserAnswersInput>
+}
+
 export type QuestionBankCreateWithoutAnswerOptionsInput = {
   id?: string
   text: string
@@ -532,6 +560,7 @@ export type QuestionBankCreateWithoutAnswerOptionsInput = {
   updatedAt?: Date | string
   quizConfigs?: Prisma.QuizConfigCreateNestedManyWithoutQuestionsInput
   quizSessionQuestions?: Prisma.QuizSessionQuestionCreateNestedManyWithoutQuestionInput
+  userAnswers?: Prisma.UserAnswerCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionBankUncheckedCreateWithoutAnswerOptionsInput = {
@@ -545,6 +574,7 @@ export type QuestionBankUncheckedCreateWithoutAnswerOptionsInput = {
   updatedAt?: Date | string
   quizConfigs?: Prisma.QuizConfigUncheckedCreateNestedManyWithoutQuestionsInput
   quizSessionQuestions?: Prisma.QuizSessionQuestionUncheckedCreateNestedManyWithoutQuestionInput
+  userAnswers?: Prisma.UserAnswerUncheckedCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionBankCreateOrConnectWithoutAnswerOptionsInput = {
@@ -574,6 +604,7 @@ export type QuestionBankUpdateWithoutAnswerOptionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quizConfigs?: Prisma.QuizConfigUpdateManyWithoutQuestionsNestedInput
   quizSessionQuestions?: Prisma.QuizSessionQuestionUpdateManyWithoutQuestionNestedInput
+  userAnswers?: Prisma.UserAnswerUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionBankUncheckedUpdateWithoutAnswerOptionsInput = {
@@ -587,6 +618,7 @@ export type QuestionBankUncheckedUpdateWithoutAnswerOptionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quizConfigs?: Prisma.QuizConfigUncheckedUpdateManyWithoutQuestionsNestedInput
   quizSessionQuestions?: Prisma.QuizSessionQuestionUncheckedUpdateManyWithoutQuestionNestedInput
+  userAnswers?: Prisma.UserAnswerUncheckedUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionBankCreateWithoutQuizConfigsInput = {
@@ -600,6 +632,7 @@ export type QuestionBankCreateWithoutQuizConfigsInput = {
   updatedAt?: Date | string
   answerOptions?: Prisma.AnswerOptionCreateNestedManyWithoutQuestionInput
   quizSessionQuestions?: Prisma.QuizSessionQuestionCreateNestedManyWithoutQuestionInput
+  userAnswers?: Prisma.UserAnswerCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionBankUncheckedCreateWithoutQuizConfigsInput = {
@@ -613,6 +646,7 @@ export type QuestionBankUncheckedCreateWithoutQuizConfigsInput = {
   updatedAt?: Date | string
   answerOptions?: Prisma.AnswerOptionUncheckedCreateNestedManyWithoutQuestionInput
   quizSessionQuestions?: Prisma.QuizSessionQuestionUncheckedCreateNestedManyWithoutQuestionInput
+  userAnswers?: Prisma.UserAnswerUncheckedCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionBankCreateOrConnectWithoutQuizConfigsInput = {
@@ -661,6 +695,7 @@ export type QuestionBankCreateWithoutQuizSessionQuestionsInput = {
   updatedAt?: Date | string
   answerOptions?: Prisma.AnswerOptionCreateNestedManyWithoutQuestionInput
   quizConfigs?: Prisma.QuizConfigCreateNestedManyWithoutQuestionsInput
+  userAnswers?: Prisma.UserAnswerCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionBankUncheckedCreateWithoutQuizSessionQuestionsInput = {
@@ -674,6 +709,7 @@ export type QuestionBankUncheckedCreateWithoutQuizSessionQuestionsInput = {
   updatedAt?: Date | string
   answerOptions?: Prisma.AnswerOptionUncheckedCreateNestedManyWithoutQuestionInput
   quizConfigs?: Prisma.QuizConfigUncheckedCreateNestedManyWithoutQuestionsInput
+  userAnswers?: Prisma.UserAnswerUncheckedCreateNestedManyWithoutQuestionInput
 }
 
 export type QuestionBankCreateOrConnectWithoutQuizSessionQuestionsInput = {
@@ -703,6 +739,7 @@ export type QuestionBankUpdateWithoutQuizSessionQuestionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   answerOptions?: Prisma.AnswerOptionUpdateManyWithoutQuestionNestedInput
   quizConfigs?: Prisma.QuizConfigUpdateManyWithoutQuestionsNestedInput
+  userAnswers?: Prisma.UserAnswerUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionBankUncheckedUpdateWithoutQuizSessionQuestionsInput = {
@@ -716,6 +753,79 @@ export type QuestionBankUncheckedUpdateWithoutQuizSessionQuestionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   answerOptions?: Prisma.AnswerOptionUncheckedUpdateManyWithoutQuestionNestedInput
   quizConfigs?: Prisma.QuizConfigUncheckedUpdateManyWithoutQuestionsNestedInput
+  userAnswers?: Prisma.UserAnswerUncheckedUpdateManyWithoutQuestionNestedInput
+}
+
+export type QuestionBankCreateWithoutUserAnswersInput = {
+  id?: string
+  text: string
+  type?: $Enums.QuestionType
+  correctAnswer: string
+  points?: number
+  difficulty?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  answerOptions?: Prisma.AnswerOptionCreateNestedManyWithoutQuestionInput
+  quizConfigs?: Prisma.QuizConfigCreateNestedManyWithoutQuestionsInput
+  quizSessionQuestions?: Prisma.QuizSessionQuestionCreateNestedManyWithoutQuestionInput
+}
+
+export type QuestionBankUncheckedCreateWithoutUserAnswersInput = {
+  id?: string
+  text: string
+  type?: $Enums.QuestionType
+  correctAnswer: string
+  points?: number
+  difficulty?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  answerOptions?: Prisma.AnswerOptionUncheckedCreateNestedManyWithoutQuestionInput
+  quizConfigs?: Prisma.QuizConfigUncheckedCreateNestedManyWithoutQuestionsInput
+  quizSessionQuestions?: Prisma.QuizSessionQuestionUncheckedCreateNestedManyWithoutQuestionInput
+}
+
+export type QuestionBankCreateOrConnectWithoutUserAnswersInput = {
+  where: Prisma.QuestionBankWhereUniqueInput
+  create: Prisma.XOR<Prisma.QuestionBankCreateWithoutUserAnswersInput, Prisma.QuestionBankUncheckedCreateWithoutUserAnswersInput>
+}
+
+export type QuestionBankUpsertWithoutUserAnswersInput = {
+  update: Prisma.XOR<Prisma.QuestionBankUpdateWithoutUserAnswersInput, Prisma.QuestionBankUncheckedUpdateWithoutUserAnswersInput>
+  create: Prisma.XOR<Prisma.QuestionBankCreateWithoutUserAnswersInput, Prisma.QuestionBankUncheckedCreateWithoutUserAnswersInput>
+  where?: Prisma.QuestionBankWhereInput
+}
+
+export type QuestionBankUpdateToOneWithWhereWithoutUserAnswersInput = {
+  where?: Prisma.QuestionBankWhereInput
+  data: Prisma.XOR<Prisma.QuestionBankUpdateWithoutUserAnswersInput, Prisma.QuestionBankUncheckedUpdateWithoutUserAnswersInput>
+}
+
+export type QuestionBankUpdateWithoutUserAnswersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  text?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
+  correctAnswer?: Prisma.StringFieldUpdateOperationsInput | string
+  points?: Prisma.IntFieldUpdateOperationsInput | number
+  difficulty?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  answerOptions?: Prisma.AnswerOptionUpdateManyWithoutQuestionNestedInput
+  quizConfigs?: Prisma.QuizConfigUpdateManyWithoutQuestionsNestedInput
+  quizSessionQuestions?: Prisma.QuizSessionQuestionUpdateManyWithoutQuestionNestedInput
+}
+
+export type QuestionBankUncheckedUpdateWithoutUserAnswersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  text?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumQuestionTypeFieldUpdateOperationsInput | $Enums.QuestionType
+  correctAnswer?: Prisma.StringFieldUpdateOperationsInput | string
+  points?: Prisma.IntFieldUpdateOperationsInput | number
+  difficulty?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  answerOptions?: Prisma.AnswerOptionUncheckedUpdateManyWithoutQuestionNestedInput
+  quizConfigs?: Prisma.QuizConfigUncheckedUpdateManyWithoutQuestionsNestedInput
+  quizSessionQuestions?: Prisma.QuizSessionQuestionUncheckedUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionBankUpdateWithoutQuizConfigsInput = {
@@ -729,6 +839,7 @@ export type QuestionBankUpdateWithoutQuizConfigsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   answerOptions?: Prisma.AnswerOptionUpdateManyWithoutQuestionNestedInput
   quizSessionQuestions?: Prisma.QuizSessionQuestionUpdateManyWithoutQuestionNestedInput
+  userAnswers?: Prisma.UserAnswerUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionBankUncheckedUpdateWithoutQuizConfigsInput = {
@@ -742,6 +853,7 @@ export type QuestionBankUncheckedUpdateWithoutQuizConfigsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   answerOptions?: Prisma.AnswerOptionUncheckedUpdateManyWithoutQuestionNestedInput
   quizSessionQuestions?: Prisma.QuizSessionQuestionUncheckedUpdateManyWithoutQuestionNestedInput
+  userAnswers?: Prisma.UserAnswerUncheckedUpdateManyWithoutQuestionNestedInput
 }
 
 export type QuestionBankUncheckedUpdateManyWithoutQuizConfigsInput = {
@@ -764,12 +876,14 @@ export type QuestionBankCountOutputType = {
   answerOptions: number
   quizConfigs: number
   quizSessionQuestions: number
+  userAnswers: number
 }
 
 export type QuestionBankCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   answerOptions?: boolean | QuestionBankCountOutputTypeCountAnswerOptionsArgs
   quizConfigs?: boolean | QuestionBankCountOutputTypeCountQuizConfigsArgs
   quizSessionQuestions?: boolean | QuestionBankCountOutputTypeCountQuizSessionQuestionsArgs
+  userAnswers?: boolean | QuestionBankCountOutputTypeCountUserAnswersArgs
 }
 
 /**
@@ -803,6 +917,13 @@ export type QuestionBankCountOutputTypeCountQuizSessionQuestionsArgs<ExtArgs ext
   where?: Prisma.QuizSessionQuestionWhereInput
 }
 
+/**
+ * QuestionBankCountOutputType without action
+ */
+export type QuestionBankCountOutputTypeCountUserAnswersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserAnswerWhereInput
+}
+
 
 export type QuestionBankSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -816,6 +937,7 @@ export type QuestionBankSelect<ExtArgs extends runtime.Types.Extensions.Internal
   answerOptions?: boolean | Prisma.QuestionBank$answerOptionsArgs<ExtArgs>
   quizConfigs?: boolean | Prisma.QuestionBank$quizConfigsArgs<ExtArgs>
   quizSessionQuestions?: boolean | Prisma.QuestionBank$quizSessionQuestionsArgs<ExtArgs>
+  userAnswers?: boolean | Prisma.QuestionBank$userAnswersArgs<ExtArgs>
   _count?: boolean | Prisma.QuestionBankCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["questionBank"]>
 
@@ -857,6 +979,7 @@ export type QuestionBankInclude<ExtArgs extends runtime.Types.Extensions.Interna
   answerOptions?: boolean | Prisma.QuestionBank$answerOptionsArgs<ExtArgs>
   quizConfigs?: boolean | Prisma.QuestionBank$quizConfigsArgs<ExtArgs>
   quizSessionQuestions?: boolean | Prisma.QuestionBank$quizSessionQuestionsArgs<ExtArgs>
+  userAnswers?: boolean | Prisma.QuestionBank$userAnswersArgs<ExtArgs>
   _count?: boolean | Prisma.QuestionBankCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type QuestionBankIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -868,6 +991,7 @@ export type $QuestionBankPayload<ExtArgs extends runtime.Types.Extensions.Intern
     answerOptions: Prisma.$AnswerOptionPayload<ExtArgs>[]
     quizConfigs: Prisma.$QuizConfigPayload<ExtArgs>[]
     quizSessionQuestions: Prisma.$QuizSessionQuestionPayload<ExtArgs>[]
+    userAnswers: Prisma.$UserAnswerPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1275,6 +1399,7 @@ export interface Prisma__QuestionBankClient<T, Null = never, ExtArgs extends run
   answerOptions<T extends Prisma.QuestionBank$answerOptionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.QuestionBank$answerOptionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AnswerOptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   quizConfigs<T extends Prisma.QuestionBank$quizConfigsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.QuestionBank$quizConfigsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$QuizConfigPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   quizSessionQuestions<T extends Prisma.QuestionBank$quizSessionQuestionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.QuestionBank$quizSessionQuestionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$QuizSessionQuestionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  userAnswers<T extends Prisma.QuestionBank$userAnswersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.QuestionBank$userAnswersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserAnswerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1774,6 +1899,30 @@ export type QuestionBank$quizSessionQuestionsArgs<ExtArgs extends runtime.Types.
   take?: number
   skip?: number
   distinct?: Prisma.QuizSessionQuestionScalarFieldEnum | Prisma.QuizSessionQuestionScalarFieldEnum[]
+}
+
+/**
+ * QuestionBank.userAnswers
+ */
+export type QuestionBank$userAnswersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserAnswer
+   */
+  select?: Prisma.UserAnswerSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserAnswer
+   */
+  omit?: Prisma.UserAnswerOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserAnswerInclude<ExtArgs> | null
+  where?: Prisma.UserAnswerWhereInput
+  orderBy?: Prisma.UserAnswerOrderByWithRelationInput | Prisma.UserAnswerOrderByWithRelationInput[]
+  cursor?: Prisma.UserAnswerWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserAnswerScalarFieldEnum | Prisma.UserAnswerScalarFieldEnum[]
 }
 
 /**

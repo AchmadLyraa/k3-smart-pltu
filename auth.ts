@@ -32,6 +32,34 @@ export function generateToken(length: number = 32): string {
   return randomBytes(length).toString("hex");
 }
 
+export function validatePasswordStrength(password: string): {
+  isValid: boolean;
+  errors: string[];
+} {
+  const errors: string[] = [];
+
+  if (password.length < 8) {
+    errors.push("Password minimal 8 karakter");
+  }
+
+  if (!/[A-Z]/.test(password)) {
+    errors.push("Harus ada huruf besar");
+  }
+
+  if (!/[a-z]/.test(password)) {
+    errors.push("Harus ada huruf kecil");
+  }
+
+  if (!/[0-9]/.test(password)) {
+    errors.push("Harus ada angka");
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
+
 /**
  * Auth Config (FULL - pakai Prisma)
  */

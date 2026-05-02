@@ -41,7 +41,11 @@ export default async function CMSDashboard() {
         </TabsList>
 
         <TabsContent value="materials">
-          <CMSMaterialsTab topics={topics} materials={materials} />
+          <CMSMaterialsTab
+            topics={topics}
+            materials={materials}
+            questions={questions}
+          />
         </TabsContent>
 
         <TabsContent value="questions">

@@ -10,6 +10,10 @@ import WorkerMaterialList from "@/components/worker/worker-material-list";
 
 export default async function WorkerMaterialsPage() {
   const materialsResult = await getWorkerMaterials();
+  console.log(
+    "materials:",
+    JSON.stringify(materialsResult.data?.[0]?.mediaFiles, null, 2),
+  );
   const materials = materialsResult.success ? materialsResult.data : [];
 
   return (

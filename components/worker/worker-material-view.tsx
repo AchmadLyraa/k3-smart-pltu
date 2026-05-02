@@ -9,11 +9,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  markMaterialComplete,
-  getMaterialProgress,
-} from "@/app/actions/worker";
-import { ArrowLeft, CheckCircle } from "lucide-react";
+import { markMaterialComplete, getQuizByMaterial } from "@/app/actions/worker";
+import { ArrowLeft, CheckCircle, PlayCircle } from "lucide-react";
+import WorkerQuizList from "./worker-quiz-list";
 
 interface MediaFile {
   id: string;
@@ -28,10 +26,9 @@ interface Material {
   type: string;
   duration?: number;
   mediaFiles: MediaFile[];
-  topic: {
-    id: string;
-    name: string;
-  };
+  topic: { id: string; name: string };
+  quizConfigs?: any[];
+  progress?: Array<{ status: string; completedAt: string | null }>;
 }
 
 interface WorkerMaterialViewProps {
@@ -45,8 +42,13 @@ export default function WorkerMaterialView({
   onBack,
   onComplete,
 }: WorkerMaterialViewProps) {
+  const alreadyComplete = material.progress?.[0]?.status === "COMPLETED";
   const [loading, setLoading] = useState(false);
-  const [isComplete, setIsComplete] = useState(false);
+  const [isComplete, setIsComplete] = useState(alreadyComplete);
+  const [showQuiz, setShowQuiz] = useState(false);
+  const [quizConfigs, setQuizConfigs] = useState<any[]>(
+    material.quizConfigs ?? [],
+  );
 
   const handleMarkComplete = async () => {
     setLoading(true);
@@ -54,7 +56,13 @@ export default function WorkerMaterialView({
       const result = await markMaterialComplete(material.id);
       if (result.success) {
         setIsComplete(true);
-        setTimeout(() => onComplete(material.id), 1500);
+        onComplete(material.id);
+
+        // Fetch quiz kalau belum ada
+        if (quizConfigs.length === 0) {
+          const quizResult = await getQuizByMaterial(material.id);
+          if (quizResult.success) setQuizConfigs(quizResult.data);
+        }
       }
     } finally {
       setLoading(false);
@@ -62,19 +70,14 @@ export default function WorkerMaterialView({
   };
 
   const getVideoEmbed = (url: string) => {
-    // Extract YouTube video ID
     const youtubeMatch = url.match(
       /(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/,
     );
-    if (youtubeMatch) {
-      return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
-    }
-    // Handle Google Drive links
+    if (youtubeMatch) return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
     if (url.includes("drive.google.com")) {
       const driveMatch = url.match(/\/d\/([^/]+)/);
-      if (driveMatch) {
+      if (driveMatch)
         return `https://drive.google.com/file/d/${driveMatch[1]}/preview`;
-      }
     }
     return url;
   };
@@ -91,13 +94,12 @@ export default function WorkerMaterialView({
     const media = material.mediaFiles[0];
 
     if (material.type === "VIDEO") {
-      const embedUrl = getVideoEmbed(media.url);
       return (
         <div className="aspect-video bg-black rounded-lg overflow-hidden">
           <iframe
             width="100%"
             height="100%"
-            src={embedUrl}
+            src={getVideoEmbed(media.url)}
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
@@ -114,12 +116,27 @@ export default function WorkerMaterialView({
       );
     }
 
+    if (material.type === "ARTICLE") {
+      return (
+        <div className="prose prose-sm max-w-none p-4 bg-muted/30 rounded-lg">
+          <p className="whitespace-pre-wrap">{media.url}</p>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
+  if (showQuiz) {
     return (
-      <div className="prose prose-sm max-w-none">
-        <p>{media.url}</p>
+      <div className="container mx-auto px-4 py-8">
+        <WorkerQuizList
+          quizConfigs={quizConfigs}
+          onBack={() => setShowQuiz(false)}
+        />
       </div>
     );
-  };
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -154,25 +171,41 @@ export default function WorkerMaterialView({
 
         <div className="flex justify-between items-center">
           <p className="text-sm text-muted-foreground">
-            Material Type: {material.type}
-            {material.duration &&
-              ` • Duration: ${Math.ceil(material.duration / 60)}m`}
+            {material.type}
+            {material.duration
+              ? ` • ${Math.ceil(material.duration / 60)}m`
+              : ""}
           </p>
 
-          <Button
-            onClick={handleMarkComplete}
-            disabled={loading || isComplete}
-            size="lg"
-          >
-            {isComplete ? (
-              <>
-                <CheckCircle className="w-4 h-4 mr-2" />
-                Completed
-              </>
-            ) : (
-              "Mark as Complete"
+          <div className="flex gap-2">
+            {isComplete && quizConfigs.length > 0 && (
+              <Button
+                variant="outline"
+                onClick={() => setShowQuiz(true)}
+                className="gap-2"
+              >
+                <PlayCircle className="w-4 h-4" />
+                Take Quiz
+              </Button>
             )}
-          </Button>
+
+            <Button
+              onClick={handleMarkComplete}
+              disabled={loading || isComplete}
+              size="lg"
+            >
+              {isComplete ? (
+                <>
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  Completed
+                </>
+              ) : loading ? (
+                "Menyimpan..."
+              ) : (
+                "Mark as Complete"
+              )}
+            </Button>
+          </div>
         </div>
       </div>
     </div>

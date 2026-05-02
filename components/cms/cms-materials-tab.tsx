@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -24,9 +25,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Pencil, Trash2, FileVideo, FileImage, FileText } from "lucide-react";
+import {
+  Pencil,
+  Trash2,
+  FileVideo,
+  FileImage,
+  FileText,
+  ClipboardList,
+  Plus,
+  X,
+  CheckCircle2,
+  Circle,
+} from "lucide-react";
 import MaterialForm from "./material-form";
-
 import {
   updateMaterial,
   deleteMaterial,
@@ -35,6 +46,11 @@ import {
   addMediaFile,
   removeMediaFile,
 } from "@/app/actions/content";
+import {
+  createQuizConfig,
+  getQuizByMaterial,
+  deleteQuestion,
+} from "@/app/actions/quiz";
 
 const typeIcon = {
   VIDEO: FileVideo,
@@ -51,12 +67,84 @@ const statusColor = {
   PUBLISHED: "bg-green-100 text-green-700",
   ARCHIVED: "bg-gray-100 text-gray-500",
 };
+const difficultyColor = {
+  easy: "bg-green-100 text-green-700",
+  medium: "bg-yellow-100 text-yellow-700",
+  hard: "bg-red-100 text-red-700",
+};
 
-export default function CMSMaterialsTab({ topics, materials }) {
+export default function CMSMaterialsTab({ topics, materials, questions }) {
   const [showForm, setShowForm] = useState(false);
   const [editMaterial, setEditMaterial] = useState<any>(null);
   const [editData, setEditData] = useState<any>(null);
   const [saving, setSaving] = useState(false);
+
+  // Quiz dialog state
+  const [quizMaterial, setQuizMaterial] = useState<any>(null);
+  const [existingQuizzes, setExistingQuizzes] = useState<any[]>([]);
+  const [showQuizForm, setShowQuizForm] = useState(false);
+  const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
+  const [quizFormData, setQuizFormData] = useState({
+    name: "",
+    description: "",
+    totalQuestions: 5,
+    passingScore: 70,
+    timeLimit: 600,
+    allowRetake: true,
+    maxRetries: 3,
+    showCorrectAns: true,
+    shuffleQuestions: true,
+  });
+  const [savingQuiz, setSavingQuiz] = useState(false);
+
+  const openQuizDialog = async (m: any) => {
+    setQuizMaterial(m);
+    setShowQuizForm(false);
+    setSelectedQuestions([]);
+    const result = await getQuizByMaterial(m.id);
+    if (result.success) setExistingQuizzes(result.data);
+    else setExistingQuizzes([]);
+  };
+
+  const handleCreateQuiz = async () => {
+    if (!quizFormData.name.trim()) return alert("Nama quiz wajib diisi");
+    if (selectedQuestions.length === 0) return alert("Pilih minimal 1 soal");
+
+    setSavingQuiz(true);
+    try {
+      const result = await createQuizConfig({
+        materialId: quizMaterial.id,
+        ...quizFormData,
+        totalQuestions: Math.min(
+          quizFormData.totalQuestions,
+          selectedQuestions.length,
+        ),
+        questionIds: selectedQuestions,
+      });
+      if (result.success) {
+        const updated = await getQuizByMaterial(quizMaterial.id);
+        if (updated.success) setExistingQuizzes(updated.data);
+        setShowQuizForm(false);
+        setSelectedQuestions([]);
+        setQuizFormData({
+          name: "",
+          description: "",
+          totalQuestions: 5,
+          passingScore: 70,
+          timeLimit: 600,
+          allowRetake: true,
+          maxRetries: 3,
+          showCorrectAns: true,
+          shuffleQuestions: true,
+        });
+        window.location.reload();
+      } else {
+        alert(result.error ?? "Gagal buat quiz");
+      }
+    } finally {
+      setSavingQuiz(false);
+    }
+  };
 
   const openEdit = (m: any) => {
     setEditMaterial(m);
@@ -68,7 +156,8 @@ export default function CMSMaterialsTab({ topics, materials }) {
       duration: m.duration,
       videoUrl: m.mediaFiles?.find((f: any) => f.type === "video")?.url ?? "",
       imageUrl: m.thumbnail ?? "",
-      articleContent: "",
+      articleContent:
+        m.mediaFiles?.find((f: any) => f.type === "article")?.url ?? "",
     });
   };
 
@@ -88,11 +177,8 @@ export default function CMSMaterialsTab({ topics, materials }) {
       });
 
       if (result.success) {
-        // Hapus media files lama dulu, ganti dengan yang baru
         const existingFiles = editMaterial.mediaFiles ?? [];
-        for (const f of existingFiles) {
-          await removeMediaFile(f.id);
-        }
+        for (const f of existingFiles) await removeMediaFile(f.id);
 
         if (editData.type === "VIDEO" && editData.videoUrl?.trim()) {
           await addMediaFile({
@@ -103,7 +189,6 @@ export default function CMSMaterialsTab({ topics, materials }) {
             duration: editData.duration,
           });
         }
-
         if (editData.type === "INFOGRAPHIC" && editData.imageUrl?.trim()) {
           await addMediaFile({
             materialId: editMaterial.id,
@@ -112,7 +197,6 @@ export default function CMSMaterialsTab({ topics, materials }) {
             fileName: editData.title,
           });
         }
-
         if (editData.type === "ARTICLE" && editData.articleContent?.trim()) {
           await addMediaFile({
             materialId: editMaterial.id,
@@ -186,7 +270,7 @@ export default function CMSMaterialsTab({ topics, materials }) {
 
           {materials.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
-              No materials yet. Create your first material.
+              No materials yet.
             </div>
           ) : (
             <div className="space-y-3">
@@ -233,7 +317,7 @@ export default function CMSMaterialsTab({ topics, materials }) {
                         <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
                           {typeLabel[m.type] ?? m.type}
                         </span>
-                        <div className="flex gap-1 mt-1">
+                        <div className="flex gap-1 mt-1 flex-wrap justify-end">
                           {m.status !== "PUBLISHED" && (
                             <Button
                               size="sm"
@@ -254,6 +338,14 @@ export default function CMSMaterialsTab({ topics, materials }) {
                               Archive
                             </Button>
                           )}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 px-2 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                            onClick={() => openQuizDialog(m)}
+                          >
+                            <ClipboardList className="w-3 h-3 mr-1" /> Quiz
+                          </Button>
                           <Button
                             size="sm"
                             variant="outline"
@@ -280,6 +372,224 @@ export default function CMSMaterialsTab({ topics, materials }) {
           )}
         </CardContent>
       </Card>
+
+      {/* Quiz Dialog */}
+      <Dialog
+        open={!!quizMaterial}
+        onOpenChange={(open) => !open && setQuizMaterial(null)}
+      >
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Manage Quiz — {quizMaterial?.title}</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {/* Existing quizzes */}
+            {existingQuizzes.length > 0 && (
+              <div>
+                <p className="text-sm font-medium mb-2">Quiz yang sudah ada:</p>
+                <div className="space-y-2">
+                  {existingQuizzes.map((quiz: any) => (
+                    <div
+                      key={quiz.id}
+                      className="border rounded-lg p-3 flex justify-between items-center"
+                    >
+                      <div>
+                        <p className="text-sm font-medium">{quiz.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {quiz.questionCount} soal •{" "}
+                          {Math.floor(quiz.timeLimit / 60)} menit • Lulus{" "}
+                          {quiz.passingScore}%
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Toggle form */}
+            {!showQuizForm ? (
+              <Button onClick={() => setShowQuizForm(true)} className="w-full">
+                <Plus className="w-4 h-4 mr-2" /> Tambah Quiz Config
+              </Button>
+            ) : (
+              <div className="border rounded-lg p-4 space-y-4">
+                <div className="flex justify-between items-center">
+                  <p className="font-medium text-sm">Quiz Baru</p>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowQuizForm(false)}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Nama Quiz
+                  </label>
+                  <Input
+                    value={quizFormData.name}
+                    onChange={(e) =>
+                      setQuizFormData({ ...quizFormData, name: e.target.value })
+                    }
+                    placeholder="Nama quiz"
+                  />
+                </div>
+
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Jumlah Soal
+                    </label>
+                    <Input
+                      type="number"
+                      value={quizFormData.totalQuestions}
+                      onChange={(e) =>
+                        setQuizFormData({
+                          ...quizFormData,
+                          totalQuestions: parseInt(e.target.value) || 5,
+                        })
+                      }
+                      min="1"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Nilai Lulus (%)
+                    </label>
+                    <Input
+                      type="number"
+                      value={quizFormData.passingScore}
+                      onChange={(e) =>
+                        setQuizFormData({
+                          ...quizFormData,
+                          passingScore: parseInt(e.target.value) || 70,
+                        })
+                      }
+                      min="0"
+                      max="100"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Waktu (menit)
+                    </label>
+                    <Input
+                      type="number"
+                      value={Math.floor(quizFormData.timeLimit / 60)}
+                      onChange={(e) =>
+                        setQuizFormData({
+                          ...quizFormData,
+                          timeLimit: (parseInt(e.target.value) || 10) * 60,
+                        })
+                      }
+                      min="1"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-4 text-sm">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <Checkbox
+                      checked={quizFormData.allowRetake}
+                      onCheckedChange={(c) =>
+                        setQuizFormData({
+                          ...quizFormData,
+                          allowRetake: c as boolean,
+                        })
+                      }
+                    />
+                    Allow Retake
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <Checkbox
+                      checked={quizFormData.showCorrectAns}
+                      onCheckedChange={(c) =>
+                        setQuizFormData({
+                          ...quizFormData,
+                          showCorrectAns: c as boolean,
+                        })
+                      }
+                    />
+                    Show Answers
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <Checkbox
+                      checked={quizFormData.shuffleQuestions}
+                      onCheckedChange={(c) =>
+                        setQuizFormData({
+                          ...quizFormData,
+                          shuffleQuestions: c as boolean,
+                        })
+                      }
+                    />
+                    Shuffle
+                  </label>
+                </div>
+
+                {/* Select questions */}
+                <div>
+                  <p className="text-sm font-medium mb-2">
+                    Pilih Soal ({selectedQuestions.length} dipilih)
+                  </p>
+                  {questions.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      Belum ada soal di bank soal.
+                    </p>
+                  ) : (
+                    <div className="space-y-2 max-h-64 overflow-y-auto border rounded-lg p-2">
+                      {questions.map((q: any) => (
+                        <label
+                          key={q.id}
+                          className="flex items-start gap-2 p-2 hover:bg-muted rounded cursor-pointer"
+                        >
+                          <Checkbox
+                            checked={selectedQuestions.includes(q.id)}
+                            onCheckedChange={(checked) => {
+                              setSelectedQuestions((prev) =>
+                                checked
+                                  ? [...prev, q.id]
+                                  : prev.filter((id) => id !== q.id),
+                              );
+                            }}
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm">{q.text}</p>
+                            <div className="flex gap-2 mt-0.5">
+                              <span className="text-xs text-muted-foreground">
+                                {q.type}
+                              </span>
+                              <span
+                                className={`text-xs px-1.5 rounded-full ${difficultyColor[q.difficulty] ?? ""}`}
+                              >
+                                {q.difficulty}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {q.points} pts
+                              </span>
+                            </div>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <Button
+                  className="w-full"
+                  onClick={handleCreateQuiz}
+                  disabled={savingQuiz}
+                >
+                  {savingQuiz ? "Menyimpan..." : "Simpan Quiz Config"}
+                </Button>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Edit Dialog */}
       <Dialog
@@ -365,14 +675,11 @@ export default function CMSMaterialsTab({ topics, materials }) {
                 />
               </div>
 
-              {/* VIDEO */}
               {editData.type === "VIDEO" && (
                 <div className="space-y-3 border rounded-lg p-4 bg-muted/30">
                   <p className="text-sm font-medium">Video Settings</p>
                   <div>
-                    <label className="block text-sm mb-1">
-                      URL Video (YouTube / direct link)
-                    </label>
+                    <label className="block text-sm mb-1">URL Video</label>
                     <Input
                       value={editData.videoUrl}
                       onChange={(e) =>
@@ -398,36 +705,27 @@ export default function CMSMaterialsTab({ topics, materials }) {
                     />
                   </div>
                   {editData.videoUrl && (
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">
-                        Preview:
-                      </p>
-                      <div className="aspect-video rounded overflow-hidden bg-black">
-                        <iframe
-                          src={editData.videoUrl.replace("watch?v=", "embed/")}
-                          className="w-full h-full"
-                          allowFullScreen
-                        />
-                      </div>
+                    <div className="aspect-video rounded overflow-hidden bg-black">
+                      <iframe
+                        src={editData.videoUrl.replace("watch?v=", "embed/")}
+                        className="w-full h-full"
+                        allowFullScreen
+                      />
                     </div>
                   )}
                 </div>
               )}
 
-              {/* INFOGRAPHIC */}
               {editData.type === "INFOGRAPHIC" && (
                 <div className="space-y-3 border rounded-lg p-4 bg-muted/30">
                   <p className="text-sm font-medium">Infographic Settings</p>
-                  <div>
-                    <label className="block text-sm mb-1">URL Gambar</label>
-                    <Input
-                      value={editData.imageUrl}
-                      onChange={(e) =>
-                        setEditData({ ...editData, imageUrl: e.target.value })
-                      }
-                      placeholder="https://example.com/image.png"
-                    />
-                  </div>
+                  <Input
+                    value={editData.imageUrl}
+                    onChange={(e) =>
+                      setEditData({ ...editData, imageUrl: e.target.value })
+                    }
+                    placeholder="https://example.com/image.png"
+                  />
                   {editData.imageUrl && (
                     <img
                       src={editData.imageUrl}
@@ -439,24 +737,20 @@ export default function CMSMaterialsTab({ topics, materials }) {
                 </div>
               )}
 
-              {/* ARTICLE */}
               {editData.type === "ARTICLE" && (
                 <div className="space-y-3 border rounded-lg p-4 bg-muted/30">
                   <p className="text-sm font-medium">Article Settings</p>
-                  <div>
-                    <label className="block text-sm mb-1">Konten Artikel</label>
-                    <Textarea
-                      value={editData.articleContent}
-                      onChange={(e) =>
-                        setEditData({
-                          ...editData,
-                          articleContent: e.target.value,
-                        })
-                      }
-                      placeholder="Tulis konten artikel di sini..."
-                      rows={8}
-                    />
-                  </div>
+                  <Textarea
+                    value={editData.articleContent}
+                    onChange={(e) =>
+                      setEditData({
+                        ...editData,
+                        articleContent: e.target.value,
+                      })
+                    }
+                    placeholder="Tulis konten artikel..."
+                    rows={8}
+                  />
                   <div>
                     <label className="block text-sm mb-1">
                       Estimasi Baca (menit)

@@ -242,6 +242,7 @@ export type UserAnswerWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"UserAnswer"> | Date | string
   quizSession?: Prisma.XOR<Prisma.QuizSessionScalarRelationFilter, Prisma.QuizSessionWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  question?: Prisma.XOR<Prisma.QuestionBankNullableScalarRelationFilter, Prisma.QuestionBankWhereInput> | null
 }
 
 export type UserAnswerOrderByWithRelationInput = {
@@ -255,10 +256,12 @@ export type UserAnswerOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   quizSession?: Prisma.QuizSessionOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
+  question?: Prisma.QuestionBankOrderByWithRelationInput
 }
 
 export type UserAnswerWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  quizSessionId_questionId?: Prisma.UserAnswerQuizSessionIdQuestionIdCompoundUniqueInput
   AND?: Prisma.UserAnswerWhereInput | Prisma.UserAnswerWhereInput[]
   OR?: Prisma.UserAnswerWhereInput[]
   NOT?: Prisma.UserAnswerWhereInput | Prisma.UserAnswerWhereInput[]
@@ -271,7 +274,8 @@ export type UserAnswerWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"UserAnswer"> | Date | string
   quizSession?: Prisma.XOR<Prisma.QuizSessionScalarRelationFilter, Prisma.QuizSessionWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-}, "id">
+  question?: Prisma.XOR<Prisma.QuestionBankNullableScalarRelationFilter, Prisma.QuestionBankWhereInput> | null
+}, "id" | "quizSessionId_questionId">
 
 export type UserAnswerOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -305,13 +309,13 @@ export type UserAnswerScalarWhereWithAggregatesInput = {
 
 export type UserAnswerCreateInput = {
   id?: string
-  questionId?: string | null
   answer: string
   isCorrect?: boolean
   pointsEarned?: number
   createdAt?: Date | string
   quizSession: Prisma.QuizSessionCreateNestedOneWithoutUserAnswersInput
   user: Prisma.UserCreateNestedOneWithoutUserAnswersInput
+  question?: Prisma.QuestionBankCreateNestedOneWithoutUserAnswersInput
 }
 
 export type UserAnswerUncheckedCreateInput = {
@@ -327,13 +331,13 @@ export type UserAnswerUncheckedCreateInput = {
 
 export type UserAnswerUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  questionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answer?: Prisma.StringFieldUpdateOperationsInput | string
   isCorrect?: Prisma.BoolFieldUpdateOperationsInput | boolean
   pointsEarned?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quizSession?: Prisma.QuizSessionUpdateOneRequiredWithoutUserAnswersNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutUserAnswersNestedInput
+  question?: Prisma.QuestionBankUpdateOneWithoutUserAnswersNestedInput
 }
 
 export type UserAnswerUncheckedUpdateInput = {
@@ -360,7 +364,6 @@ export type UserAnswerCreateManyInput = {
 
 export type UserAnswerUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  questionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answer?: Prisma.StringFieldUpdateOperationsInput | string
   isCorrect?: Prisma.BoolFieldUpdateOperationsInput | boolean
   pointsEarned?: Prisma.IntFieldUpdateOperationsInput | number
@@ -386,6 +389,11 @@ export type UserAnswerListRelationFilter = {
 
 export type UserAnswerOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type UserAnswerQuizSessionIdQuestionIdCompoundUniqueInput = {
+  quizSessionId: string
+  questionId: string
 }
 
 export type UserAnswerCountOrderByAggregateInput = {
@@ -471,6 +479,48 @@ export type UserAnswerUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.UserAnswerScalarWhereInput | Prisma.UserAnswerScalarWhereInput[]
 }
 
+export type UserAnswerCreateNestedManyWithoutQuestionInput = {
+  create?: Prisma.XOR<Prisma.UserAnswerCreateWithoutQuestionInput, Prisma.UserAnswerUncheckedCreateWithoutQuestionInput> | Prisma.UserAnswerCreateWithoutQuestionInput[] | Prisma.UserAnswerUncheckedCreateWithoutQuestionInput[]
+  connectOrCreate?: Prisma.UserAnswerCreateOrConnectWithoutQuestionInput | Prisma.UserAnswerCreateOrConnectWithoutQuestionInput[]
+  createMany?: Prisma.UserAnswerCreateManyQuestionInputEnvelope
+  connect?: Prisma.UserAnswerWhereUniqueInput | Prisma.UserAnswerWhereUniqueInput[]
+}
+
+export type UserAnswerUncheckedCreateNestedManyWithoutQuestionInput = {
+  create?: Prisma.XOR<Prisma.UserAnswerCreateWithoutQuestionInput, Prisma.UserAnswerUncheckedCreateWithoutQuestionInput> | Prisma.UserAnswerCreateWithoutQuestionInput[] | Prisma.UserAnswerUncheckedCreateWithoutQuestionInput[]
+  connectOrCreate?: Prisma.UserAnswerCreateOrConnectWithoutQuestionInput | Prisma.UserAnswerCreateOrConnectWithoutQuestionInput[]
+  createMany?: Prisma.UserAnswerCreateManyQuestionInputEnvelope
+  connect?: Prisma.UserAnswerWhereUniqueInput | Prisma.UserAnswerWhereUniqueInput[]
+}
+
+export type UserAnswerUpdateManyWithoutQuestionNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAnswerCreateWithoutQuestionInput, Prisma.UserAnswerUncheckedCreateWithoutQuestionInput> | Prisma.UserAnswerCreateWithoutQuestionInput[] | Prisma.UserAnswerUncheckedCreateWithoutQuestionInput[]
+  connectOrCreate?: Prisma.UserAnswerCreateOrConnectWithoutQuestionInput | Prisma.UserAnswerCreateOrConnectWithoutQuestionInput[]
+  upsert?: Prisma.UserAnswerUpsertWithWhereUniqueWithoutQuestionInput | Prisma.UserAnswerUpsertWithWhereUniqueWithoutQuestionInput[]
+  createMany?: Prisma.UserAnswerCreateManyQuestionInputEnvelope
+  set?: Prisma.UserAnswerWhereUniqueInput | Prisma.UserAnswerWhereUniqueInput[]
+  disconnect?: Prisma.UserAnswerWhereUniqueInput | Prisma.UserAnswerWhereUniqueInput[]
+  delete?: Prisma.UserAnswerWhereUniqueInput | Prisma.UserAnswerWhereUniqueInput[]
+  connect?: Prisma.UserAnswerWhereUniqueInput | Prisma.UserAnswerWhereUniqueInput[]
+  update?: Prisma.UserAnswerUpdateWithWhereUniqueWithoutQuestionInput | Prisma.UserAnswerUpdateWithWhereUniqueWithoutQuestionInput[]
+  updateMany?: Prisma.UserAnswerUpdateManyWithWhereWithoutQuestionInput | Prisma.UserAnswerUpdateManyWithWhereWithoutQuestionInput[]
+  deleteMany?: Prisma.UserAnswerScalarWhereInput | Prisma.UserAnswerScalarWhereInput[]
+}
+
+export type UserAnswerUncheckedUpdateManyWithoutQuestionNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAnswerCreateWithoutQuestionInput, Prisma.UserAnswerUncheckedCreateWithoutQuestionInput> | Prisma.UserAnswerCreateWithoutQuestionInput[] | Prisma.UserAnswerUncheckedCreateWithoutQuestionInput[]
+  connectOrCreate?: Prisma.UserAnswerCreateOrConnectWithoutQuestionInput | Prisma.UserAnswerCreateOrConnectWithoutQuestionInput[]
+  upsert?: Prisma.UserAnswerUpsertWithWhereUniqueWithoutQuestionInput | Prisma.UserAnswerUpsertWithWhereUniqueWithoutQuestionInput[]
+  createMany?: Prisma.UserAnswerCreateManyQuestionInputEnvelope
+  set?: Prisma.UserAnswerWhereUniqueInput | Prisma.UserAnswerWhereUniqueInput[]
+  disconnect?: Prisma.UserAnswerWhereUniqueInput | Prisma.UserAnswerWhereUniqueInput[]
+  delete?: Prisma.UserAnswerWhereUniqueInput | Prisma.UserAnswerWhereUniqueInput[]
+  connect?: Prisma.UserAnswerWhereUniqueInput | Prisma.UserAnswerWhereUniqueInput[]
+  update?: Prisma.UserAnswerUpdateWithWhereUniqueWithoutQuestionInput | Prisma.UserAnswerUpdateWithWhereUniqueWithoutQuestionInput[]
+  updateMany?: Prisma.UserAnswerUpdateManyWithWhereWithoutQuestionInput | Prisma.UserAnswerUpdateManyWithWhereWithoutQuestionInput[]
+  deleteMany?: Prisma.UserAnswerScalarWhereInput | Prisma.UserAnswerScalarWhereInput[]
+}
+
 export type UserAnswerCreateNestedManyWithoutQuizSessionInput = {
   create?: Prisma.XOR<Prisma.UserAnswerCreateWithoutQuizSessionInput, Prisma.UserAnswerUncheckedCreateWithoutQuizSessionInput> | Prisma.UserAnswerCreateWithoutQuizSessionInput[] | Prisma.UserAnswerUncheckedCreateWithoutQuizSessionInput[]
   connectOrCreate?: Prisma.UserAnswerCreateOrConnectWithoutQuizSessionInput | Prisma.UserAnswerCreateOrConnectWithoutQuizSessionInput[]
@@ -515,12 +565,12 @@ export type UserAnswerUncheckedUpdateManyWithoutQuizSessionNestedInput = {
 
 export type UserAnswerCreateWithoutUserInput = {
   id?: string
-  questionId?: string | null
   answer: string
   isCorrect?: boolean
   pointsEarned?: number
   createdAt?: Date | string
   quizSession: Prisma.QuizSessionCreateNestedOneWithoutUserAnswersInput
+  question?: Prisma.QuestionBankCreateNestedOneWithoutUserAnswersInput
 }
 
 export type UserAnswerUncheckedCreateWithoutUserInput = {
@@ -573,14 +623,60 @@ export type UserAnswerScalarWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"UserAnswer"> | Date | string
 }
 
+export type UserAnswerCreateWithoutQuestionInput = {
+  id?: string
+  answer: string
+  isCorrect?: boolean
+  pointsEarned?: number
+  createdAt?: Date | string
+  quizSession: Prisma.QuizSessionCreateNestedOneWithoutUserAnswersInput
+  user: Prisma.UserCreateNestedOneWithoutUserAnswersInput
+}
+
+export type UserAnswerUncheckedCreateWithoutQuestionInput = {
+  id?: string
+  quizSessionId: string
+  userId: string
+  answer: string
+  isCorrect?: boolean
+  pointsEarned?: number
+  createdAt?: Date | string
+}
+
+export type UserAnswerCreateOrConnectWithoutQuestionInput = {
+  where: Prisma.UserAnswerWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAnswerCreateWithoutQuestionInput, Prisma.UserAnswerUncheckedCreateWithoutQuestionInput>
+}
+
+export type UserAnswerCreateManyQuestionInputEnvelope = {
+  data: Prisma.UserAnswerCreateManyQuestionInput | Prisma.UserAnswerCreateManyQuestionInput[]
+  skipDuplicates?: boolean
+}
+
+export type UserAnswerUpsertWithWhereUniqueWithoutQuestionInput = {
+  where: Prisma.UserAnswerWhereUniqueInput
+  update: Prisma.XOR<Prisma.UserAnswerUpdateWithoutQuestionInput, Prisma.UserAnswerUncheckedUpdateWithoutQuestionInput>
+  create: Prisma.XOR<Prisma.UserAnswerCreateWithoutQuestionInput, Prisma.UserAnswerUncheckedCreateWithoutQuestionInput>
+}
+
+export type UserAnswerUpdateWithWhereUniqueWithoutQuestionInput = {
+  where: Prisma.UserAnswerWhereUniqueInput
+  data: Prisma.XOR<Prisma.UserAnswerUpdateWithoutQuestionInput, Prisma.UserAnswerUncheckedUpdateWithoutQuestionInput>
+}
+
+export type UserAnswerUpdateManyWithWhereWithoutQuestionInput = {
+  where: Prisma.UserAnswerScalarWhereInput
+  data: Prisma.XOR<Prisma.UserAnswerUpdateManyMutationInput, Prisma.UserAnswerUncheckedUpdateManyWithoutQuestionInput>
+}
+
 export type UserAnswerCreateWithoutQuizSessionInput = {
   id?: string
-  questionId?: string | null
   answer: string
   isCorrect?: boolean
   pointsEarned?: number
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutUserAnswersInput
+  question?: Prisma.QuestionBankCreateNestedOneWithoutUserAnswersInput
 }
 
 export type UserAnswerUncheckedCreateWithoutQuizSessionInput = {
@@ -631,12 +727,12 @@ export type UserAnswerCreateManyUserInput = {
 
 export type UserAnswerUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  questionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answer?: Prisma.StringFieldUpdateOperationsInput | string
   isCorrect?: Prisma.BoolFieldUpdateOperationsInput | boolean
   pointsEarned?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quizSession?: Prisma.QuizSessionUpdateOneRequiredWithoutUserAnswersNestedInput
+  question?: Prisma.QuestionBankUpdateOneWithoutUserAnswersNestedInput
 }
 
 export type UserAnswerUncheckedUpdateWithoutUserInput = {
@@ -659,6 +755,46 @@ export type UserAnswerUncheckedUpdateManyWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type UserAnswerCreateManyQuestionInput = {
+  id?: string
+  quizSessionId: string
+  userId: string
+  answer: string
+  isCorrect?: boolean
+  pointsEarned?: number
+  createdAt?: Date | string
+}
+
+export type UserAnswerUpdateWithoutQuestionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  answer?: Prisma.StringFieldUpdateOperationsInput | string
+  isCorrect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pointsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  quizSession?: Prisma.QuizSessionUpdateOneRequiredWithoutUserAnswersNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutUserAnswersNestedInput
+}
+
+export type UserAnswerUncheckedUpdateWithoutQuestionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  quizSessionId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  answer?: Prisma.StringFieldUpdateOperationsInput | string
+  isCorrect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pointsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type UserAnswerUncheckedUpdateManyWithoutQuestionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  quizSessionId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  answer?: Prisma.StringFieldUpdateOperationsInput | string
+  isCorrect?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pointsEarned?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type UserAnswerCreateManyQuizSessionInput = {
   id?: string
   userId: string
@@ -671,12 +807,12 @@ export type UserAnswerCreateManyQuizSessionInput = {
 
 export type UserAnswerUpdateWithoutQuizSessionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  questionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   answer?: Prisma.StringFieldUpdateOperationsInput | string
   isCorrect?: Prisma.BoolFieldUpdateOperationsInput | boolean
   pointsEarned?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutUserAnswersNestedInput
+  question?: Prisma.QuestionBankUpdateOneWithoutUserAnswersNestedInput
 }
 
 export type UserAnswerUncheckedUpdateWithoutQuizSessionInput = {
@@ -712,6 +848,7 @@ export type UserAnswerSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   createdAt?: boolean
   quizSession?: boolean | Prisma.QuizSessionDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  question?: boolean | Prisma.UserAnswer$questionArgs<ExtArgs>
 }, ExtArgs["result"]["userAnswer"]>
 
 export type UserAnswerSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -725,6 +862,7 @@ export type UserAnswerSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   createdAt?: boolean
   quizSession?: boolean | Prisma.QuizSessionDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  question?: boolean | Prisma.UserAnswer$questionArgs<ExtArgs>
 }, ExtArgs["result"]["userAnswer"]>
 
 export type UserAnswerSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -738,6 +876,7 @@ export type UserAnswerSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   createdAt?: boolean
   quizSession?: boolean | Prisma.QuizSessionDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  question?: boolean | Prisma.UserAnswer$questionArgs<ExtArgs>
 }, ExtArgs["result"]["userAnswer"]>
 
 export type UserAnswerSelectScalar = {
@@ -755,14 +894,17 @@ export type UserAnswerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs
 export type UserAnswerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   quizSession?: boolean | Prisma.QuizSessionDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  question?: boolean | Prisma.UserAnswer$questionArgs<ExtArgs>
 }
 export type UserAnswerIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   quizSession?: boolean | Prisma.QuizSessionDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  question?: boolean | Prisma.UserAnswer$questionArgs<ExtArgs>
 }
 export type UserAnswerIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   quizSession?: boolean | Prisma.QuizSessionDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  question?: boolean | Prisma.UserAnswer$questionArgs<ExtArgs>
 }
 
 export type $UserAnswerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -770,6 +912,7 @@ export type $UserAnswerPayload<ExtArgs extends runtime.Types.Extensions.Internal
   objects: {
     quizSession: Prisma.$QuizSessionPayload<ExtArgs>
     user: Prisma.$UserPayload<ExtArgs>
+    question: Prisma.$QuestionBankPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1176,6 +1319,7 @@ export interface Prisma__UserAnswerClient<T, Null = never, ExtArgs extends runti
   readonly [Symbol.toStringTag]: "PrismaPromise"
   quizSession<T extends Prisma.QuizSessionDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.QuizSessionDefaultArgs<ExtArgs>>): Prisma.Prisma__QuizSessionClient<runtime.Types.Result.GetResult<Prisma.$QuizSessionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  question<T extends Prisma.UserAnswer$questionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserAnswer$questionArgs<ExtArgs>>): Prisma.Prisma__QuestionBankClient<runtime.Types.Result.GetResult<Prisma.$QuestionBankPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1611,6 +1755,25 @@ export type UserAnswerDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.In
    * Limit how many UserAnswers to delete.
    */
   limit?: number
+}
+
+/**
+ * UserAnswer.question
+ */
+export type UserAnswer$questionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the QuestionBank
+   */
+  select?: Prisma.QuestionBankSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the QuestionBank
+   */
+  omit?: Prisma.QuestionBankOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.QuestionBankInclude<ExtArgs> | null
+  where?: Prisma.QuestionBankWhereInput
 }
 
 /**

@@ -28,6 +28,8 @@ interface Material {
     type: string;
     url: string;
   }>;
+  progress?: Array<{ status: string; completedAt: string | null }>;
+  quizConfigs?: any[];
 }
 
 interface WorkerMaterialListProps {
@@ -40,7 +42,11 @@ export default function WorkerMaterialList({
   const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(
     null,
   );
-  const [completedMaterials, setCompletedMaterials] = useState<string[]>([]);
+  const [completedMaterials, setCompletedMaterials] = useState<string[]>(
+    materials
+      .filter((m: any) => m.progress?.[0]?.status === "COMPLETED")
+      .map((m: any) => m.id),
+  );
 
   if (selectedMaterial) {
     return (

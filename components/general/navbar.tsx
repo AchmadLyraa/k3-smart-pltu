@@ -80,6 +80,7 @@ const NAV_CONFIG: Record<
     items: [
       { label: "Home", href: "/worker/home" },
       { label: "Reward", href: "/worker/home/reward-users" },
+      { label: "Material", href: "/worker/materials" },
     ],
   },
 };
