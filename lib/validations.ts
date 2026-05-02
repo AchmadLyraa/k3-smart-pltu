@@ -139,8 +139,9 @@ export const submitAnswerSchema = z.object({
 export const rewardSchema = z.object({
   name: z.string().min(1, "Reward name is required").max(100),
   description: z.string().optional(),
-  pointCost: z.number().int().positive(),
-  quantity: z.number().int().nonnegative(),
+  pointCost: z.number().int().positive("Point cost must be a positive number"),
+  quantity: z.number().int().nonnegative("Quantity cannot be negative"),
+  status: z.enum(["AVAILABLE", "DISCONTINUED"]).optional(),
 });
 
 export const redeemRewardSchema = z.object({
