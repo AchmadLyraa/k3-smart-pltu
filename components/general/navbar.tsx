@@ -58,6 +58,7 @@ const NAV_CONFIG: Record<
       { label: "Dashboard", href: "/admin/dashboard" },
       { label: "Kelola User", href: "/admin/users" },
       { label: "Reward Management", href: "/admin/reward-admin" },
+      { label: "CMS", href: "/admin/cms" },
     ],
   },
   HSE_ADMIN: {

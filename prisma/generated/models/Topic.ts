@@ -29,6 +29,7 @@ export type TopicMinAggregateOutputType = {
   name: string | null
   slug: string | null
   icon: string | null
+  description: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -38,6 +39,7 @@ export type TopicMaxAggregateOutputType = {
   name: string | null
   slug: string | null
   icon: string | null
+  description: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -47,6 +49,7 @@ export type TopicCountAggregateOutputType = {
   name: number
   slug: number
   icon: number
+  description: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -58,6 +61,7 @@ export type TopicMinAggregateInputType = {
   name?: true
   slug?: true
   icon?: true
+  description?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -67,6 +71,7 @@ export type TopicMaxAggregateInputType = {
   name?: true
   slug?: true
   icon?: true
+  description?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -76,6 +81,7 @@ export type TopicCountAggregateInputType = {
   name?: true
   slug?: true
   icon?: true
+  description?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -158,6 +164,7 @@ export type TopicGroupByOutputType = {
   name: string
   slug: string
   icon: string | null
+  description: string | null
   createdAt: Date
   updatedAt: Date
   _count: TopicCountAggregateOutputType | null
@@ -188,6 +195,7 @@ export type TopicWhereInput = {
   name?: Prisma.StringFilter<"Topic"> | string
   slug?: Prisma.StringFilter<"Topic"> | string
   icon?: Prisma.StringNullableFilter<"Topic"> | string | null
+  description?: Prisma.StringNullableFilter<"Topic"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Topic"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Topic"> | Date | string
   materials?: Prisma.MaterialListRelationFilter
@@ -198,6 +206,7 @@ export type TopicOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   icon?: Prisma.SortOrderInput | Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   materials?: Prisma.MaterialOrderByRelationAggregateInput
@@ -211,6 +220,7 @@ export type TopicWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.TopicWhereInput[]
   NOT?: Prisma.TopicWhereInput | Prisma.TopicWhereInput[]
   icon?: Prisma.StringNullableFilter<"Topic"> | string | null
+  description?: Prisma.StringNullableFilter<"Topic"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Topic"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Topic"> | Date | string
   materials?: Prisma.MaterialListRelationFilter
@@ -221,6 +231,7 @@ export type TopicOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   icon?: Prisma.SortOrderInput | Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.TopicCountOrderByAggregateInput
@@ -236,6 +247,7 @@ export type TopicScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"Topic"> | string
   slug?: Prisma.StringWithAggregatesFilter<"Topic"> | string
   icon?: Prisma.StringNullableWithAggregatesFilter<"Topic"> | string | null
+  description?: Prisma.StringNullableWithAggregatesFilter<"Topic"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Topic"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Topic"> | Date | string
 }
@@ -245,6 +257,7 @@ export type TopicCreateInput = {
   name: string
   slug: string
   icon?: string | null
+  description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   materials?: Prisma.MaterialCreateNestedManyWithoutTopicInput
@@ -255,6 +268,7 @@ export type TopicUncheckedCreateInput = {
   name: string
   slug: string
   icon?: string | null
+  description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   materials?: Prisma.MaterialUncheckedCreateNestedManyWithoutTopicInput
@@ -265,6 +279,7 @@ export type TopicUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   materials?: Prisma.MaterialUpdateManyWithoutTopicNestedInput
@@ -275,6 +290,7 @@ export type TopicUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   materials?: Prisma.MaterialUncheckedUpdateManyWithoutTopicNestedInput
@@ -285,6 +301,7 @@ export type TopicCreateManyInput = {
   name: string
   slug: string
   icon?: string | null
+  description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -294,6 +311,7 @@ export type TopicUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -303,6 +321,7 @@ export type TopicUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -312,6 +331,7 @@ export type TopicCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   icon?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -321,6 +341,7 @@ export type TopicMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   icon?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -330,6 +351,7 @@ export type TopicMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   icon?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -358,6 +380,7 @@ export type TopicCreateWithoutMaterialsInput = {
   name: string
   slug: string
   icon?: string | null
+  description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -367,6 +390,7 @@ export type TopicUncheckedCreateWithoutMaterialsInput = {
   name: string
   slug: string
   icon?: string | null
+  description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -392,6 +416,7 @@ export type TopicUpdateWithoutMaterialsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -401,6 +426,7 @@ export type TopicUncheckedUpdateWithoutMaterialsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   icon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -441,6 +467,7 @@ export type TopicSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   name?: boolean
   slug?: boolean
   icon?: boolean
+  description?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   materials?: boolean | Prisma.Topic$materialsArgs<ExtArgs>
@@ -452,6 +479,7 @@ export type TopicSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   name?: boolean
   slug?: boolean
   icon?: boolean
+  description?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["topic"]>
@@ -461,6 +489,7 @@ export type TopicSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   name?: boolean
   slug?: boolean
   icon?: boolean
+  description?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["topic"]>
@@ -470,11 +499,12 @@ export type TopicSelectScalar = {
   name?: boolean
   slug?: boolean
   icon?: boolean
+  description?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type TopicOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "icon" | "createdAt" | "updatedAt", ExtArgs["result"]["topic"]>
+export type TopicOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "icon" | "description" | "createdAt" | "updatedAt", ExtArgs["result"]["topic"]>
 export type TopicInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   materials?: boolean | Prisma.Topic$materialsArgs<ExtArgs>
   _count?: boolean | Prisma.TopicCountOutputTypeDefaultArgs<ExtArgs>
@@ -492,6 +522,7 @@ export type $TopicPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     name: string
     slug: string
     icon: string | null
+    description: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["topic"]>
@@ -922,6 +953,7 @@ export interface TopicFieldRefs {
   readonly name: Prisma.FieldRef<"Topic", 'String'>
   readonly slug: Prisma.FieldRef<"Topic", 'String'>
   readonly icon: Prisma.FieldRef<"Topic", 'String'>
+  readonly description: Prisma.FieldRef<"Topic", 'String'>
   readonly createdAt: Prisma.FieldRef<"Topic", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Topic", 'DateTime'>
 }
