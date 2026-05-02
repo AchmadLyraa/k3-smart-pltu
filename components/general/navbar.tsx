@@ -57,6 +57,7 @@ const NAV_CONFIG: Record<
     items: [
       { label: "Dashboard", href: "/admin/dashboard" },
       { label: "Kelola User", href: "/admin/users" },
+      { label: "Reward Management", href: "/admin/reward-admin" },
     ],
   },
   HSE_ADMIN: {
@@ -75,7 +76,10 @@ const NAV_CONFIG: Record<
     label: "Worker",
     color: "bg-sky-600",
     icon: <HardHat className="w-4 h-4" />,
-    items: [{ label: "Home", href: "/worker/home" }],
+    items: [
+      { label: "Home", href: "/worker/home" },
+      { label: "Reward", href: "/worker/home/reward-users" },
+    ],
   },
 };
 
