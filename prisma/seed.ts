@@ -83,7 +83,7 @@ async function main() {
   await prisma.pointTransaction.create({
     data: {
       userId: worker.id,
-      points: 500,
+      points: 100,
       transactionType: "MANUAL_ADJUSTMENT",
       reference: "seed:worker:test-topup",
       description: "Seed poin manual untuk uji redemption reward",
@@ -92,7 +92,7 @@ async function main() {
 
   console.log("✅ Seed selesai. Login pakai:");
   console.log("admin@mail.com / password123");
-  console.log(`Worker test: ${workerEmail} dengan 500 poin awal`);
+  console.log(`Worker test: ${workerEmail} dengan 100 poin awal`);
   console.log(`Reward test: ${rewardName} (100 poin)`);
 }
 

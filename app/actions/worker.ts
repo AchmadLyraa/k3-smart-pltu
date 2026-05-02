@@ -262,15 +262,26 @@ export async function completeQuiz(sessionId: string) {
     });
 
     if (passed) {
-      await prisma.pointTransaction.create({
-        data: {
+      const alreadyPassed = await prisma.quizSession.findFirst({
+        where: {
           userId: user.id,
-          points: totalPoints,
-          transactionType: "QUIZ_COMPLETION",
-          description: `Quiz selesai: ${session.quizConfig.name}`,
-          reference: sessionId,
+          quizConfigId: session.quizConfigId,
+          passed: true,
+          id: { not: sessionId },
         },
       });
+
+      if (!alreadyPassed) {
+        await prisma.pointTransaction.create({
+          data: {
+            userId: user.id,
+            points: totalPoints,
+            transactionType: "QUIZ_COMPLETION",
+            description: `Quiz selesai: ${session.quizConfig.name}`,
+            reference: sessionId,
+          },
+        });
+      }
     }
 
     return {
@@ -328,5 +339,50 @@ export async function getQuizByMaterial(materialId: string) {
   } catch (error) {
     console.error("[getQuizByMaterial error]", error);
     return { success: false, error: "Failed to fetch quiz" };
+  }
+}
+
+export async function getWorkerStats() {
+  const user = await getCurrentUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+
+  try {
+    const [pointTransactions, materialsCompleted, quizPassed] =
+      await Promise.all([
+        prisma.pointTransaction.findMany({
+          where: { userId: user.id },
+          orderBy: { createdAt: "desc" },
+        }),
+        prisma.materialProgress.count({
+          where: { userId: user.id, status: "COMPLETED" },
+        }),
+        prisma.quizSession.count({
+          where: { userId: user.id, passed: true },
+        }),
+      ]);
+
+    const totalEarned = pointTransactions
+      .filter((t) => t.points > 0)
+      .reduce((sum, t) => sum + t.points, 0);
+
+    const totalSpent = pointTransactions
+      .filter((t) => t.points < 0)
+      .reduce((sum, t) => sum + Math.abs(t.points), 0);
+
+    const availablePoints = totalEarned - totalSpent;
+
+    return {
+      success: true,
+      data: {
+        totalPoints: totalEarned,
+        availablePoints,
+        materialsCompleted,
+        quizPassed,
+        recentTransactions: pointTransactions.slice(0, 5),
+      },
+    };
+  } catch (error) {
+    console.error("[getWorkerStats error]", error);
+    return { success: false, error: "Failed to fetch stats" };
   }
 }
