@@ -250,6 +250,17 @@ export async function completeQuiz(sessionId: string) {
         : 0;
     const passed = percentage >= session.quizConfig.passingScore;
 
+    // Hitung time bonus
+    const startedAt = session.startedAt;
+    const submittedAt = new Date();
+    const timeUsed = Math.round(
+      (submittedAt.getTime() - startedAt.getTime()) / 1000,
+    );
+    const timeLimit = session.quizConfig.timeLimit;
+    const unusedTime = Math.max(0, timeLimit - timeUsed); // jangan minus
+    const unusedPercentage = unusedTime / timeLimit;
+    const timeBonus = Math.floor(unusedPercentage * 100); // max 100 pts
+
     const updatedSession = await prisma.quizSession.update({
       where: { id: sessionId },
       data: {
@@ -272,12 +283,14 @@ export async function completeQuiz(sessionId: string) {
       });
 
       if (!alreadyPassed) {
+        const totalPointsWithBonus = totalPoints + timeBonus;
+
         await prisma.pointTransaction.create({
           data: {
             userId: user.id,
-            points: totalPoints,
+            points: totalPointsWithBonus,
             transactionType: "QUIZ_COMPLETION",
-            description: `Quiz selesai: ${session.quizConfig.name}`,
+            description: `Quiz selesai: ${session.quizConfig.name} (+${timeBonus} time bonus)`,
             reference: sessionId,
           },
         });
@@ -292,6 +305,8 @@ export async function completeQuiz(sessionId: string) {
         correctCount,
         totalQuestions: userAnswers.length,
         totalPoints,
+        timeBonus,
+        totalPointsWithBonus: passed ? totalPoints + timeBonus : 0,
         showCorrectAns: session.quizConfig.showCorrectAns,
         answers: updatedAnswers,
       },

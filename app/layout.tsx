@@ -10,22 +10,9 @@ export const metadata: Metadata = {
   title: "K3-SMART - Keselamatan Kerja Learning Platform",
   description:
     "Platform pembelajaran keselamatan kerja interaktif dengan video, infografis, dan kuis",
-  generator: "v0.app",
   icons: {
-    icon: [
-      {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
-      },
-    ],
+    icon: "/favicon.ico",
+    shortcut: "/icon.png",
     apple: "/apple-icon.png",
   },
 };

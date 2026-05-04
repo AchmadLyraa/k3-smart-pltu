@@ -49,8 +49,19 @@ export default function WorkerQuizResult({
             {result.correctCount} dari {result.totalQuestions} soal benar
           </p>
           {result.passed && (
-            <div className="mt-3 inline-flex items-center gap-2 bg-yellow-100 text-yellow-700 px-4 py-2 rounded-full text-sm font-medium">
-              <Trophy className="w-4 h-4" />+{result.totalPoints} poin didapat
+            <div className="mt-3 space-y-1">
+              <div className="inline-flex items-center gap-2 bg-yellow-100 text-yellow-700 px-4 py-2 rounded-full text-sm font-medium">
+                <Trophy className="w-4 h-4" />+{result.totalPoints} poin jawaban
+                benar
+              </div>
+              {result.timeBonus > 0 && (
+                <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-medium ml-2">
+                  ⚡ +{result.timeBonus} time bonus
+                </div>
+              )}
+              <p className="text-sm font-bold text-green-600 mt-1">
+                Total: +{result.totalPointsWithBonus} poin
+              </p>
             </div>
           )}
         </CardContent>
