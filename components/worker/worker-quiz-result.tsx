@@ -11,6 +11,12 @@ interface QuizResultProps {
     correctCount: number;
     totalQuestions: number;
     totalPoints: number;
+    timeBonus: number;
+    penaltyPercent: number;
+    penaltyPoints: number;
+    daysLate: number;
+    adjustedPoints: number;
+    totalPointsWithBonus: number;
     showCorrectAns: boolean;
     answers: any[];
   };
@@ -54,11 +60,21 @@ export default function WorkerQuizResult({
                 <Trophy className="w-4 h-4" />+{result.totalPoints} poin jawaban
                 benar
               </div>
+
+              {/* Penalty kalau telat */}
+              {result.penaltyPercent > 0 && (
+                <div className="inline-flex items-center gap-2 bg-red-100 text-red-700 px-4 py-2 rounded-full text-sm font-medium ml-2">
+                  ⚠️ -{result.penaltyPoints} penalti ({result.daysLate} hari
+                  terlambat, -{result.penaltyPercent}%)
+                </div>
+              )}
+
               {result.timeBonus > 0 && (
                 <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-medium ml-2">
                   ⚡ +{result.timeBonus} time bonus
                 </div>
               )}
+
               <p className="text-sm font-bold text-green-600 mt-1">
                 Total: +{result.totalPointsWithBonus} poin
               </p>

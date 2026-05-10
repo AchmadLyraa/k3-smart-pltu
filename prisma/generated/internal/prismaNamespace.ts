@@ -391,6 +391,7 @@ export const ModelName = {
   Account: 'Account',
   Session: 'Session',
   VerificationToken: 'VerificationToken',
+  AcademicPeriod: 'AcademicPeriod',
   Topic: 'Topic',
   Material: 'Material',
   MaterialAssignment: 'MaterialAssignment',
@@ -430,7 +431,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "unit" | "division" | "shift" | "user" | "account" | "session" | "verificationToken" | "topic" | "material" | "materialAssignment" | "mediaFile" | "questionBank" | "answerOption" | "quizConfig" | "quizSession" | "quizSessionQuestion" | "userAnswer" | "materialProgress" | "dailyCheckin" | "pointTransaction" | "monthlyPointSummary" | "semesterSummary" | "userStreak" | "badgeDefinition" | "userBadge" | "reward" | "redemption" | "notificationTemplate" | "notificationLog" | "auditLog" | "systemConfig"
+    modelProps: "unit" | "division" | "shift" | "user" | "account" | "session" | "verificationToken" | "academicPeriod" | "topic" | "material" | "materialAssignment" | "mediaFile" | "questionBank" | "answerOption" | "quizConfig" | "quizSession" | "quizSessionQuestion" | "userAnswer" | "materialProgress" | "dailyCheckin" | "pointTransaction" | "monthlyPointSummary" | "semesterSummary" | "userStreak" | "badgeDefinition" | "userBadge" | "reward" | "redemption" | "notificationTemplate" | "notificationLog" | "auditLog" | "systemConfig"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -949,6 +950,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.VerificationTokenCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.VerificationTokenCountAggregateOutputType> | number
+        }
+      }
+    }
+    AcademicPeriod: {
+      payload: Prisma.$AcademicPeriodPayload<ExtArgs>
+      fields: Prisma.AcademicPeriodFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AcademicPeriodFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AcademicPeriodPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AcademicPeriodFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AcademicPeriodPayload>
+        }
+        findFirst: {
+          args: Prisma.AcademicPeriodFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AcademicPeriodPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AcademicPeriodFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AcademicPeriodPayload>
+        }
+        findMany: {
+          args: Prisma.AcademicPeriodFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AcademicPeriodPayload>[]
+        }
+        create: {
+          args: Prisma.AcademicPeriodCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AcademicPeriodPayload>
+        }
+        createMany: {
+          args: Prisma.AcademicPeriodCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AcademicPeriodCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AcademicPeriodPayload>[]
+        }
+        delete: {
+          args: Prisma.AcademicPeriodDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AcademicPeriodPayload>
+        }
+        update: {
+          args: Prisma.AcademicPeriodUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AcademicPeriodPayload>
+        }
+        deleteMany: {
+          args: Prisma.AcademicPeriodDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AcademicPeriodUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AcademicPeriodUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AcademicPeriodPayload>[]
+        }
+        upsert: {
+          args: Prisma.AcademicPeriodUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AcademicPeriodPayload>
+        }
+        aggregate: {
+          args: Prisma.AcademicPeriodAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAcademicPeriod>
+        }
+        groupBy: {
+          args: Prisma.AcademicPeriodGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AcademicPeriodGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AcademicPeriodCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AcademicPeriodCountAggregateOutputType> | number
         }
       }
     }
@@ -2867,6 +2942,20 @@ export const VerificationTokenScalarFieldEnum = {
 export type VerificationTokenScalarFieldEnum = (typeof VerificationTokenScalarFieldEnum)[keyof typeof VerificationTokenScalarFieldEnum]
 
 
+export const AcademicPeriodScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  isActive: 'isActive',
+  lastResetAt: 'lastResetAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AcademicPeriodScalarFieldEnum = (typeof AcademicPeriodScalarFieldEnum)[keyof typeof AcademicPeriodScalarFieldEnum]
+
+
 export const TopicScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -2883,6 +2972,7 @@ export type TopicScalarFieldEnum = (typeof TopicScalarFieldEnum)[keyof typeof To
 export const MaterialScalarFieldEnum = {
   id: 'id',
   topicId: 'topicId',
+  periodId: 'periodId',
   title: 'title',
   description: 'description',
   type: 'type',
@@ -2930,6 +3020,7 @@ export type MediaFileScalarFieldEnum = (typeof MediaFileScalarFieldEnum)[keyof t
 
 export const QuestionBankScalarFieldEnum = {
   id: 'id',
+  periodId: 'periodId',
   text: 'text',
   type: 'type',
   correctAnswer: 'correctAnswer',
@@ -2961,6 +3052,7 @@ export const QuizConfigScalarFieldEnum = {
   totalQuestions: 'totalQuestions',
   passingScore: 'passingScore',
   timeLimit: 'timeLimit',
+  deadline: 'deadline',
   allowRetake: 'allowRetake',
   maxRetries: 'maxRetries',
   showCorrectAns: 'showCorrectAns',
@@ -3072,6 +3164,7 @@ export type MonthlyPointSummaryScalarFieldEnum = (typeof MonthlyPointSummaryScal
 export const SemesterSummaryScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
+  periodId: 'periodId',
   year: 'year',
   semester: 'semester',
   totalPoints: 'totalPoints',
@@ -3582,6 +3675,7 @@ export type GlobalOmitConfig = {
   account?: Prisma.AccountOmit
   session?: Prisma.SessionOmit
   verificationToken?: Prisma.VerificationTokenOmit
+  academicPeriod?: Prisma.AcademicPeriodOmit
   topic?: Prisma.TopicOmit
   material?: Prisma.MaterialOmit
   materialAssignment?: Prisma.MaterialAssignmentOmit

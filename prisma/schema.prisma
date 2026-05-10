@@ -163,6 +163,28 @@ model VerificationToken {
 }
 
 // ============================================================================
+// ACADEMIC PERIOD
+// ============================================================================
+
+model AcademicPeriod {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean   @default(false)
+  lastResetAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  materials         Material[]
+  questionBanks     QuestionBank[]
+  semesterSummaries SemesterSummary[]
+
+  @@index([isActive])
+  @@map("academic_periods")
+}
+
+// ============================================================================
 // CONTENT MANAGEMENT
 // ============================================================================
 
@@ -195,6 +217,7 @@ enum MaterialStatus {
 model Material {
   id              String         @id @default(cuid())
   topicId         String
+  periodId        String?
   title           String
   description     String?
   type            MaterialType   @default(VIDEO)
@@ -206,6 +229,7 @@ model Material {
   updatedAt       DateTime       @updatedAt
 
   topic              Topic                    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  period             AcademicPeriod?          @relation(fields: [periodId], references: [id], onDelete: SetNull)
   mediaFiles         MediaFile[]
   assignments        MaterialAssignment[]
   progress           MaterialProgress[]
@@ -213,6 +237,7 @@ model Material {
   notificationLogs   NotificationLog[]
 
   @@index([topicId])
+  @@index([periodId])
   @@index([status])
   @@map("materials")
 }
@@ -266,6 +291,7 @@ enum QuestionType {
 
 model QuestionBank {
   id            String       @id @default(cuid())
+  periodId      String?
   text          String
   type          QuestionType @default(MULTIPLE_CHOICE)
   correctAnswer String
@@ -274,11 +300,13 @@ model QuestionBank {
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
 
+  period                AcademicPeriod?         @relation(fields: [periodId], references: [id], onDelete: SetNull)
   answerOptions         AnswerOption[]
   quizConfigs           QuizConfig[]
   quizSessionQuestions  QuizSessionQuestion[]
   userAnswers           UserAnswer[]  // ← tambah ni
 
+  @@index([periodId])
   @@index([type])
   @@map("question_banks")
 }
@@ -304,6 +332,7 @@ model QuizConfig {
   totalQuestions   Int      @default(5)
   passingScore     Int      @default(70)
   timeLimit        Int      @default(600) // dalam detik
+  deadline         DateTime? // Deadline untuk quiz (-5%/hari, max -40%)
   allowRetake      Boolean  @default(true)
   maxRetries       Int      @default(3)
   showCorrectAns   Boolean  @default(true)
@@ -482,16 +511,18 @@ model MonthlyPointSummary {
 }
 
 model SemesterSummary {
-  id        String   @id @default(cuid())
-  userId    String
-  year      Int
-  semester  Int
+  id          String   @id @default(cuid())
+  userId      String
+  periodId    String?  // ← tambah ini
+  year        Int
+  semester    Int
   totalPoints Int
-  rank      Int?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  rank        Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  period AcademicPeriod? @relation(fields: [periodId], references: [id], onDelete: SetNull) // ← tambah
 
   @@unique([userId, year, semester])
   @@index([userId])

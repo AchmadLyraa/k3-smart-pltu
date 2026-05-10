@@ -32,6 +32,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { NotificationBell } from "@/components/worker/notification-bell";
 import { cn } from "@/lib/utils";
 import { Session } from "next-auth";
 
@@ -59,6 +60,7 @@ const NAV_CONFIG: Record<
       { label: "Kelola User", href: "/admin/users" },
       { label: "Reward Management", href: "/admin/reward-admin" },
       { label: "CMS", href: "/admin/cms" },
+      { label: "Riwayat Semester", href: "/admin/semester" },
     ],
   },
   HSE_ADMIN: {
@@ -79,7 +81,7 @@ const NAV_CONFIG: Record<
     icon: <HardHat className="w-4 h-4" />,
     items: [
       { label: "Home", href: "/worker/home" },
-      { label: "Reward", href: "/worker/home/reward-users" },
+      { label: "Reward", href: "/worker/reward-users" },
       { label: "Material", href: "/worker/materials" },
     ],
   },
@@ -134,6 +136,9 @@ export default function Navbar({ session }: NavbarProps) {
 
         {/* Right side */}
         <div className="flex items-center gap-2">
+          {/* Notification bell - worker only */}
+          {role === "WORKER" && <NotificationBell />}
+
           {/* Role badge - desktop only */}
           <Badge
             variant="secondary"

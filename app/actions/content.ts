@@ -74,14 +74,34 @@ export async function publishMaterial(id: string) {
         status: MaterialStatus.PUBLISHED,
         publishedAt: new Date(),
       },
+      include: {
+        topic: true,
+      },
     });
 
-    // TODO: Send notifications to all workers
-    // await sendNotificationToAllWorkers({
-    //   title: 'New Learning Material',
-    //   message: `New material available: ${material.title}`,
-    //   materialId: id,
-    // });
+    // Ambil semua worker yang ACTIVE
+    const workers = await prisma.user.findMany({
+      where: {
+        role: "WORKER",
+        status: "ACTIVE",
+      },
+      select: { id: true },
+    });
+
+    // Bulk insert notifikasi ke semua worker
+    if (workers.length > 0) {
+      await prisma.notificationLog.createMany({
+        data: workers.map((worker) => ({
+          userId: worker.id,
+          materialId: material.id,
+          type: "NEW_MATERIAL",
+          subject: "Materi Baru Tersedia! 📚",
+          message: `Materi baru "${material.title}" dari topik ${material.topic.name} telah dipublikasikan. Yuk pelajari sekarang!`,
+          status: "PENDING",
+        })),
+        skipDuplicates: true,
+      });
+    }
 
     return { success: true, data: material };
   } catch (error) {

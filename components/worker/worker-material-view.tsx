@@ -169,6 +169,45 @@ export default function WorkerMaterialView({
           <CardContent className="pt-6">{renderMedia()}</CardContent>
         </Card>
 
+        {isComplete && quizConfigs.length > 0 && (
+          <Card className="border-amber-200 bg-amber-50">
+            <CardContent className="pt-6">
+              <div className="space-y-2">
+                {quizConfigs.map((quiz) => {
+                  const deadline = quiz.deadline
+                    ? new Date(quiz.deadline)
+                    : null;
+                  const now = new Date();
+                  const isOverdue = deadline && now > deadline;
+                  const daysLeft = deadline
+                    ? Math.ceil(
+                        (deadline.getTime() - now.getTime()) /
+                          (1000 * 60 * 60 * 24),
+                      )
+                    : null;
+
+                  return (
+                    <div key={quiz.id} className="text-sm">
+                      <p className="font-medium">{quiz.name}</p>
+                      {deadline && (
+                        <p
+                          className={
+                            isOverdue ? "text-red-600" : "text-amber-700"
+                          }
+                        >
+                          {isOverdue
+                            ? `⚠️ Terlambat ${Math.abs(daysLeft || 0)} hari (Poin berkurang ${Math.min(Math.abs(daysLeft || 0) * 5, 40)}%)`
+                            : `📅 Deadline: ${deadline.toLocaleDateString("id-ID")} (${daysLeft} hari lagi)`}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <div className="flex justify-between items-center">
           <p className="text-sm text-muted-foreground">
             {material.type}

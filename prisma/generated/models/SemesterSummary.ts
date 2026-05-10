@@ -43,6 +43,7 @@ export type SemesterSummarySumAggregateOutputType = {
 export type SemesterSummaryMinAggregateOutputType = {
   id: string | null
   userId: string | null
+  periodId: string | null
   year: number | null
   semester: number | null
   totalPoints: number | null
@@ -54,6 +55,7 @@ export type SemesterSummaryMinAggregateOutputType = {
 export type SemesterSummaryMaxAggregateOutputType = {
   id: string | null
   userId: string | null
+  periodId: string | null
   year: number | null
   semester: number | null
   totalPoints: number | null
@@ -65,6 +67,7 @@ export type SemesterSummaryMaxAggregateOutputType = {
 export type SemesterSummaryCountAggregateOutputType = {
   id: number
   userId: number
+  periodId: number
   year: number
   semester: number
   totalPoints: number
@@ -92,6 +95,7 @@ export type SemesterSummarySumAggregateInputType = {
 export type SemesterSummaryMinAggregateInputType = {
   id?: true
   userId?: true
+  periodId?: true
   year?: true
   semester?: true
   totalPoints?: true
@@ -103,6 +107,7 @@ export type SemesterSummaryMinAggregateInputType = {
 export type SemesterSummaryMaxAggregateInputType = {
   id?: true
   userId?: true
+  periodId?: true
   year?: true
   semester?: true
   totalPoints?: true
@@ -114,6 +119,7 @@ export type SemesterSummaryMaxAggregateInputType = {
 export type SemesterSummaryCountAggregateInputType = {
   id?: true
   userId?: true
+  periodId?: true
   year?: true
   semester?: true
   totalPoints?: true
@@ -212,6 +218,7 @@ export type SemesterSummaryGroupByArgs<ExtArgs extends runtime.Types.Extensions.
 export type SemesterSummaryGroupByOutputType = {
   id: string
   userId: string
+  periodId: string | null
   year: number
   semester: number
   totalPoints: number
@@ -246,6 +253,7 @@ export type SemesterSummaryWhereInput = {
   NOT?: Prisma.SemesterSummaryWhereInput | Prisma.SemesterSummaryWhereInput[]
   id?: Prisma.StringFilter<"SemesterSummary"> | string
   userId?: Prisma.StringFilter<"SemesterSummary"> | string
+  periodId?: Prisma.StringNullableFilter<"SemesterSummary"> | string | null
   year?: Prisma.IntFilter<"SemesterSummary"> | number
   semester?: Prisma.IntFilter<"SemesterSummary"> | number
   totalPoints?: Prisma.IntFilter<"SemesterSummary"> | number
@@ -253,11 +261,13 @@ export type SemesterSummaryWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"SemesterSummary"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"SemesterSummary"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  period?: Prisma.XOR<Prisma.AcademicPeriodNullableScalarRelationFilter, Prisma.AcademicPeriodWhereInput> | null
 }
 
 export type SemesterSummaryOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  periodId?: Prisma.SortOrderInput | Prisma.SortOrder
   year?: Prisma.SortOrder
   semester?: Prisma.SortOrder
   totalPoints?: Prisma.SortOrder
@@ -265,6 +275,7 @@ export type SemesterSummaryOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
+  period?: Prisma.AcademicPeriodOrderByWithRelationInput
 }
 
 export type SemesterSummaryWhereUniqueInput = Prisma.AtLeast<{
@@ -274,6 +285,7 @@ export type SemesterSummaryWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.SemesterSummaryWhereInput[]
   NOT?: Prisma.SemesterSummaryWhereInput | Prisma.SemesterSummaryWhereInput[]
   userId?: Prisma.StringFilter<"SemesterSummary"> | string
+  periodId?: Prisma.StringNullableFilter<"SemesterSummary"> | string | null
   year?: Prisma.IntFilter<"SemesterSummary"> | number
   semester?: Prisma.IntFilter<"SemesterSummary"> | number
   totalPoints?: Prisma.IntFilter<"SemesterSummary"> | number
@@ -281,11 +293,13 @@ export type SemesterSummaryWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"SemesterSummary"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"SemesterSummary"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  period?: Prisma.XOR<Prisma.AcademicPeriodNullableScalarRelationFilter, Prisma.AcademicPeriodWhereInput> | null
 }, "id" | "userId_year_semester">
 
 export type SemesterSummaryOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  periodId?: Prisma.SortOrderInput | Prisma.SortOrder
   year?: Prisma.SortOrder
   semester?: Prisma.SortOrder
   totalPoints?: Prisma.SortOrder
@@ -305,6 +319,7 @@ export type SemesterSummaryScalarWhereWithAggregatesInput = {
   NOT?: Prisma.SemesterSummaryScalarWhereWithAggregatesInput | Prisma.SemesterSummaryScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"SemesterSummary"> | string
   userId?: Prisma.StringWithAggregatesFilter<"SemesterSummary"> | string
+  periodId?: Prisma.StringNullableWithAggregatesFilter<"SemesterSummary"> | string | null
   year?: Prisma.IntWithAggregatesFilter<"SemesterSummary"> | number
   semester?: Prisma.IntWithAggregatesFilter<"SemesterSummary"> | number
   totalPoints?: Prisma.IntWithAggregatesFilter<"SemesterSummary"> | number
@@ -322,11 +337,13 @@ export type SemesterSummaryCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutSemesterSummariesInput
+  period?: Prisma.AcademicPeriodCreateNestedOneWithoutSemesterSummariesInput
 }
 
 export type SemesterSummaryUncheckedCreateInput = {
   id?: string
   userId: string
+  periodId?: string | null
   year: number
   semester: number
   totalPoints: number
@@ -344,11 +361,13 @@ export type SemesterSummaryUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutSemesterSummariesNestedInput
+  period?: Prisma.AcademicPeriodUpdateOneWithoutSemesterSummariesNestedInput
 }
 
 export type SemesterSummaryUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  periodId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   year?: Prisma.IntFieldUpdateOperationsInput | number
   semester?: Prisma.IntFieldUpdateOperationsInput | number
   totalPoints?: Prisma.IntFieldUpdateOperationsInput | number
@@ -360,6 +379,7 @@ export type SemesterSummaryUncheckedUpdateInput = {
 export type SemesterSummaryCreateManyInput = {
   id?: string
   userId: string
+  periodId?: string | null
   year: number
   semester: number
   totalPoints: number
@@ -381,6 +401,7 @@ export type SemesterSummaryUpdateManyMutationInput = {
 export type SemesterSummaryUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  periodId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   year?: Prisma.IntFieldUpdateOperationsInput | number
   semester?: Prisma.IntFieldUpdateOperationsInput | number
   totalPoints?: Prisma.IntFieldUpdateOperationsInput | number
@@ -408,6 +429,7 @@ export type SemesterSummaryUserIdYearSemesterCompoundUniqueInput = {
 export type SemesterSummaryCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  periodId?: Prisma.SortOrder
   year?: Prisma.SortOrder
   semester?: Prisma.SortOrder
   totalPoints?: Prisma.SortOrder
@@ -426,6 +448,7 @@ export type SemesterSummaryAvgOrderByAggregateInput = {
 export type SemesterSummaryMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  periodId?: Prisma.SortOrder
   year?: Prisma.SortOrder
   semester?: Prisma.SortOrder
   totalPoints?: Prisma.SortOrder
@@ -437,6 +460,7 @@ export type SemesterSummaryMaxOrderByAggregateInput = {
 export type SemesterSummaryMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  periodId?: Prisma.SortOrder
   year?: Prisma.SortOrder
   semester?: Prisma.SortOrder
   totalPoints?: Prisma.SortOrder
@@ -494,6 +518,48 @@ export type SemesterSummaryUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.SemesterSummaryScalarWhereInput | Prisma.SemesterSummaryScalarWhereInput[]
 }
 
+export type SemesterSummaryCreateNestedManyWithoutPeriodInput = {
+  create?: Prisma.XOR<Prisma.SemesterSummaryCreateWithoutPeriodInput, Prisma.SemesterSummaryUncheckedCreateWithoutPeriodInput> | Prisma.SemesterSummaryCreateWithoutPeriodInput[] | Prisma.SemesterSummaryUncheckedCreateWithoutPeriodInput[]
+  connectOrCreate?: Prisma.SemesterSummaryCreateOrConnectWithoutPeriodInput | Prisma.SemesterSummaryCreateOrConnectWithoutPeriodInput[]
+  createMany?: Prisma.SemesterSummaryCreateManyPeriodInputEnvelope
+  connect?: Prisma.SemesterSummaryWhereUniqueInput | Prisma.SemesterSummaryWhereUniqueInput[]
+}
+
+export type SemesterSummaryUncheckedCreateNestedManyWithoutPeriodInput = {
+  create?: Prisma.XOR<Prisma.SemesterSummaryCreateWithoutPeriodInput, Prisma.SemesterSummaryUncheckedCreateWithoutPeriodInput> | Prisma.SemesterSummaryCreateWithoutPeriodInput[] | Prisma.SemesterSummaryUncheckedCreateWithoutPeriodInput[]
+  connectOrCreate?: Prisma.SemesterSummaryCreateOrConnectWithoutPeriodInput | Prisma.SemesterSummaryCreateOrConnectWithoutPeriodInput[]
+  createMany?: Prisma.SemesterSummaryCreateManyPeriodInputEnvelope
+  connect?: Prisma.SemesterSummaryWhereUniqueInput | Prisma.SemesterSummaryWhereUniqueInput[]
+}
+
+export type SemesterSummaryUpdateManyWithoutPeriodNestedInput = {
+  create?: Prisma.XOR<Prisma.SemesterSummaryCreateWithoutPeriodInput, Prisma.SemesterSummaryUncheckedCreateWithoutPeriodInput> | Prisma.SemesterSummaryCreateWithoutPeriodInput[] | Prisma.SemesterSummaryUncheckedCreateWithoutPeriodInput[]
+  connectOrCreate?: Prisma.SemesterSummaryCreateOrConnectWithoutPeriodInput | Prisma.SemesterSummaryCreateOrConnectWithoutPeriodInput[]
+  upsert?: Prisma.SemesterSummaryUpsertWithWhereUniqueWithoutPeriodInput | Prisma.SemesterSummaryUpsertWithWhereUniqueWithoutPeriodInput[]
+  createMany?: Prisma.SemesterSummaryCreateManyPeriodInputEnvelope
+  set?: Prisma.SemesterSummaryWhereUniqueInput | Prisma.SemesterSummaryWhereUniqueInput[]
+  disconnect?: Prisma.SemesterSummaryWhereUniqueInput | Prisma.SemesterSummaryWhereUniqueInput[]
+  delete?: Prisma.SemesterSummaryWhereUniqueInput | Prisma.SemesterSummaryWhereUniqueInput[]
+  connect?: Prisma.SemesterSummaryWhereUniqueInput | Prisma.SemesterSummaryWhereUniqueInput[]
+  update?: Prisma.SemesterSummaryUpdateWithWhereUniqueWithoutPeriodInput | Prisma.SemesterSummaryUpdateWithWhereUniqueWithoutPeriodInput[]
+  updateMany?: Prisma.SemesterSummaryUpdateManyWithWhereWithoutPeriodInput | Prisma.SemesterSummaryUpdateManyWithWhereWithoutPeriodInput[]
+  deleteMany?: Prisma.SemesterSummaryScalarWhereInput | Prisma.SemesterSummaryScalarWhereInput[]
+}
+
+export type SemesterSummaryUncheckedUpdateManyWithoutPeriodNestedInput = {
+  create?: Prisma.XOR<Prisma.SemesterSummaryCreateWithoutPeriodInput, Prisma.SemesterSummaryUncheckedCreateWithoutPeriodInput> | Prisma.SemesterSummaryCreateWithoutPeriodInput[] | Prisma.SemesterSummaryUncheckedCreateWithoutPeriodInput[]
+  connectOrCreate?: Prisma.SemesterSummaryCreateOrConnectWithoutPeriodInput | Prisma.SemesterSummaryCreateOrConnectWithoutPeriodInput[]
+  upsert?: Prisma.SemesterSummaryUpsertWithWhereUniqueWithoutPeriodInput | Prisma.SemesterSummaryUpsertWithWhereUniqueWithoutPeriodInput[]
+  createMany?: Prisma.SemesterSummaryCreateManyPeriodInputEnvelope
+  set?: Prisma.SemesterSummaryWhereUniqueInput | Prisma.SemesterSummaryWhereUniqueInput[]
+  disconnect?: Prisma.SemesterSummaryWhereUniqueInput | Prisma.SemesterSummaryWhereUniqueInput[]
+  delete?: Prisma.SemesterSummaryWhereUniqueInput | Prisma.SemesterSummaryWhereUniqueInput[]
+  connect?: Prisma.SemesterSummaryWhereUniqueInput | Prisma.SemesterSummaryWhereUniqueInput[]
+  update?: Prisma.SemesterSummaryUpdateWithWhereUniqueWithoutPeriodInput | Prisma.SemesterSummaryUpdateWithWhereUniqueWithoutPeriodInput[]
+  updateMany?: Prisma.SemesterSummaryUpdateManyWithWhereWithoutPeriodInput | Prisma.SemesterSummaryUpdateManyWithWhereWithoutPeriodInput[]
+  deleteMany?: Prisma.SemesterSummaryScalarWhereInput | Prisma.SemesterSummaryScalarWhereInput[]
+}
+
 export type SemesterSummaryCreateWithoutUserInput = {
   id?: string
   year: number
@@ -502,10 +568,12 @@ export type SemesterSummaryCreateWithoutUserInput = {
   rank?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  period?: Prisma.AcademicPeriodCreateNestedOneWithoutSemesterSummariesInput
 }
 
 export type SemesterSummaryUncheckedCreateWithoutUserInput = {
   id?: string
+  periodId?: string | null
   year: number
   semester: number
   totalPoints: number
@@ -546,6 +614,7 @@ export type SemesterSummaryScalarWhereInput = {
   NOT?: Prisma.SemesterSummaryScalarWhereInput | Prisma.SemesterSummaryScalarWhereInput[]
   id?: Prisma.StringFilter<"SemesterSummary"> | string
   userId?: Prisma.StringFilter<"SemesterSummary"> | string
+  periodId?: Prisma.StringNullableFilter<"SemesterSummary"> | string | null
   year?: Prisma.IntFilter<"SemesterSummary"> | number
   semester?: Prisma.IntFilter<"SemesterSummary"> | number
   totalPoints?: Prisma.IntFilter<"SemesterSummary"> | number
@@ -554,8 +623,57 @@ export type SemesterSummaryScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"SemesterSummary"> | Date | string
 }
 
+export type SemesterSummaryCreateWithoutPeriodInput = {
+  id?: string
+  year: number
+  semester: number
+  totalPoints: number
+  rank?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutSemesterSummariesInput
+}
+
+export type SemesterSummaryUncheckedCreateWithoutPeriodInput = {
+  id?: string
+  userId: string
+  year: number
+  semester: number
+  totalPoints: number
+  rank?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type SemesterSummaryCreateOrConnectWithoutPeriodInput = {
+  where: Prisma.SemesterSummaryWhereUniqueInput
+  create: Prisma.XOR<Prisma.SemesterSummaryCreateWithoutPeriodInput, Prisma.SemesterSummaryUncheckedCreateWithoutPeriodInput>
+}
+
+export type SemesterSummaryCreateManyPeriodInputEnvelope = {
+  data: Prisma.SemesterSummaryCreateManyPeriodInput | Prisma.SemesterSummaryCreateManyPeriodInput[]
+  skipDuplicates?: boolean
+}
+
+export type SemesterSummaryUpsertWithWhereUniqueWithoutPeriodInput = {
+  where: Prisma.SemesterSummaryWhereUniqueInput
+  update: Prisma.XOR<Prisma.SemesterSummaryUpdateWithoutPeriodInput, Prisma.SemesterSummaryUncheckedUpdateWithoutPeriodInput>
+  create: Prisma.XOR<Prisma.SemesterSummaryCreateWithoutPeriodInput, Prisma.SemesterSummaryUncheckedCreateWithoutPeriodInput>
+}
+
+export type SemesterSummaryUpdateWithWhereUniqueWithoutPeriodInput = {
+  where: Prisma.SemesterSummaryWhereUniqueInput
+  data: Prisma.XOR<Prisma.SemesterSummaryUpdateWithoutPeriodInput, Prisma.SemesterSummaryUncheckedUpdateWithoutPeriodInput>
+}
+
+export type SemesterSummaryUpdateManyWithWhereWithoutPeriodInput = {
+  where: Prisma.SemesterSummaryScalarWhereInput
+  data: Prisma.XOR<Prisma.SemesterSummaryUpdateManyMutationInput, Prisma.SemesterSummaryUncheckedUpdateManyWithoutPeriodInput>
+}
+
 export type SemesterSummaryCreateManyUserInput = {
   id?: string
+  periodId?: string | null
   year: number
   semester: number
   totalPoints: number
@@ -572,10 +690,12 @@ export type SemesterSummaryUpdateWithoutUserInput = {
   rank?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  period?: Prisma.AcademicPeriodUpdateOneWithoutSemesterSummariesNestedInput
 }
 
 export type SemesterSummaryUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  periodId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   year?: Prisma.IntFieldUpdateOperationsInput | number
   semester?: Prisma.IntFieldUpdateOperationsInput | number
   totalPoints?: Prisma.IntFieldUpdateOperationsInput | number
@@ -586,6 +706,51 @@ export type SemesterSummaryUncheckedUpdateWithoutUserInput = {
 
 export type SemesterSummaryUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  periodId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  year?: Prisma.IntFieldUpdateOperationsInput | number
+  semester?: Prisma.IntFieldUpdateOperationsInput | number
+  totalPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  rank?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type SemesterSummaryCreateManyPeriodInput = {
+  id?: string
+  userId: string
+  year: number
+  semester: number
+  totalPoints: number
+  rank?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type SemesterSummaryUpdateWithoutPeriodInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  year?: Prisma.IntFieldUpdateOperationsInput | number
+  semester?: Prisma.IntFieldUpdateOperationsInput | number
+  totalPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  rank?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutSemesterSummariesNestedInput
+}
+
+export type SemesterSummaryUncheckedUpdateWithoutPeriodInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  year?: Prisma.IntFieldUpdateOperationsInput | number
+  semester?: Prisma.IntFieldUpdateOperationsInput | number
+  totalPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  rank?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type SemesterSummaryUncheckedUpdateManyWithoutPeriodInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
   year?: Prisma.IntFieldUpdateOperationsInput | number
   semester?: Prisma.IntFieldUpdateOperationsInput | number
   totalPoints?: Prisma.IntFieldUpdateOperationsInput | number
@@ -599,6 +764,7 @@ export type SemesterSummaryUncheckedUpdateManyWithoutUserInput = {
 export type SemesterSummarySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
+  periodId?: boolean
   year?: boolean
   semester?: boolean
   totalPoints?: boolean
@@ -606,11 +772,13 @@ export type SemesterSummarySelect<ExtArgs extends runtime.Types.Extensions.Inter
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  period?: boolean | Prisma.SemesterSummary$periodArgs<ExtArgs>
 }, ExtArgs["result"]["semesterSummary"]>
 
 export type SemesterSummarySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
+  periodId?: boolean
   year?: boolean
   semester?: boolean
   totalPoints?: boolean
@@ -618,11 +786,13 @@ export type SemesterSummarySelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  period?: boolean | Prisma.SemesterSummary$periodArgs<ExtArgs>
 }, ExtArgs["result"]["semesterSummary"]>
 
 export type SemesterSummarySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
+  periodId?: boolean
   year?: boolean
   semester?: boolean
   totalPoints?: boolean
@@ -630,11 +800,13 @@ export type SemesterSummarySelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  period?: boolean | Prisma.SemesterSummary$periodArgs<ExtArgs>
 }, ExtArgs["result"]["semesterSummary"]>
 
 export type SemesterSummarySelectScalar = {
   id?: boolean
   userId?: boolean
+  periodId?: boolean
   year?: boolean
   semester?: boolean
   totalPoints?: boolean
@@ -643,25 +815,30 @@ export type SemesterSummarySelectScalar = {
   updatedAt?: boolean
 }
 
-export type SemesterSummaryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "year" | "semester" | "totalPoints" | "rank" | "createdAt" | "updatedAt", ExtArgs["result"]["semesterSummary"]>
+export type SemesterSummaryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "periodId" | "year" | "semester" | "totalPoints" | "rank" | "createdAt" | "updatedAt", ExtArgs["result"]["semesterSummary"]>
 export type SemesterSummaryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  period?: boolean | Prisma.SemesterSummary$periodArgs<ExtArgs>
 }
 export type SemesterSummaryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  period?: boolean | Prisma.SemesterSummary$periodArgs<ExtArgs>
 }
 export type SemesterSummaryIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  period?: boolean | Prisma.SemesterSummary$periodArgs<ExtArgs>
 }
 
 export type $SemesterSummaryPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "SemesterSummary"
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
+    period: Prisma.$AcademicPeriodPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     userId: string
+    periodId: string | null
     year: number
     semester: number
     totalPoints: number
@@ -1063,6 +1240,7 @@ readonly fields: SemesterSummaryFieldRefs;
 export interface Prisma__SemesterSummaryClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  period<T extends Prisma.SemesterSummary$periodArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SemesterSummary$periodArgs<ExtArgs>>): Prisma.Prisma__AcademicPeriodClient<runtime.Types.Result.GetResult<Prisma.$AcademicPeriodPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1094,6 +1272,7 @@ export interface Prisma__SemesterSummaryClient<T, Null = never, ExtArgs extends 
 export interface SemesterSummaryFieldRefs {
   readonly id: Prisma.FieldRef<"SemesterSummary", 'String'>
   readonly userId: Prisma.FieldRef<"SemesterSummary", 'String'>
+  readonly periodId: Prisma.FieldRef<"SemesterSummary", 'String'>
   readonly year: Prisma.FieldRef<"SemesterSummary", 'Int'>
   readonly semester: Prisma.FieldRef<"SemesterSummary", 'Int'>
   readonly totalPoints: Prisma.FieldRef<"SemesterSummary", 'Int'>
@@ -1498,6 +1677,25 @@ export type SemesterSummaryDeleteManyArgs<ExtArgs extends runtime.Types.Extensio
    * Limit how many SemesterSummaries to delete.
    */
   limit?: number
+}
+
+/**
+ * SemesterSummary.period
+ */
+export type SemesterSummary$periodArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AcademicPeriod
+   */
+  select?: Prisma.AcademicPeriodSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AcademicPeriod
+   */
+  omit?: Prisma.AcademicPeriodOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AcademicPeriodInclude<ExtArgs> | null
+  where?: Prisma.AcademicPeriodWhereInput
 }
 
 /**

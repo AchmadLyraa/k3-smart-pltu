@@ -37,6 +37,7 @@ export type MaterialSumAggregateOutputType = {
 export type MaterialMinAggregateOutputType = {
   id: string | null
   topicId: string | null
+  periodId: string | null
   title: string | null
   description: string | null
   type: $Enums.MaterialType | null
@@ -51,6 +52,7 @@ export type MaterialMinAggregateOutputType = {
 export type MaterialMaxAggregateOutputType = {
   id: string | null
   topicId: string | null
+  periodId: string | null
   title: string | null
   description: string | null
   type: $Enums.MaterialType | null
@@ -65,6 +67,7 @@ export type MaterialMaxAggregateOutputType = {
 export type MaterialCountAggregateOutputType = {
   id: number
   topicId: number
+  periodId: number
   title: number
   description: number
   type: number
@@ -89,6 +92,7 @@ export type MaterialSumAggregateInputType = {
 export type MaterialMinAggregateInputType = {
   id?: true
   topicId?: true
+  periodId?: true
   title?: true
   description?: true
   type?: true
@@ -103,6 +107,7 @@ export type MaterialMinAggregateInputType = {
 export type MaterialMaxAggregateInputType = {
   id?: true
   topicId?: true
+  periodId?: true
   title?: true
   description?: true
   type?: true
@@ -117,6 +122,7 @@ export type MaterialMaxAggregateInputType = {
 export type MaterialCountAggregateInputType = {
   id?: true
   topicId?: true
+  periodId?: true
   title?: true
   description?: true
   type?: true
@@ -218,6 +224,7 @@ export type MaterialGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
 export type MaterialGroupByOutputType = {
   id: string
   topicId: string
+  periodId: string | null
   title: string
   description: string | null
   type: $Enums.MaterialType
@@ -255,6 +262,7 @@ export type MaterialWhereInput = {
   NOT?: Prisma.MaterialWhereInput | Prisma.MaterialWhereInput[]
   id?: Prisma.StringFilter<"Material"> | string
   topicId?: Prisma.StringFilter<"Material"> | string
+  periodId?: Prisma.StringNullableFilter<"Material"> | string | null
   title?: Prisma.StringFilter<"Material"> | string
   description?: Prisma.StringNullableFilter<"Material"> | string | null
   type?: Prisma.EnumMaterialTypeFilter<"Material"> | $Enums.MaterialType
@@ -265,6 +273,7 @@ export type MaterialWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Material"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Material"> | Date | string
   topic?: Prisma.XOR<Prisma.TopicScalarRelationFilter, Prisma.TopicWhereInput>
+  period?: Prisma.XOR<Prisma.AcademicPeriodNullableScalarRelationFilter, Prisma.AcademicPeriodWhereInput> | null
   mediaFiles?: Prisma.MediaFileListRelationFilter
   assignments?: Prisma.MaterialAssignmentListRelationFilter
   progress?: Prisma.MaterialProgressListRelationFilter
@@ -275,6 +284,7 @@ export type MaterialWhereInput = {
 export type MaterialOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   topicId?: Prisma.SortOrder
+  periodId?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrder
@@ -285,6 +295,7 @@ export type MaterialOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   topic?: Prisma.TopicOrderByWithRelationInput
+  period?: Prisma.AcademicPeriodOrderByWithRelationInput
   mediaFiles?: Prisma.MediaFileOrderByRelationAggregateInput
   assignments?: Prisma.MaterialAssignmentOrderByRelationAggregateInput
   progress?: Prisma.MaterialProgressOrderByRelationAggregateInput
@@ -298,6 +309,7 @@ export type MaterialWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.MaterialWhereInput[]
   NOT?: Prisma.MaterialWhereInput | Prisma.MaterialWhereInput[]
   topicId?: Prisma.StringFilter<"Material"> | string
+  periodId?: Prisma.StringNullableFilter<"Material"> | string | null
   title?: Prisma.StringFilter<"Material"> | string
   description?: Prisma.StringNullableFilter<"Material"> | string | null
   type?: Prisma.EnumMaterialTypeFilter<"Material"> | $Enums.MaterialType
@@ -308,6 +320,7 @@ export type MaterialWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Material"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Material"> | Date | string
   topic?: Prisma.XOR<Prisma.TopicScalarRelationFilter, Prisma.TopicWhereInput>
+  period?: Prisma.XOR<Prisma.AcademicPeriodNullableScalarRelationFilter, Prisma.AcademicPeriodWhereInput> | null
   mediaFiles?: Prisma.MediaFileListRelationFilter
   assignments?: Prisma.MaterialAssignmentListRelationFilter
   progress?: Prisma.MaterialProgressListRelationFilter
@@ -318,6 +331,7 @@ export type MaterialWhereUniqueInput = Prisma.AtLeast<{
 export type MaterialOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   topicId?: Prisma.SortOrder
+  periodId?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrder
@@ -340,6 +354,7 @@ export type MaterialScalarWhereWithAggregatesInput = {
   NOT?: Prisma.MaterialScalarWhereWithAggregatesInput | Prisma.MaterialScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Material"> | string
   topicId?: Prisma.StringWithAggregatesFilter<"Material"> | string
+  periodId?: Prisma.StringNullableWithAggregatesFilter<"Material"> | string | null
   title?: Prisma.StringWithAggregatesFilter<"Material"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"Material"> | string | null
   type?: Prisma.EnumMaterialTypeWithAggregatesFilter<"Material"> | $Enums.MaterialType
@@ -363,6 +378,7 @@ export type MaterialCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   topic: Prisma.TopicCreateNestedOneWithoutMaterialsInput
+  period?: Prisma.AcademicPeriodCreateNestedOneWithoutMaterialsInput
   mediaFiles?: Prisma.MediaFileCreateNestedManyWithoutMaterialInput
   assignments?: Prisma.MaterialAssignmentCreateNestedManyWithoutMaterialInput
   progress?: Prisma.MaterialProgressCreateNestedManyWithoutMaterialInput
@@ -373,6 +389,7 @@ export type MaterialCreateInput = {
 export type MaterialUncheckedCreateInput = {
   id?: string
   topicId: string
+  periodId?: string | null
   title: string
   description?: string | null
   type?: $Enums.MaterialType
@@ -401,6 +418,7 @@ export type MaterialUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   topic?: Prisma.TopicUpdateOneRequiredWithoutMaterialsNestedInput
+  period?: Prisma.AcademicPeriodUpdateOneWithoutMaterialsNestedInput
   mediaFiles?: Prisma.MediaFileUpdateManyWithoutMaterialNestedInput
   assignments?: Prisma.MaterialAssignmentUpdateManyWithoutMaterialNestedInput
   progress?: Prisma.MaterialProgressUpdateManyWithoutMaterialNestedInput
@@ -411,6 +429,7 @@ export type MaterialUpdateInput = {
 export type MaterialUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   topicId?: Prisma.StringFieldUpdateOperationsInput | string
+  periodId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumMaterialTypeFieldUpdateOperationsInput | $Enums.MaterialType
@@ -430,6 +449,7 @@ export type MaterialUncheckedUpdateInput = {
 export type MaterialCreateManyInput = {
   id?: string
   topicId: string
+  periodId?: string | null
   title: string
   description?: string | null
   type?: $Enums.MaterialType
@@ -457,6 +477,7 @@ export type MaterialUpdateManyMutationInput = {
 export type MaterialUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   topicId?: Prisma.StringFieldUpdateOperationsInput | string
+  periodId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumMaterialTypeFieldUpdateOperationsInput | $Enums.MaterialType
@@ -481,6 +502,7 @@ export type MaterialOrderByRelationAggregateInput = {
 export type MaterialCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   topicId?: Prisma.SortOrder
+  periodId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   type?: Prisma.SortOrder
@@ -499,6 +521,7 @@ export type MaterialAvgOrderByAggregateInput = {
 export type MaterialMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   topicId?: Prisma.SortOrder
+  periodId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   type?: Prisma.SortOrder
@@ -513,6 +536,7 @@ export type MaterialMaxOrderByAggregateInput = {
 export type MaterialMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   topicId?: Prisma.SortOrder
+  periodId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   type?: Prisma.SortOrder
@@ -536,6 +560,48 @@ export type MaterialScalarRelationFilter = {
 export type MaterialNullableScalarRelationFilter = {
   is?: Prisma.MaterialWhereInput | null
   isNot?: Prisma.MaterialWhereInput | null
+}
+
+export type MaterialCreateNestedManyWithoutPeriodInput = {
+  create?: Prisma.XOR<Prisma.MaterialCreateWithoutPeriodInput, Prisma.MaterialUncheckedCreateWithoutPeriodInput> | Prisma.MaterialCreateWithoutPeriodInput[] | Prisma.MaterialUncheckedCreateWithoutPeriodInput[]
+  connectOrCreate?: Prisma.MaterialCreateOrConnectWithoutPeriodInput | Prisma.MaterialCreateOrConnectWithoutPeriodInput[]
+  createMany?: Prisma.MaterialCreateManyPeriodInputEnvelope
+  connect?: Prisma.MaterialWhereUniqueInput | Prisma.MaterialWhereUniqueInput[]
+}
+
+export type MaterialUncheckedCreateNestedManyWithoutPeriodInput = {
+  create?: Prisma.XOR<Prisma.MaterialCreateWithoutPeriodInput, Prisma.MaterialUncheckedCreateWithoutPeriodInput> | Prisma.MaterialCreateWithoutPeriodInput[] | Prisma.MaterialUncheckedCreateWithoutPeriodInput[]
+  connectOrCreate?: Prisma.MaterialCreateOrConnectWithoutPeriodInput | Prisma.MaterialCreateOrConnectWithoutPeriodInput[]
+  createMany?: Prisma.MaterialCreateManyPeriodInputEnvelope
+  connect?: Prisma.MaterialWhereUniqueInput | Prisma.MaterialWhereUniqueInput[]
+}
+
+export type MaterialUpdateManyWithoutPeriodNestedInput = {
+  create?: Prisma.XOR<Prisma.MaterialCreateWithoutPeriodInput, Prisma.MaterialUncheckedCreateWithoutPeriodInput> | Prisma.MaterialCreateWithoutPeriodInput[] | Prisma.MaterialUncheckedCreateWithoutPeriodInput[]
+  connectOrCreate?: Prisma.MaterialCreateOrConnectWithoutPeriodInput | Prisma.MaterialCreateOrConnectWithoutPeriodInput[]
+  upsert?: Prisma.MaterialUpsertWithWhereUniqueWithoutPeriodInput | Prisma.MaterialUpsertWithWhereUniqueWithoutPeriodInput[]
+  createMany?: Prisma.MaterialCreateManyPeriodInputEnvelope
+  set?: Prisma.MaterialWhereUniqueInput | Prisma.MaterialWhereUniqueInput[]
+  disconnect?: Prisma.MaterialWhereUniqueInput | Prisma.MaterialWhereUniqueInput[]
+  delete?: Prisma.MaterialWhereUniqueInput | Prisma.MaterialWhereUniqueInput[]
+  connect?: Prisma.MaterialWhereUniqueInput | Prisma.MaterialWhereUniqueInput[]
+  update?: Prisma.MaterialUpdateWithWhereUniqueWithoutPeriodInput | Prisma.MaterialUpdateWithWhereUniqueWithoutPeriodInput[]
+  updateMany?: Prisma.MaterialUpdateManyWithWhereWithoutPeriodInput | Prisma.MaterialUpdateManyWithWhereWithoutPeriodInput[]
+  deleteMany?: Prisma.MaterialScalarWhereInput | Prisma.MaterialScalarWhereInput[]
+}
+
+export type MaterialUncheckedUpdateManyWithoutPeriodNestedInput = {
+  create?: Prisma.XOR<Prisma.MaterialCreateWithoutPeriodInput, Prisma.MaterialUncheckedCreateWithoutPeriodInput> | Prisma.MaterialCreateWithoutPeriodInput[] | Prisma.MaterialUncheckedCreateWithoutPeriodInput[]
+  connectOrCreate?: Prisma.MaterialCreateOrConnectWithoutPeriodInput | Prisma.MaterialCreateOrConnectWithoutPeriodInput[]
+  upsert?: Prisma.MaterialUpsertWithWhereUniqueWithoutPeriodInput | Prisma.MaterialUpsertWithWhereUniqueWithoutPeriodInput[]
+  createMany?: Prisma.MaterialCreateManyPeriodInputEnvelope
+  set?: Prisma.MaterialWhereUniqueInput | Prisma.MaterialWhereUniqueInput[]
+  disconnect?: Prisma.MaterialWhereUniqueInput | Prisma.MaterialWhereUniqueInput[]
+  delete?: Prisma.MaterialWhereUniqueInput | Prisma.MaterialWhereUniqueInput[]
+  connect?: Prisma.MaterialWhereUniqueInput | Prisma.MaterialWhereUniqueInput[]
+  update?: Prisma.MaterialUpdateWithWhereUniqueWithoutPeriodInput | Prisma.MaterialUpdateWithWhereUniqueWithoutPeriodInput[]
+  updateMany?: Prisma.MaterialUpdateManyWithWhereWithoutPeriodInput | Prisma.MaterialUpdateManyWithWhereWithoutPeriodInput[]
+  deleteMany?: Prisma.MaterialScalarWhereInput | Prisma.MaterialScalarWhereInput[]
 }
 
 export type MaterialCreateNestedManyWithoutTopicInput = {
@@ -668,6 +734,88 @@ export type MaterialUpdateOneWithoutNotificationLogsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.MaterialUpdateToOneWithWhereWithoutNotificationLogsInput, Prisma.MaterialUpdateWithoutNotificationLogsInput>, Prisma.MaterialUncheckedUpdateWithoutNotificationLogsInput>
 }
 
+export type MaterialCreateWithoutPeriodInput = {
+  id?: string
+  title: string
+  description?: string | null
+  type?: $Enums.MaterialType
+  duration?: number
+  thumbnail?: string | null
+  status?: $Enums.MaterialStatus
+  publishedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  topic: Prisma.TopicCreateNestedOneWithoutMaterialsInput
+  mediaFiles?: Prisma.MediaFileCreateNestedManyWithoutMaterialInput
+  assignments?: Prisma.MaterialAssignmentCreateNestedManyWithoutMaterialInput
+  progress?: Prisma.MaterialProgressCreateNestedManyWithoutMaterialInput
+  quizConfigs?: Prisma.QuizConfigCreateNestedManyWithoutMaterialInput
+  notificationLogs?: Prisma.NotificationLogCreateNestedManyWithoutMaterialInput
+}
+
+export type MaterialUncheckedCreateWithoutPeriodInput = {
+  id?: string
+  topicId: string
+  title: string
+  description?: string | null
+  type?: $Enums.MaterialType
+  duration?: number
+  thumbnail?: string | null
+  status?: $Enums.MaterialStatus
+  publishedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  mediaFiles?: Prisma.MediaFileUncheckedCreateNestedManyWithoutMaterialInput
+  assignments?: Prisma.MaterialAssignmentUncheckedCreateNestedManyWithoutMaterialInput
+  progress?: Prisma.MaterialProgressUncheckedCreateNestedManyWithoutMaterialInput
+  quizConfigs?: Prisma.QuizConfigUncheckedCreateNestedManyWithoutMaterialInput
+  notificationLogs?: Prisma.NotificationLogUncheckedCreateNestedManyWithoutMaterialInput
+}
+
+export type MaterialCreateOrConnectWithoutPeriodInput = {
+  where: Prisma.MaterialWhereUniqueInput
+  create: Prisma.XOR<Prisma.MaterialCreateWithoutPeriodInput, Prisma.MaterialUncheckedCreateWithoutPeriodInput>
+}
+
+export type MaterialCreateManyPeriodInputEnvelope = {
+  data: Prisma.MaterialCreateManyPeriodInput | Prisma.MaterialCreateManyPeriodInput[]
+  skipDuplicates?: boolean
+}
+
+export type MaterialUpsertWithWhereUniqueWithoutPeriodInput = {
+  where: Prisma.MaterialWhereUniqueInput
+  update: Prisma.XOR<Prisma.MaterialUpdateWithoutPeriodInput, Prisma.MaterialUncheckedUpdateWithoutPeriodInput>
+  create: Prisma.XOR<Prisma.MaterialCreateWithoutPeriodInput, Prisma.MaterialUncheckedCreateWithoutPeriodInput>
+}
+
+export type MaterialUpdateWithWhereUniqueWithoutPeriodInput = {
+  where: Prisma.MaterialWhereUniqueInput
+  data: Prisma.XOR<Prisma.MaterialUpdateWithoutPeriodInput, Prisma.MaterialUncheckedUpdateWithoutPeriodInput>
+}
+
+export type MaterialUpdateManyWithWhereWithoutPeriodInput = {
+  where: Prisma.MaterialScalarWhereInput
+  data: Prisma.XOR<Prisma.MaterialUpdateManyMutationInput, Prisma.MaterialUncheckedUpdateManyWithoutPeriodInput>
+}
+
+export type MaterialScalarWhereInput = {
+  AND?: Prisma.MaterialScalarWhereInput | Prisma.MaterialScalarWhereInput[]
+  OR?: Prisma.MaterialScalarWhereInput[]
+  NOT?: Prisma.MaterialScalarWhereInput | Prisma.MaterialScalarWhereInput[]
+  id?: Prisma.StringFilter<"Material"> | string
+  topicId?: Prisma.StringFilter<"Material"> | string
+  periodId?: Prisma.StringNullableFilter<"Material"> | string | null
+  title?: Prisma.StringFilter<"Material"> | string
+  description?: Prisma.StringNullableFilter<"Material"> | string | null
+  type?: Prisma.EnumMaterialTypeFilter<"Material"> | $Enums.MaterialType
+  duration?: Prisma.IntFilter<"Material"> | number
+  thumbnail?: Prisma.StringNullableFilter<"Material"> | string | null
+  status?: Prisma.EnumMaterialStatusFilter<"Material"> | $Enums.MaterialStatus
+  publishedAt?: Prisma.DateTimeNullableFilter<"Material"> | Date | string | null
+  createdAt?: Prisma.DateTimeFilter<"Material"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Material"> | Date | string
+}
+
 export type MaterialCreateWithoutTopicInput = {
   id?: string
   title: string
@@ -679,6 +827,7 @@ export type MaterialCreateWithoutTopicInput = {
   publishedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  period?: Prisma.AcademicPeriodCreateNestedOneWithoutMaterialsInput
   mediaFiles?: Prisma.MediaFileCreateNestedManyWithoutMaterialInput
   assignments?: Prisma.MaterialAssignmentCreateNestedManyWithoutMaterialInput
   progress?: Prisma.MaterialProgressCreateNestedManyWithoutMaterialInput
@@ -688,6 +837,7 @@ export type MaterialCreateWithoutTopicInput = {
 
 export type MaterialUncheckedCreateWithoutTopicInput = {
   id?: string
+  periodId?: string | null
   title: string
   description?: string | null
   type?: $Enums.MaterialType
@@ -730,23 +880,6 @@ export type MaterialUpdateManyWithWhereWithoutTopicInput = {
   data: Prisma.XOR<Prisma.MaterialUpdateManyMutationInput, Prisma.MaterialUncheckedUpdateManyWithoutTopicInput>
 }
 
-export type MaterialScalarWhereInput = {
-  AND?: Prisma.MaterialScalarWhereInput | Prisma.MaterialScalarWhereInput[]
-  OR?: Prisma.MaterialScalarWhereInput[]
-  NOT?: Prisma.MaterialScalarWhereInput | Prisma.MaterialScalarWhereInput[]
-  id?: Prisma.StringFilter<"Material"> | string
-  topicId?: Prisma.StringFilter<"Material"> | string
-  title?: Prisma.StringFilter<"Material"> | string
-  description?: Prisma.StringNullableFilter<"Material"> | string | null
-  type?: Prisma.EnumMaterialTypeFilter<"Material"> | $Enums.MaterialType
-  duration?: Prisma.IntFilter<"Material"> | number
-  thumbnail?: Prisma.StringNullableFilter<"Material"> | string | null
-  status?: Prisma.EnumMaterialStatusFilter<"Material"> | $Enums.MaterialStatus
-  publishedAt?: Prisma.DateTimeNullableFilter<"Material"> | Date | string | null
-  createdAt?: Prisma.DateTimeFilter<"Material"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Material"> | Date | string
-}
-
 export type MaterialCreateWithoutAssignmentsInput = {
   id?: string
   title: string
@@ -759,6 +892,7 @@ export type MaterialCreateWithoutAssignmentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   topic: Prisma.TopicCreateNestedOneWithoutMaterialsInput
+  period?: Prisma.AcademicPeriodCreateNestedOneWithoutMaterialsInput
   mediaFiles?: Prisma.MediaFileCreateNestedManyWithoutMaterialInput
   progress?: Prisma.MaterialProgressCreateNestedManyWithoutMaterialInput
   quizConfigs?: Prisma.QuizConfigCreateNestedManyWithoutMaterialInput
@@ -768,6 +902,7 @@ export type MaterialCreateWithoutAssignmentsInput = {
 export type MaterialUncheckedCreateWithoutAssignmentsInput = {
   id?: string
   topicId: string
+  periodId?: string | null
   title: string
   description?: string | null
   type?: $Enums.MaterialType
@@ -811,6 +946,7 @@ export type MaterialUpdateWithoutAssignmentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   topic?: Prisma.TopicUpdateOneRequiredWithoutMaterialsNestedInput
+  period?: Prisma.AcademicPeriodUpdateOneWithoutMaterialsNestedInput
   mediaFiles?: Prisma.MediaFileUpdateManyWithoutMaterialNestedInput
   progress?: Prisma.MaterialProgressUpdateManyWithoutMaterialNestedInput
   quizConfigs?: Prisma.QuizConfigUpdateManyWithoutMaterialNestedInput
@@ -820,6 +956,7 @@ export type MaterialUpdateWithoutAssignmentsInput = {
 export type MaterialUncheckedUpdateWithoutAssignmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   topicId?: Prisma.StringFieldUpdateOperationsInput | string
+  periodId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumMaterialTypeFieldUpdateOperationsInput | $Enums.MaterialType
@@ -847,6 +984,7 @@ export type MaterialCreateWithoutMediaFilesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   topic: Prisma.TopicCreateNestedOneWithoutMaterialsInput
+  period?: Prisma.AcademicPeriodCreateNestedOneWithoutMaterialsInput
   assignments?: Prisma.MaterialAssignmentCreateNestedManyWithoutMaterialInput
   progress?: Prisma.MaterialProgressCreateNestedManyWithoutMaterialInput
   quizConfigs?: Prisma.QuizConfigCreateNestedManyWithoutMaterialInput
@@ -856,6 +994,7 @@ export type MaterialCreateWithoutMediaFilesInput = {
 export type MaterialUncheckedCreateWithoutMediaFilesInput = {
   id?: string
   topicId: string
+  periodId?: string | null
   title: string
   description?: string | null
   type?: $Enums.MaterialType
@@ -899,6 +1038,7 @@ export type MaterialUpdateWithoutMediaFilesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   topic?: Prisma.TopicUpdateOneRequiredWithoutMaterialsNestedInput
+  period?: Prisma.AcademicPeriodUpdateOneWithoutMaterialsNestedInput
   assignments?: Prisma.MaterialAssignmentUpdateManyWithoutMaterialNestedInput
   progress?: Prisma.MaterialProgressUpdateManyWithoutMaterialNestedInput
   quizConfigs?: Prisma.QuizConfigUpdateManyWithoutMaterialNestedInput
@@ -908,6 +1048,7 @@ export type MaterialUpdateWithoutMediaFilesInput = {
 export type MaterialUncheckedUpdateWithoutMediaFilesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   topicId?: Prisma.StringFieldUpdateOperationsInput | string
+  periodId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumMaterialTypeFieldUpdateOperationsInput | $Enums.MaterialType
@@ -935,6 +1076,7 @@ export type MaterialCreateWithoutQuizConfigsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   topic: Prisma.TopicCreateNestedOneWithoutMaterialsInput
+  period?: Prisma.AcademicPeriodCreateNestedOneWithoutMaterialsInput
   mediaFiles?: Prisma.MediaFileCreateNestedManyWithoutMaterialInput
   assignments?: Prisma.MaterialAssignmentCreateNestedManyWithoutMaterialInput
   progress?: Prisma.MaterialProgressCreateNestedManyWithoutMaterialInput
@@ -944,6 +1086,7 @@ export type MaterialCreateWithoutQuizConfigsInput = {
 export type MaterialUncheckedCreateWithoutQuizConfigsInput = {
   id?: string
   topicId: string
+  periodId?: string | null
   title: string
   description?: string | null
   type?: $Enums.MaterialType
@@ -987,6 +1130,7 @@ export type MaterialUpdateWithoutQuizConfigsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   topic?: Prisma.TopicUpdateOneRequiredWithoutMaterialsNestedInput
+  period?: Prisma.AcademicPeriodUpdateOneWithoutMaterialsNestedInput
   mediaFiles?: Prisma.MediaFileUpdateManyWithoutMaterialNestedInput
   assignments?: Prisma.MaterialAssignmentUpdateManyWithoutMaterialNestedInput
   progress?: Prisma.MaterialProgressUpdateManyWithoutMaterialNestedInput
@@ -996,6 +1140,7 @@ export type MaterialUpdateWithoutQuizConfigsInput = {
 export type MaterialUncheckedUpdateWithoutQuizConfigsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   topicId?: Prisma.StringFieldUpdateOperationsInput | string
+  periodId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumMaterialTypeFieldUpdateOperationsInput | $Enums.MaterialType
@@ -1023,6 +1168,7 @@ export type MaterialCreateWithoutProgressInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   topic: Prisma.TopicCreateNestedOneWithoutMaterialsInput
+  period?: Prisma.AcademicPeriodCreateNestedOneWithoutMaterialsInput
   mediaFiles?: Prisma.MediaFileCreateNestedManyWithoutMaterialInput
   assignments?: Prisma.MaterialAssignmentCreateNestedManyWithoutMaterialInput
   quizConfigs?: Prisma.QuizConfigCreateNestedManyWithoutMaterialInput
@@ -1032,6 +1178,7 @@ export type MaterialCreateWithoutProgressInput = {
 export type MaterialUncheckedCreateWithoutProgressInput = {
   id?: string
   topicId: string
+  periodId?: string | null
   title: string
   description?: string | null
   type?: $Enums.MaterialType
@@ -1075,6 +1222,7 @@ export type MaterialUpdateWithoutProgressInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   topic?: Prisma.TopicUpdateOneRequiredWithoutMaterialsNestedInput
+  period?: Prisma.AcademicPeriodUpdateOneWithoutMaterialsNestedInput
   mediaFiles?: Prisma.MediaFileUpdateManyWithoutMaterialNestedInput
   assignments?: Prisma.MaterialAssignmentUpdateManyWithoutMaterialNestedInput
   quizConfigs?: Prisma.QuizConfigUpdateManyWithoutMaterialNestedInput
@@ -1084,6 +1232,7 @@ export type MaterialUpdateWithoutProgressInput = {
 export type MaterialUncheckedUpdateWithoutProgressInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   topicId?: Prisma.StringFieldUpdateOperationsInput | string
+  periodId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumMaterialTypeFieldUpdateOperationsInput | $Enums.MaterialType
@@ -1111,6 +1260,7 @@ export type MaterialCreateWithoutNotificationLogsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   topic: Prisma.TopicCreateNestedOneWithoutMaterialsInput
+  period?: Prisma.AcademicPeriodCreateNestedOneWithoutMaterialsInput
   mediaFiles?: Prisma.MediaFileCreateNestedManyWithoutMaterialInput
   assignments?: Prisma.MaterialAssignmentCreateNestedManyWithoutMaterialInput
   progress?: Prisma.MaterialProgressCreateNestedManyWithoutMaterialInput
@@ -1120,6 +1270,7 @@ export type MaterialCreateWithoutNotificationLogsInput = {
 export type MaterialUncheckedCreateWithoutNotificationLogsInput = {
   id?: string
   topicId: string
+  periodId?: string | null
   title: string
   description?: string | null
   type?: $Enums.MaterialType
@@ -1163,6 +1314,7 @@ export type MaterialUpdateWithoutNotificationLogsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   topic?: Prisma.TopicUpdateOneRequiredWithoutMaterialsNestedInput
+  period?: Prisma.AcademicPeriodUpdateOneWithoutMaterialsNestedInput
   mediaFiles?: Prisma.MediaFileUpdateManyWithoutMaterialNestedInput
   assignments?: Prisma.MaterialAssignmentUpdateManyWithoutMaterialNestedInput
   progress?: Prisma.MaterialProgressUpdateManyWithoutMaterialNestedInput
@@ -1172,6 +1324,7 @@ export type MaterialUpdateWithoutNotificationLogsInput = {
 export type MaterialUncheckedUpdateWithoutNotificationLogsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   topicId?: Prisma.StringFieldUpdateOperationsInput | string
+  periodId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumMaterialTypeFieldUpdateOperationsInput | $Enums.MaterialType
@@ -1187,8 +1340,75 @@ export type MaterialUncheckedUpdateWithoutNotificationLogsInput = {
   quizConfigs?: Prisma.QuizConfigUncheckedUpdateManyWithoutMaterialNestedInput
 }
 
+export type MaterialCreateManyPeriodInput = {
+  id?: string
+  topicId: string
+  title: string
+  description?: string | null
+  type?: $Enums.MaterialType
+  duration?: number
+  thumbnail?: string | null
+  status?: $Enums.MaterialStatus
+  publishedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type MaterialUpdateWithoutPeriodInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumMaterialTypeFieldUpdateOperationsInput | $Enums.MaterialType
+  duration?: Prisma.IntFieldUpdateOperationsInput | number
+  thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumMaterialStatusFieldUpdateOperationsInput | $Enums.MaterialStatus
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  topic?: Prisma.TopicUpdateOneRequiredWithoutMaterialsNestedInput
+  mediaFiles?: Prisma.MediaFileUpdateManyWithoutMaterialNestedInput
+  assignments?: Prisma.MaterialAssignmentUpdateManyWithoutMaterialNestedInput
+  progress?: Prisma.MaterialProgressUpdateManyWithoutMaterialNestedInput
+  quizConfigs?: Prisma.QuizConfigUpdateManyWithoutMaterialNestedInput
+  notificationLogs?: Prisma.NotificationLogUpdateManyWithoutMaterialNestedInput
+}
+
+export type MaterialUncheckedUpdateWithoutPeriodInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  topicId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumMaterialTypeFieldUpdateOperationsInput | $Enums.MaterialType
+  duration?: Prisma.IntFieldUpdateOperationsInput | number
+  thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumMaterialStatusFieldUpdateOperationsInput | $Enums.MaterialStatus
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  mediaFiles?: Prisma.MediaFileUncheckedUpdateManyWithoutMaterialNestedInput
+  assignments?: Prisma.MaterialAssignmentUncheckedUpdateManyWithoutMaterialNestedInput
+  progress?: Prisma.MaterialProgressUncheckedUpdateManyWithoutMaterialNestedInput
+  quizConfigs?: Prisma.QuizConfigUncheckedUpdateManyWithoutMaterialNestedInput
+  notificationLogs?: Prisma.NotificationLogUncheckedUpdateManyWithoutMaterialNestedInput
+}
+
+export type MaterialUncheckedUpdateManyWithoutPeriodInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  topicId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  type?: Prisma.EnumMaterialTypeFieldUpdateOperationsInput | $Enums.MaterialType
+  duration?: Prisma.IntFieldUpdateOperationsInput | number
+  thumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumMaterialStatusFieldUpdateOperationsInput | $Enums.MaterialStatus
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type MaterialCreateManyTopicInput = {
   id?: string
+  periodId?: string | null
   title: string
   description?: string | null
   type?: $Enums.MaterialType
@@ -1211,6 +1431,7 @@ export type MaterialUpdateWithoutTopicInput = {
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  period?: Prisma.AcademicPeriodUpdateOneWithoutMaterialsNestedInput
   mediaFiles?: Prisma.MediaFileUpdateManyWithoutMaterialNestedInput
   assignments?: Prisma.MaterialAssignmentUpdateManyWithoutMaterialNestedInput
   progress?: Prisma.MaterialProgressUpdateManyWithoutMaterialNestedInput
@@ -1220,6 +1441,7 @@ export type MaterialUpdateWithoutTopicInput = {
 
 export type MaterialUncheckedUpdateWithoutTopicInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  periodId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumMaterialTypeFieldUpdateOperationsInput | $Enums.MaterialType
@@ -1238,6 +1460,7 @@ export type MaterialUncheckedUpdateWithoutTopicInput = {
 
 export type MaterialUncheckedUpdateManyWithoutTopicInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  periodId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumMaterialTypeFieldUpdateOperationsInput | $Enums.MaterialType
@@ -1319,6 +1542,7 @@ export type MaterialCountOutputTypeCountNotificationLogsArgs<ExtArgs extends run
 export type MaterialSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   topicId?: boolean
+  periodId?: boolean
   title?: boolean
   description?: boolean
   type?: boolean
@@ -1329,6 +1553,7 @@ export type MaterialSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   createdAt?: boolean
   updatedAt?: boolean
   topic?: boolean | Prisma.TopicDefaultArgs<ExtArgs>
+  period?: boolean | Prisma.Material$periodArgs<ExtArgs>
   mediaFiles?: boolean | Prisma.Material$mediaFilesArgs<ExtArgs>
   assignments?: boolean | Prisma.Material$assignmentsArgs<ExtArgs>
   progress?: boolean | Prisma.Material$progressArgs<ExtArgs>
@@ -1340,6 +1565,7 @@ export type MaterialSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
 export type MaterialSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   topicId?: boolean
+  periodId?: boolean
   title?: boolean
   description?: boolean
   type?: boolean
@@ -1350,11 +1576,13 @@ export type MaterialSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   createdAt?: boolean
   updatedAt?: boolean
   topic?: boolean | Prisma.TopicDefaultArgs<ExtArgs>
+  period?: boolean | Prisma.Material$periodArgs<ExtArgs>
 }, ExtArgs["result"]["material"]>
 
 export type MaterialSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   topicId?: boolean
+  periodId?: boolean
   title?: boolean
   description?: boolean
   type?: boolean
@@ -1365,11 +1593,13 @@ export type MaterialSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   createdAt?: boolean
   updatedAt?: boolean
   topic?: boolean | Prisma.TopicDefaultArgs<ExtArgs>
+  period?: boolean | Prisma.Material$periodArgs<ExtArgs>
 }, ExtArgs["result"]["material"]>
 
 export type MaterialSelectScalar = {
   id?: boolean
   topicId?: boolean
+  periodId?: boolean
   title?: boolean
   description?: boolean
   type?: boolean
@@ -1381,9 +1611,10 @@ export type MaterialSelectScalar = {
   updatedAt?: boolean
 }
 
-export type MaterialOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "topicId" | "title" | "description" | "type" | "duration" | "thumbnail" | "status" | "publishedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["material"]>
+export type MaterialOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "topicId" | "periodId" | "title" | "description" | "type" | "duration" | "thumbnail" | "status" | "publishedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["material"]>
 export type MaterialInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   topic?: boolean | Prisma.TopicDefaultArgs<ExtArgs>
+  period?: boolean | Prisma.Material$periodArgs<ExtArgs>
   mediaFiles?: boolean | Prisma.Material$mediaFilesArgs<ExtArgs>
   assignments?: boolean | Prisma.Material$assignmentsArgs<ExtArgs>
   progress?: boolean | Prisma.Material$progressArgs<ExtArgs>
@@ -1393,15 +1624,18 @@ export type MaterialInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
 }
 export type MaterialIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   topic?: boolean | Prisma.TopicDefaultArgs<ExtArgs>
+  period?: boolean | Prisma.Material$periodArgs<ExtArgs>
 }
 export type MaterialIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   topic?: boolean | Prisma.TopicDefaultArgs<ExtArgs>
+  period?: boolean | Prisma.Material$periodArgs<ExtArgs>
 }
 
 export type $MaterialPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Material"
   objects: {
     topic: Prisma.$TopicPayload<ExtArgs>
+    period: Prisma.$AcademicPeriodPayload<ExtArgs> | null
     mediaFiles: Prisma.$MediaFilePayload<ExtArgs>[]
     assignments: Prisma.$MaterialAssignmentPayload<ExtArgs>[]
     progress: Prisma.$MaterialProgressPayload<ExtArgs>[]
@@ -1411,6 +1645,7 @@ export type $MaterialPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     topicId: string
+    periodId: string | null
     title: string
     description: string | null
     type: $Enums.MaterialType
@@ -1815,6 +2050,7 @@ readonly fields: MaterialFieldRefs;
 export interface Prisma__MaterialClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   topic<T extends Prisma.TopicDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TopicDefaultArgs<ExtArgs>>): Prisma.Prisma__TopicClient<runtime.Types.Result.GetResult<Prisma.$TopicPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  period<T extends Prisma.Material$periodArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Material$periodArgs<ExtArgs>>): Prisma.Prisma__AcademicPeriodClient<runtime.Types.Result.GetResult<Prisma.$AcademicPeriodPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   mediaFiles<T extends Prisma.Material$mediaFilesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Material$mediaFilesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MediaFilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   assignments<T extends Prisma.Material$assignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Material$assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MaterialAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   progress<T extends Prisma.Material$progressArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Material$progressArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MaterialProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -1851,6 +2087,7 @@ export interface Prisma__MaterialClient<T, Null = never, ExtArgs extends runtime
 export interface MaterialFieldRefs {
   readonly id: Prisma.FieldRef<"Material", 'String'>
   readonly topicId: Prisma.FieldRef<"Material", 'String'>
+  readonly periodId: Prisma.FieldRef<"Material", 'String'>
   readonly title: Prisma.FieldRef<"Material", 'String'>
   readonly description: Prisma.FieldRef<"Material", 'String'>
   readonly type: Prisma.FieldRef<"Material", 'MaterialType'>
@@ -2258,6 +2495,25 @@ export type MaterialDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Limit how many Materials to delete.
    */
   limit?: number
+}
+
+/**
+ * Material.period
+ */
+export type Material$periodArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AcademicPeriod
+   */
+  select?: Prisma.AcademicPeriodSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AcademicPeriod
+   */
+  omit?: Prisma.AcademicPeriodOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AcademicPeriodInclude<ExtArgs> | null
+  where?: Prisma.AcademicPeriodWhereInput
 }
 
 /**

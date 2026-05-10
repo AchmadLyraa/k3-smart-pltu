@@ -31,16 +31,28 @@ export default async function WorkerHomePage() {
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 grid-cols-4 mb-8">
+      <div className="grid gap-4 grid-cols-5 mb-8">
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm text-muted-foreground">Total Poin</p>
               <Trophy className="w-5 h-5 text-yellow-500" />
             </div>
-            <p className="text-3xl font-bold">{stats?.totalPoints ?? 0}</p>
+            <p className="text-3xl font-bold">{stats?.allTimePoints ?? 0}</p>
             <p className="text-xs text-muted-foreground mt-1">
               akumulasi keseluruhan
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm text-muted-foreground">Poin Semester ini</p>
+              <Trophy className="w-5 h-5 text-yellow-500" />
+            </div>
+            <p className="text-3xl font-bold">{stats?.totalPoints ?? 0}</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              akumulasi semester ini
             </p>
           </CardContent>
         </Card>

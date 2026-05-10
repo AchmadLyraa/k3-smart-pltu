@@ -94,6 +94,7 @@ export default function CMSMaterialsTab({ topics, materials, questions }) {
     maxRetries: 3,
     showCorrectAns: true,
     shuffleQuestions: true,
+    deadline: "",
   });
   const [savingQuiz, setSavingQuiz] = useState(false);
 
@@ -115,6 +116,9 @@ export default function CMSMaterialsTab({ topics, materials, questions }) {
       const result = await createQuizConfig({
         materialId: quizMaterial.id,
         ...quizFormData,
+        deadline: quizFormData.deadline
+          ? new Date(quizFormData.deadline)
+          : undefined,
         totalQuestions: Math.min(
           quizFormData.totalQuestions,
           selectedQuestions.length,
@@ -136,6 +140,7 @@ export default function CMSMaterialsTab({ topics, materials, questions }) {
           maxRetries: 3,
           showCorrectAns: true,
           shuffleQuestions: true,
+          deadline: "",
         });
         window.location.reload();
       } else {
@@ -400,6 +405,23 @@ export default function CMSMaterialsTab({ topics, materials, questions }) {
                           {quiz.questionCount} soal •{" "}
                           {Math.floor(quiz.timeLimit / 60)} menit • Lulus{" "}
                           {quiz.passingScore}%
+                          {quiz.deadline && (
+                            <span
+                              className={`ml-1 ${new Date() > new Date(quiz.deadline) ? "text-red-500" : "text-amber-600"}`}
+                            >
+                              • Deadline:{" "}
+                              {new Date(quiz.deadline).toLocaleDateString(
+                                "id-ID",
+                                {
+                                  day: "numeric",
+                                  month: "short",
+                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                },
+                              )}
+                            </span>
+                          )}
                         </p>
                       </div>
                     </div>
@@ -488,6 +510,24 @@ export default function CMSMaterialsTab({ topics, materials, questions }) {
                       }
                       min="1"
                     />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Deadline (opsional)
+                    </label>
+                    <Input
+                      type="datetime-local"
+                      value={quizFormData.deadline}
+                      onChange={(e) =>
+                        setQuizFormData({
+                          ...quizFormData,
+                          deadline: e.target.value,
+                        })
+                      }
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Lewat deadline: -5% per hari, maks -40%
+                    </p>
                   </div>
                 </div>
 

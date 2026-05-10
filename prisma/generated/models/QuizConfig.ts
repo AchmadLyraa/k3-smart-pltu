@@ -48,6 +48,7 @@ export type QuizConfigMinAggregateOutputType = {
   totalQuestions: number | null
   passingScore: number | null
   timeLimit: number | null
+  deadline: Date | null
   allowRetake: boolean | null
   maxRetries: number | null
   showCorrectAns: boolean | null
@@ -64,6 +65,7 @@ export type QuizConfigMaxAggregateOutputType = {
   totalQuestions: number | null
   passingScore: number | null
   timeLimit: number | null
+  deadline: Date | null
   allowRetake: boolean | null
   maxRetries: number | null
   showCorrectAns: boolean | null
@@ -80,6 +82,7 @@ export type QuizConfigCountAggregateOutputType = {
   totalQuestions: number
   passingScore: number
   timeLimit: number
+  deadline: number
   allowRetake: number
   maxRetries: number
   showCorrectAns: number
@@ -112,6 +115,7 @@ export type QuizConfigMinAggregateInputType = {
   totalQuestions?: true
   passingScore?: true
   timeLimit?: true
+  deadline?: true
   allowRetake?: true
   maxRetries?: true
   showCorrectAns?: true
@@ -128,6 +132,7 @@ export type QuizConfigMaxAggregateInputType = {
   totalQuestions?: true
   passingScore?: true
   timeLimit?: true
+  deadline?: true
   allowRetake?: true
   maxRetries?: true
   showCorrectAns?: true
@@ -144,6 +149,7 @@ export type QuizConfigCountAggregateInputType = {
   totalQuestions?: true
   passingScore?: true
   timeLimit?: true
+  deadline?: true
   allowRetake?: true
   maxRetries?: true
   showCorrectAns?: true
@@ -247,6 +253,7 @@ export type QuizConfigGroupByOutputType = {
   totalQuestions: number
   passingScore: number
   timeLimit: number
+  deadline: Date | null
   allowRetake: boolean
   maxRetries: number
   showCorrectAns: boolean
@@ -286,6 +293,7 @@ export type QuizConfigWhereInput = {
   totalQuestions?: Prisma.IntFilter<"QuizConfig"> | number
   passingScore?: Prisma.IntFilter<"QuizConfig"> | number
   timeLimit?: Prisma.IntFilter<"QuizConfig"> | number
+  deadline?: Prisma.DateTimeNullableFilter<"QuizConfig"> | Date | string | null
   allowRetake?: Prisma.BoolFilter<"QuizConfig"> | boolean
   maxRetries?: Prisma.IntFilter<"QuizConfig"> | number
   showCorrectAns?: Prisma.BoolFilter<"QuizConfig"> | boolean
@@ -305,6 +313,7 @@ export type QuizConfigOrderByWithRelationInput = {
   totalQuestions?: Prisma.SortOrder
   passingScore?: Prisma.SortOrder
   timeLimit?: Prisma.SortOrder
+  deadline?: Prisma.SortOrderInput | Prisma.SortOrder
   allowRetake?: Prisma.SortOrder
   maxRetries?: Prisma.SortOrder
   showCorrectAns?: Prisma.SortOrder
@@ -327,6 +336,7 @@ export type QuizConfigWhereUniqueInput = Prisma.AtLeast<{
   totalQuestions?: Prisma.IntFilter<"QuizConfig"> | number
   passingScore?: Prisma.IntFilter<"QuizConfig"> | number
   timeLimit?: Prisma.IntFilter<"QuizConfig"> | number
+  deadline?: Prisma.DateTimeNullableFilter<"QuizConfig"> | Date | string | null
   allowRetake?: Prisma.BoolFilter<"QuizConfig"> | boolean
   maxRetries?: Prisma.IntFilter<"QuizConfig"> | number
   showCorrectAns?: Prisma.BoolFilter<"QuizConfig"> | boolean
@@ -346,6 +356,7 @@ export type QuizConfigOrderByWithAggregationInput = {
   totalQuestions?: Prisma.SortOrder
   passingScore?: Prisma.SortOrder
   timeLimit?: Prisma.SortOrder
+  deadline?: Prisma.SortOrderInput | Prisma.SortOrder
   allowRetake?: Prisma.SortOrder
   maxRetries?: Prisma.SortOrder
   showCorrectAns?: Prisma.SortOrder
@@ -370,6 +381,7 @@ export type QuizConfigScalarWhereWithAggregatesInput = {
   totalQuestions?: Prisma.IntWithAggregatesFilter<"QuizConfig"> | number
   passingScore?: Prisma.IntWithAggregatesFilter<"QuizConfig"> | number
   timeLimit?: Prisma.IntWithAggregatesFilter<"QuizConfig"> | number
+  deadline?: Prisma.DateTimeNullableWithAggregatesFilter<"QuizConfig"> | Date | string | null
   allowRetake?: Prisma.BoolWithAggregatesFilter<"QuizConfig"> | boolean
   maxRetries?: Prisma.IntWithAggregatesFilter<"QuizConfig"> | number
   showCorrectAns?: Prisma.BoolWithAggregatesFilter<"QuizConfig"> | boolean
@@ -385,6 +397,7 @@ export type QuizConfigCreateInput = {
   totalQuestions?: number
   passingScore?: number
   timeLimit?: number
+  deadline?: Date | string | null
   allowRetake?: boolean
   maxRetries?: number
   showCorrectAns?: boolean
@@ -404,6 +417,7 @@ export type QuizConfigUncheckedCreateInput = {
   totalQuestions?: number
   passingScore?: number
   timeLimit?: number
+  deadline?: Date | string | null
   allowRetake?: boolean
   maxRetries?: number
   showCorrectAns?: boolean
@@ -421,6 +435,7 @@ export type QuizConfigUpdateInput = {
   totalQuestions?: Prisma.IntFieldUpdateOperationsInput | number
   passingScore?: Prisma.IntFieldUpdateOperationsInput | number
   timeLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   allowRetake?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxRetries?: Prisma.IntFieldUpdateOperationsInput | number
   showCorrectAns?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -440,6 +455,7 @@ export type QuizConfigUncheckedUpdateInput = {
   totalQuestions?: Prisma.IntFieldUpdateOperationsInput | number
   passingScore?: Prisma.IntFieldUpdateOperationsInput | number
   timeLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   allowRetake?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxRetries?: Prisma.IntFieldUpdateOperationsInput | number
   showCorrectAns?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -458,6 +474,7 @@ export type QuizConfigCreateManyInput = {
   totalQuestions?: number
   passingScore?: number
   timeLimit?: number
+  deadline?: Date | string | null
   allowRetake?: boolean
   maxRetries?: number
   showCorrectAns?: boolean
@@ -473,6 +490,7 @@ export type QuizConfigUpdateManyMutationInput = {
   totalQuestions?: Prisma.IntFieldUpdateOperationsInput | number
   passingScore?: Prisma.IntFieldUpdateOperationsInput | number
   timeLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   allowRetake?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxRetries?: Prisma.IntFieldUpdateOperationsInput | number
   showCorrectAns?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -489,6 +507,7 @@ export type QuizConfigUncheckedUpdateManyInput = {
   totalQuestions?: Prisma.IntFieldUpdateOperationsInput | number
   passingScore?: Prisma.IntFieldUpdateOperationsInput | number
   timeLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   allowRetake?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxRetries?: Prisma.IntFieldUpdateOperationsInput | number
   showCorrectAns?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -515,6 +534,7 @@ export type QuizConfigCountOrderByAggregateInput = {
   totalQuestions?: Prisma.SortOrder
   passingScore?: Prisma.SortOrder
   timeLimit?: Prisma.SortOrder
+  deadline?: Prisma.SortOrder
   allowRetake?: Prisma.SortOrder
   maxRetries?: Prisma.SortOrder
   showCorrectAns?: Prisma.SortOrder
@@ -538,6 +558,7 @@ export type QuizConfigMaxOrderByAggregateInput = {
   totalQuestions?: Prisma.SortOrder
   passingScore?: Prisma.SortOrder
   timeLimit?: Prisma.SortOrder
+  deadline?: Prisma.SortOrder
   allowRetake?: Prisma.SortOrder
   maxRetries?: Prisma.SortOrder
   showCorrectAns?: Prisma.SortOrder
@@ -554,6 +575,7 @@ export type QuizConfigMinOrderByAggregateInput = {
   totalQuestions?: Prisma.SortOrder
   passingScore?: Prisma.SortOrder
   timeLimit?: Prisma.SortOrder
+  deadline?: Prisma.SortOrder
   allowRetake?: Prisma.SortOrder
   maxRetries?: Prisma.SortOrder
   showCorrectAns?: Prisma.SortOrder
@@ -675,6 +697,7 @@ export type QuizConfigCreateWithoutMaterialInput = {
   totalQuestions?: number
   passingScore?: number
   timeLimit?: number
+  deadline?: Date | string | null
   allowRetake?: boolean
   maxRetries?: number
   showCorrectAns?: boolean
@@ -692,6 +715,7 @@ export type QuizConfigUncheckedCreateWithoutMaterialInput = {
   totalQuestions?: number
   passingScore?: number
   timeLimit?: number
+  deadline?: Date | string | null
   allowRetake?: boolean
   maxRetries?: number
   showCorrectAns?: boolean
@@ -739,6 +763,7 @@ export type QuizConfigScalarWhereInput = {
   totalQuestions?: Prisma.IntFilter<"QuizConfig"> | number
   passingScore?: Prisma.IntFilter<"QuizConfig"> | number
   timeLimit?: Prisma.IntFilter<"QuizConfig"> | number
+  deadline?: Prisma.DateTimeNullableFilter<"QuizConfig"> | Date | string | null
   allowRetake?: Prisma.BoolFilter<"QuizConfig"> | boolean
   maxRetries?: Prisma.IntFilter<"QuizConfig"> | number
   showCorrectAns?: Prisma.BoolFilter<"QuizConfig"> | boolean
@@ -754,6 +779,7 @@ export type QuizConfigCreateWithoutQuestionsInput = {
   totalQuestions?: number
   passingScore?: number
   timeLimit?: number
+  deadline?: Date | string | null
   allowRetake?: boolean
   maxRetries?: number
   showCorrectAns?: boolean
@@ -772,6 +798,7 @@ export type QuizConfigUncheckedCreateWithoutQuestionsInput = {
   totalQuestions?: number
   passingScore?: number
   timeLimit?: number
+  deadline?: Date | string | null
   allowRetake?: boolean
   maxRetries?: number
   showCorrectAns?: boolean
@@ -809,6 +836,7 @@ export type QuizConfigCreateWithoutQuizSessionsInput = {
   totalQuestions?: number
   passingScore?: number
   timeLimit?: number
+  deadline?: Date | string | null
   allowRetake?: boolean
   maxRetries?: number
   showCorrectAns?: boolean
@@ -827,6 +855,7 @@ export type QuizConfigUncheckedCreateWithoutQuizSessionsInput = {
   totalQuestions?: number
   passingScore?: number
   timeLimit?: number
+  deadline?: Date | string | null
   allowRetake?: boolean
   maxRetries?: number
   showCorrectAns?: boolean
@@ -859,6 +888,7 @@ export type QuizConfigUpdateWithoutQuizSessionsInput = {
   totalQuestions?: Prisma.IntFieldUpdateOperationsInput | number
   passingScore?: Prisma.IntFieldUpdateOperationsInput | number
   timeLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   allowRetake?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxRetries?: Prisma.IntFieldUpdateOperationsInput | number
   showCorrectAns?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -877,6 +907,7 @@ export type QuizConfigUncheckedUpdateWithoutQuizSessionsInput = {
   totalQuestions?: Prisma.IntFieldUpdateOperationsInput | number
   passingScore?: Prisma.IntFieldUpdateOperationsInput | number
   timeLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   allowRetake?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxRetries?: Prisma.IntFieldUpdateOperationsInput | number
   showCorrectAns?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -893,6 +924,7 @@ export type QuizConfigCreateManyMaterialInput = {
   totalQuestions?: number
   passingScore?: number
   timeLimit?: number
+  deadline?: Date | string | null
   allowRetake?: boolean
   maxRetries?: number
   showCorrectAns?: boolean
@@ -908,6 +940,7 @@ export type QuizConfigUpdateWithoutMaterialInput = {
   totalQuestions?: Prisma.IntFieldUpdateOperationsInput | number
   passingScore?: Prisma.IntFieldUpdateOperationsInput | number
   timeLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   allowRetake?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxRetries?: Prisma.IntFieldUpdateOperationsInput | number
   showCorrectAns?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -925,6 +958,7 @@ export type QuizConfigUncheckedUpdateWithoutMaterialInput = {
   totalQuestions?: Prisma.IntFieldUpdateOperationsInput | number
   passingScore?: Prisma.IntFieldUpdateOperationsInput | number
   timeLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   allowRetake?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxRetries?: Prisma.IntFieldUpdateOperationsInput | number
   showCorrectAns?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -942,6 +976,7 @@ export type QuizConfigUncheckedUpdateManyWithoutMaterialInput = {
   totalQuestions?: Prisma.IntFieldUpdateOperationsInput | number
   passingScore?: Prisma.IntFieldUpdateOperationsInput | number
   timeLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   allowRetake?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxRetries?: Prisma.IntFieldUpdateOperationsInput | number
   showCorrectAns?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -957,6 +992,7 @@ export type QuizConfigUpdateWithoutQuestionsInput = {
   totalQuestions?: Prisma.IntFieldUpdateOperationsInput | number
   passingScore?: Prisma.IntFieldUpdateOperationsInput | number
   timeLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   allowRetake?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxRetries?: Prisma.IntFieldUpdateOperationsInput | number
   showCorrectAns?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -975,6 +1011,7 @@ export type QuizConfigUncheckedUpdateWithoutQuestionsInput = {
   totalQuestions?: Prisma.IntFieldUpdateOperationsInput | number
   passingScore?: Prisma.IntFieldUpdateOperationsInput | number
   timeLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   allowRetake?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxRetries?: Prisma.IntFieldUpdateOperationsInput | number
   showCorrectAns?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -992,6 +1029,7 @@ export type QuizConfigUncheckedUpdateManyWithoutQuestionsInput = {
   totalQuestions?: Prisma.IntFieldUpdateOperationsInput | number
   passingScore?: Prisma.IntFieldUpdateOperationsInput | number
   timeLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  deadline?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   allowRetake?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxRetries?: Prisma.IntFieldUpdateOperationsInput | number
   showCorrectAns?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1048,6 +1086,7 @@ export type QuizConfigSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   totalQuestions?: boolean
   passingScore?: boolean
   timeLimit?: boolean
+  deadline?: boolean
   allowRetake?: boolean
   maxRetries?: boolean
   showCorrectAns?: boolean
@@ -1068,6 +1107,7 @@ export type QuizConfigSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   totalQuestions?: boolean
   passingScore?: boolean
   timeLimit?: boolean
+  deadline?: boolean
   allowRetake?: boolean
   maxRetries?: boolean
   showCorrectAns?: boolean
@@ -1085,6 +1125,7 @@ export type QuizConfigSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   totalQuestions?: boolean
   passingScore?: boolean
   timeLimit?: boolean
+  deadline?: boolean
   allowRetake?: boolean
   maxRetries?: boolean
   showCorrectAns?: boolean
@@ -1102,6 +1143,7 @@ export type QuizConfigSelectScalar = {
   totalQuestions?: boolean
   passingScore?: boolean
   timeLimit?: boolean
+  deadline?: boolean
   allowRetake?: boolean
   maxRetries?: boolean
   showCorrectAns?: boolean
@@ -1110,7 +1152,7 @@ export type QuizConfigSelectScalar = {
   updatedAt?: boolean
 }
 
-export type QuizConfigOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "materialId" | "name" | "description" | "totalQuestions" | "passingScore" | "timeLimit" | "allowRetake" | "maxRetries" | "showCorrectAns" | "shuffleQuestions" | "createdAt" | "updatedAt", ExtArgs["result"]["quizConfig"]>
+export type QuizConfigOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "materialId" | "name" | "description" | "totalQuestions" | "passingScore" | "timeLimit" | "deadline" | "allowRetake" | "maxRetries" | "showCorrectAns" | "shuffleQuestions" | "createdAt" | "updatedAt", ExtArgs["result"]["quizConfig"]>
 export type QuizConfigInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   material?: boolean | Prisma.MaterialDefaultArgs<ExtArgs>
   questions?: boolean | Prisma.QuizConfig$questionsArgs<ExtArgs>
@@ -1139,6 +1181,7 @@ export type $QuizConfigPayload<ExtArgs extends runtime.Types.Extensions.Internal
     totalQuestions: number
     passingScore: number
     timeLimit: number
+    deadline: Date | null
     allowRetake: boolean
     maxRetries: number
     showCorrectAns: boolean
@@ -1578,6 +1621,7 @@ export interface QuizConfigFieldRefs {
   readonly totalQuestions: Prisma.FieldRef<"QuizConfig", 'Int'>
   readonly passingScore: Prisma.FieldRef<"QuizConfig", 'Int'>
   readonly timeLimit: Prisma.FieldRef<"QuizConfig", 'Int'>
+  readonly deadline: Prisma.FieldRef<"QuizConfig", 'DateTime'>
   readonly allowRetake: Prisma.FieldRef<"QuizConfig", 'Boolean'>
   readonly maxRetries: Prisma.FieldRef<"QuizConfig", 'Int'>
   readonly showCorrectAns: Prisma.FieldRef<"QuizConfig", 'Boolean'>

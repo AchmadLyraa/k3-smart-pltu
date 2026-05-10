@@ -96,6 +96,38 @@ export default function WorkerQuizView({
           <Clock className="w-4 h-4" />
           {formatTime(timeLeft)}
         </div>
+        {quizConfig.deadline &&
+          (() => {
+            const deadline = new Date(quizConfig.deadline);
+            const now = new Date();
+            const isLate = now > deadline;
+            const diffMs = Math.abs(deadline.getTime() - now.getTime());
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            const diffHours = Math.floor(
+              (diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+            );
+
+            return (
+              <div
+                className={`text-xs px-3 py-1.5 rounded-full ${
+                  isLate
+                    ? "bg-red-100 text-red-600"
+                    : "bg-amber-100 text-amber-700"
+                }`}
+              >
+                {isLate ? (
+                  <>
+                    ⚠️ Terlambat {diffDays} hari — penalti -
+                    {Math.min(diffDays * 5, 40)}%
+                  </>
+                ) : (
+                  <>
+                    ⏰ Deadline: {diffDays}h {diffHours}j lagi
+                  </>
+                )}
+              </div>
+            );
+          })()}
       </div>
 
       {/* Progress bar */}

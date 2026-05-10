@@ -77,6 +77,11 @@ export type Session = Prisma.SessionModel
  */
 export type VerificationToken = Prisma.VerificationTokenModel
 /**
+ * Model AcademicPeriod
+ * 
+ */
+export type AcademicPeriod = Prisma.AcademicPeriodModel
+/**
  * Model Topic
  * 
  */

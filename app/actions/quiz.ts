@@ -150,6 +150,7 @@ export async function createQuizConfig(data: {
   showCorrectAns: boolean;
   shuffleQuestions: boolean;
   questionIds: string[];
+  deadline?: Date; // ← tambah
 }) {
   await requireAuth(["SUPER_ADMIN"]);
 
@@ -166,8 +167,9 @@ export async function createQuizConfig(data: {
         maxRetries: data.maxRetries,
         showCorrectAns: data.showCorrectAns,
         shuffleQuestions: data.shuffleQuestions,
+        deadline: data.deadline, // ← tambah
         questions: {
-          connect: data.questionIds.map((id) => ({ id })), // ← guna connect
+          connect: data.questionIds.map((id) => ({ id })),
         },
       },
     });

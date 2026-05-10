@@ -58,6 +58,7 @@ export const ModelName = {
   Account: 'Account',
   Session: 'Session',
   VerificationToken: 'VerificationToken',
+  AcademicPeriod: 'AcademicPeriod',
   Topic: 'Topic',
   Material: 'Material',
   MaterialAssignment: 'MaterialAssignment',
@@ -200,6 +201,20 @@ export const VerificationTokenScalarFieldEnum = {
 export type VerificationTokenScalarFieldEnum = (typeof VerificationTokenScalarFieldEnum)[keyof typeof VerificationTokenScalarFieldEnum]
 
 
+export const AcademicPeriodScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  isActive: 'isActive',
+  lastResetAt: 'lastResetAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AcademicPeriodScalarFieldEnum = (typeof AcademicPeriodScalarFieldEnum)[keyof typeof AcademicPeriodScalarFieldEnum]
+
+
 export const TopicScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -216,6 +231,7 @@ export type TopicScalarFieldEnum = (typeof TopicScalarFieldEnum)[keyof typeof To
 export const MaterialScalarFieldEnum = {
   id: 'id',
   topicId: 'topicId',
+  periodId: 'periodId',
   title: 'title',
   description: 'description',
   type: 'type',
@@ -263,6 +279,7 @@ export type MediaFileScalarFieldEnum = (typeof MediaFileScalarFieldEnum)[keyof t
 
 export const QuestionBankScalarFieldEnum = {
   id: 'id',
+  periodId: 'periodId',
   text: 'text',
   type: 'type',
   correctAnswer: 'correctAnswer',
@@ -294,6 +311,7 @@ export const QuizConfigScalarFieldEnum = {
   totalQuestions: 'totalQuestions',
   passingScore: 'passingScore',
   timeLimit: 'timeLimit',
+  deadline: 'deadline',
   allowRetake: 'allowRetake',
   maxRetries: 'maxRetries',
   showCorrectAns: 'showCorrectAns',
@@ -405,6 +423,7 @@ export type MonthlyPointSummaryScalarFieldEnum = (typeof MonthlyPointSummaryScal
 export const SemesterSummaryScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
+  periodId: 'periodId',
   year: 'year',
   semester: 'semester',
   totalPoints: 'totalPoints',

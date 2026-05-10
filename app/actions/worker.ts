@@ -257,15 +257,22 @@ export async function completeQuiz(sessionId: string) {
       (submittedAt.getTime() - startedAt.getTime()) / 1000,
     );
     const timeLimit = session.quizConfig.timeLimit;
-    const unusedTime = Math.max(0, timeLimit - timeUsed); // jangan minus
+    const unusedTime = Math.max(0, timeLimit - timeUsed);
     const unusedPercentage = unusedTime / timeLimit;
-    const timeBonus = Math.floor(unusedPercentage * 100); // max 100 pts
+    const timeBonus = Math.floor(unusedPercentage * 100);
+
+    // Deklarasi di luar block if — biar bisa direturn
+    let deadlinePenalty = 0;
+    let daysLate = 0;
+    let penaltyPoints = 0;
+    let adjustedPoints = totalPoints;
+    let totalPointsWithBonus = 0;
 
     const updatedSession = await prisma.quizSession.update({
       where: { id: sessionId },
       data: {
         status: "GRADED",
-        submittedAt: new Date(),
+        submittedAt,
         score: totalPoints,
         correctAnswers: correctCount,
         passed,
@@ -283,14 +290,36 @@ export async function completeQuiz(sessionId: string) {
       });
 
       if (!alreadyPassed) {
-        const totalPointsWithBonus = totalPoints + timeBonus;
+        let description = `Quiz selesai: ${session.quizConfig.name}`;
+
+        if (session.quizConfig.deadline) {
+          const deadlineDate = new Date(session.quizConfig.deadline);
+          if (submittedAt > deadlineDate) {
+            daysLate = Math.ceil(
+              (submittedAt.getTime() - deadlineDate.getTime()) /
+                (1000 * 60 * 60 * 24),
+            );
+            deadlinePenalty = Math.min(daysLate * 5, 40);
+          }
+        }
+
+        penaltyPoints = Math.floor((totalPoints * deadlinePenalty) / 100);
+        adjustedPoints = totalPoints - penaltyPoints;
+        totalPointsWithBonus = adjustedPoints + timeBonus;
+
+        if (deadlinePenalty > 0) {
+          description += ` (Terlambat ${daysLate} hari, -${deadlinePenalty}%)`;
+        }
+        if (timeBonus > 0) {
+          description += ` (+${timeBonus} time bonus)`;
+        }
 
         await prisma.pointTransaction.create({
           data: {
             userId: user.id,
             points: totalPointsWithBonus,
             transactionType: "QUIZ_COMPLETION",
-            description: `Quiz selesai: ${session.quizConfig.name} (+${timeBonus} time bonus)`,
+            description,
             reference: sessionId,
           },
         });
@@ -306,7 +335,11 @@ export async function completeQuiz(sessionId: string) {
         totalQuestions: userAnswers.length,
         totalPoints,
         timeBonus,
-        totalPointsWithBonus: passed ? totalPoints + timeBonus : 0,
+        penaltyPercent: deadlinePenalty,
+        penaltyPoints,
+        daysLate,
+        adjustedPoints,
+        totalPointsWithBonus,
         showCorrectAns: session.quizConfig.showCorrectAns,
         answers: updatedAnswers,
       },
@@ -362,19 +395,27 @@ export async function getWorkerStats() {
   if (!user) return { success: false, error: "Not authenticated" };
 
   try {
-    const [pointTransactions, materialsCompleted, quizPassed] =
-      await Promise.all([
-        prisma.pointTransaction.findMany({
-          where: { userId: user.id },
-          orderBy: { createdAt: "desc" },
-        }),
-        prisma.materialProgress.count({
-          where: { userId: user.id, status: "COMPLETED" },
-        }),
-        prisma.quizSession.count({
-          where: { userId: user.id, passed: true },
-        }),
-      ]);
+    const [
+      pointTransactions,
+      materialsCompleted,
+      quizPassed,
+      semesterSummaries,
+    ] = await Promise.all([
+      prisma.pointTransaction.findMany({
+        where: { userId: user.id },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.materialProgress.count({
+        where: { userId: user.id, status: "COMPLETED" },
+      }),
+      prisma.quizSession.count({
+        where: { userId: user.id, passed: true },
+      }),
+      prisma.semesterSummary.findMany({
+        where: { userId: user.id },
+        select: { totalPoints: true },
+      }),
+    ]);
 
     const totalEarned = pointTransactions
       .filter((t) => t.points > 0)
@@ -386,11 +427,19 @@ export async function getWorkerStats() {
 
     const availablePoints = totalEarned - totalSpent;
 
+    // Akumulasi dari semester-semester lalu + aktif sekarang
+    const historicalPoints = semesterSummaries.reduce(
+      (sum, s) => sum + s.totalPoints,
+      0,
+    );
+    const allTimePoints = historicalPoints + totalEarned;
+
     return {
       success: true,
       data: {
-        totalPoints: totalEarned,
-        availablePoints,
+        allTimePoints, // total dari awal sampai sekarang
+        totalPoints: totalEarned, // poin semester berjalan
+        availablePoints, // bisa ditukar (earned - spent semester ini)
         materialsCompleted,
         quizPassed,
         recentTransactions: pointTransactions.slice(0, 5),
