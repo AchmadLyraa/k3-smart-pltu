@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -9,46 +10,21 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { markMaterialComplete, getQuizByMaterial } from "@/app/actions/worker";
+import { markMaterialComplete } from "@/app/actions/worker";
 import { ArrowLeft, CheckCircle, PlayCircle } from "lucide-react";
-import WorkerQuizList from "./worker-quiz-list";
-
-interface MediaFile {
-  id: string;
-  type: string;
-  url: string;
-}
-
-interface Material {
-  id: string;
-  title: string;
-  description?: string;
-  type: string;
-  duration?: number;
-  mediaFiles: MediaFile[];
-  topic: { id: string; name: string };
-  quizConfigs?: any[];
-  progress?: Array<{ status: string; completedAt: string | null }>;
-}
+import Link from "next/link";
 
 interface WorkerMaterialViewProps {
-  material: Material;
-  onBack: () => void;
-  onComplete: (materialId: string) => void;
+  material: any;
 }
 
 export default function WorkerMaterialView({
   material,
-  onBack,
-  onComplete,
 }: WorkerMaterialViewProps) {
+  const router = useRouter();
   const alreadyComplete = material.progress?.[0]?.status === "COMPLETED";
   const [loading, setLoading] = useState(false);
   const [isComplete, setIsComplete] = useState(alreadyComplete);
-  const [showQuiz, setShowQuiz] = useState(false);
-  const [quizConfigs, setQuizConfigs] = useState<any[]>(
-    material.quizConfigs ?? [],
-  );
 
   const handleMarkComplete = async () => {
     setLoading(true);
@@ -56,13 +32,7 @@ export default function WorkerMaterialView({
       const result = await markMaterialComplete(material.id);
       if (result.success) {
         setIsComplete(true);
-        onComplete(material.id);
-
-        // Fetch quiz kalau belum ada
-        if (quizConfigs.length === 0) {
-          const quizResult = await getQuizByMaterial(material.id);
-          if (quizResult.success) setQuizConfigs(quizResult.data);
-        }
+        router.refresh(); // refresh server data
       }
     } finally {
       setLoading(false);
@@ -123,24 +93,15 @@ export default function WorkerMaterialView({
         </div>
       );
     }
-
-    return null;
   };
-
-  if (showQuiz) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <WorkerQuizList
-          quizConfigs={quizConfigs}
-          onBack={() => setShowQuiz(false)}
-        />
-      </div>
-    );
-  }
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <Button variant="ghost" onClick={onBack} className="mb-6">
+      <Button
+        variant="ghost"
+        onClick={() => router.push("/worker/materials")}
+        className="mb-6"
+      >
         <ArrowLeft className="w-4 h-4 mr-2" />
         Back to Materials
       </Button>
@@ -169,25 +130,23 @@ export default function WorkerMaterialView({
           <CardContent className="pt-6">{renderMedia()}</CardContent>
         </Card>
 
-        {isComplete && quizConfigs.length > 0 && (
+        {/* Deadline info */}
+        {isComplete && material.quizConfigs?.length > 0 && (
           <Card className="border-amber-200 bg-amber-50">
             <CardContent className="pt-6">
               <div className="space-y-2">
-                {quizConfigs.map((quiz) => {
+                {material.quizConfigs.map((quiz: any) => {
                   const deadline = quiz.deadline
                     ? new Date(quiz.deadline)
                     : null;
                   const now = new Date();
                   const isOverdue = deadline && now > deadline;
-
-                  // Hitung hari telat pakai ceil dari selisih positif
                   const daysLate = deadline
                     ? Math.ceil(
                         (now.getTime() - deadline.getTime()) /
                           (1000 * 60 * 60 * 24),
                       )
                     : 0;
-
                   const daysLeft = deadline
                     ? Math.ceil(
                         (deadline.getTime() - now.getTime()) /
@@ -226,15 +185,13 @@ export default function WorkerMaterialView({
           </p>
 
           <div className="flex gap-2">
-            {isComplete && quizConfigs.length > 0 && (
-              <Button
-                variant="outline"
-                onClick={() => setShowQuiz(true)}
-                className="gap-2"
-              >
-                <PlayCircle className="w-4 h-4" />
-                Take Quiz
-              </Button>
+            {isComplete && material.quizConfigs?.length > 0 && (
+              <Link href={`/worker/materials/${material.id}/quiz`}>
+                <Button variant="outline" className="gap-2">
+                  <PlayCircle className="w-4 h-4" />
+                  Take Quiz
+                </Button>
+              </Link>
             )}
 
             <Button

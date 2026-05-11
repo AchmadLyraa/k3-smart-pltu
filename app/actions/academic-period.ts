@@ -13,7 +13,7 @@ export async function getAcademicPeriods() {
         materials: {
           include: {
             topic: true,
-            mediaFiles: true,
+            // mediaFiles: true,
             quizConfigs: true,
           },
         },
@@ -26,7 +26,7 @@ export async function getAcademicPeriods() {
       },
       include: {
         topic: true,
-        mediaFiles: true,
+        // mediaFiles: true,
         quizConfigs: true,
       },
     });
@@ -151,7 +151,7 @@ export async function getWorkerMaterialsByPeriod() {
           where: { status: "PUBLISHED" },
           include: {
             topic: true,
-            mediaFiles: true,
+            // mediaFiles: true,
             quizConfigs: true,
             progress: {
               where: { userId }, // ← filter by user yang login
@@ -165,7 +165,7 @@ export async function getWorkerMaterialsByPeriod() {
       where: { status: "PUBLISHED", periodId: null },
       include: {
         topic: true,
-        mediaFiles: true,
+        // mediaFiles: true,
         quizConfigs: true,
         progress: {
           where: { userId }, // ← filter by user yang login

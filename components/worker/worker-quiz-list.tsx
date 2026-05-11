@@ -15,7 +15,7 @@ import WorkerQuizView from "./worker-quiz-view";
 
 interface WorkerQuizListProps {
   quizConfigs: any[];
-  onBack: () => void;
+  onBack: string | (() => void);
 }
 
 export default function WorkerQuizList({
@@ -62,10 +62,6 @@ export default function WorkerQuizList({
 
   return (
     <div className="space-y-4">
-      <Button variant="ghost" onClick={onBack} className="mb-2 px-0">
-        ← Kembali ke Materi
-      </Button>
-
       <h3 className="font-semibold text-lg">Quiz Tersedia</h3>
 
       {error && (

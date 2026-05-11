@@ -688,3 +688,42 @@ export async function getQuizHistoryDetail(sessionId: string) {
     };
   }
 }
+
+export async function getWorkerMaterial(materialId: string) {
+  const user = await getCurrentUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+
+  try {
+    const material = await prisma.material.findUnique({
+      where: { id: materialId, status: "PUBLISHED" },
+      include: {
+        topic: true,
+        mediaFiles: true,
+        quizConfigs: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            totalQuestions: true,
+            passingScore: true,
+            timeLimit: true,
+            allowRetake: true,
+            maxRetries: true,
+            showCorrectAns: true,
+            deadline: true,
+          },
+        },
+        progress: {
+          where: { userId: user.id },
+          select: { status: true, completedAt: true },
+        },
+      },
+    });
+
+    if (!material) return { success: false, error: "Material not found" };
+
+    return { success: true, data: material };
+  } catch (error) {
+    return { success: false, error: "Failed to fetch material" };
+  }
+}

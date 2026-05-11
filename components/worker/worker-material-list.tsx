@@ -10,8 +10,8 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import WorkerMaterialView from "./worker-material-view";
 import { Clock, CheckCircle, ChevronDown, ChevronRight } from "lucide-react";
+import Link from "next/link";
 
 interface Material {
   id: string;
@@ -20,9 +20,7 @@ interface Material {
   type: string;
   duration?: number;
   topic: { id: string; name: string };
-  mediaFiles: Array<{ id: string; type: string; url: string }>;
   progress?: Array<{ status: string; completedAt: string | null }>;
-  quizConfigs?: any[];
 }
 
 interface Period {
@@ -43,31 +41,13 @@ export default function WorkerMaterialList({
   periods,
   unassigned,
 }: WorkerMaterialListProps) {
-  const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(
-    null,
-  );
-  const [completedMaterials, setCompletedMaterials] = useState<string[]>(() => {
-    const all = [...periods.flatMap((p) => p.materials), ...unassigned];
-    return all
-      .filter((m) => m.progress?.[0]?.status === "COMPLETED")
-      .map((m) => m.id);
-  });
+  const completedIds = [...periods.flatMap((p) => p.materials), ...unassigned]
+    .filter((m) => m.progress?.[0]?.status === "COMPLETED")
+    .map((m) => m.id);
+
   const [expandedPeriods, setExpandedPeriods] = useState<string[]>(() =>
     periods.filter((p) => p.isActive).map((p) => p.id),
   );
-
-  if (selectedMaterial) {
-    return (
-      <WorkerMaterialView
-        material={selectedMaterial}
-        onBack={() => setSelectedMaterial(null)}
-        onComplete={(materialId) => {
-          setCompletedMaterials((prev) => [...prev, materialId]);
-          setSelectedMaterial(null);
-        }}
-      />
-    );
-  }
 
   const toggleExpand = (id: string) => {
     setExpandedPeriods((prev) =>
@@ -89,7 +69,7 @@ export default function WorkerMaterialList({
   };
 
   const MaterialCard = ({ material }: { material: Material }) => {
-    const isCompleted = completedMaterials.includes(material.id);
+    const isCompleted = completedIds.includes(material.id);
     return (
       <Card className="hover:shadow-md transition-shadow">
         <CardHeader className="pb-2">
@@ -119,13 +99,14 @@ export default function WorkerMaterialList({
               </Badge>
             )}
           </div>
-          <Button
-            onClick={() => setSelectedMaterial(material)}
-            className="w-full"
-            variant={isCompleted ? "outline" : "default"}
-          >
-            {isCompleted ? "Review" : "Pelajari"}
-          </Button>
+          <Link href={`/worker/materials/${material.id}`}>
+            <Button
+              className="w-full"
+              variant={isCompleted ? "outline" : "default"}
+            >
+              {isCompleted ? "Review" : "Pelajari"}
+            </Button>
+          </Link>
         </CardContent>
       </Card>
     );
@@ -133,10 +114,8 @@ export default function WorkerMaterialList({
 
   return (
     <div className="space-y-4">
-      {/* Period Groups */}
       {periods.map((period) => (
         <div key={period.id} className="border rounded-xl overflow-hidden">
-          {/* Period Header */}
           <button
             className="w-full flex items-center justify-between p-4 bg-muted/40 hover:bg-muted/60 transition-colors text-left"
             onClick={() => toggleExpand(period.id)}
@@ -159,9 +138,8 @@ export default function WorkerMaterialList({
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {period.materials.length} materi •{" "}
                   {
-                    period.materials.filter((m) =>
-                      completedMaterials.includes(m.id),
-                    ).length
+                    period.materials.filter((m) => completedIds.includes(m.id))
+                      .length
                   }{" "}
                   selesai
                 </p>
@@ -169,7 +147,6 @@ export default function WorkerMaterialList({
             </div>
           </button>
 
-          {/* Material Grid */}
           {expandedPeriods.includes(period.id) && (
             <div className="p-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {period.materials.length === 0 ? (
@@ -186,7 +163,6 @@ export default function WorkerMaterialList({
         </div>
       ))}
 
-      {/* Unassigned */}
       {unassigned.length > 0 && (
         <div className="border rounded-xl overflow-hidden">
           <button
