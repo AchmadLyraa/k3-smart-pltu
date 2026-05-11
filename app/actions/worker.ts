@@ -541,3 +541,150 @@ export async function getWorkerStats() {
     return { success: false, error: "Failed to fetch stats" };
   }
 }
+
+export async function getWorkerQuizHistory() {
+  const session = await requireAuth(["WORKER"]);
+  const userId = (session.user as any).id as string;
+
+  try {
+    const histories = await prisma.quizSession.findMany({
+      where: {
+        userId,
+
+        status: {
+          in: ["SUBMITTED", "GRADED"],
+        },
+      },
+
+      select: {
+        id: true,
+        score: true,
+        passed: true,
+        submittedAt: true,
+        createdAt: true,
+
+        quizConfig: {
+          select: {
+            id: true,
+            name: true,
+            passingScore: true,
+
+            material: {
+              select: {
+                id: true,
+                title: true,
+
+                topic: {
+                  select: {
+                    name: true,
+                  },
+                },
+
+                period: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+
+      orderBy: {
+        submittedAt: "desc",
+      },
+    });
+
+    const passed = histories.filter((h) => h.passed === true).length;
+
+    const failed = histories.filter((h) => h.passed === false).length;
+
+    return {
+      success: true,
+
+      data: {
+        histories,
+
+        stats: {
+          total: histories.length,
+          passed,
+          failed,
+        },
+      },
+    };
+  } catch (error) {
+    console.error("[getWorkerQuizHistory error]", error);
+
+    return {
+      success: false,
+      error: "Failed to load quiz history",
+    };
+  }
+}
+
+export async function getQuizHistoryDetail(sessionId: string) {
+  const session = await requireAuth(["WORKER"]);
+  const userId = (session.user as any).id as string;
+
+  try {
+    const detail = await prisma.quizSession.findFirst({
+      where: {
+        id: sessionId,
+        userId,
+      },
+
+      select: {
+        id: true,
+        score: true,
+        passed: true,
+        submittedAt: true,
+        correctAnswers: true,
+        totalQuestions: true,
+
+        quizConfig: {
+          select: {
+            name: true,
+            passingScore: true,
+          },
+        },
+
+        userAnswers: {
+          select: {
+            id: true,
+            answer: true,
+            isCorrect: true,
+            pointsEarned: true,
+
+            question: {
+              select: {
+                text: true,
+                correctAnswer: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!detail) {
+      return {
+        success: false,
+        error: "Quiz history not found",
+      };
+    }
+
+    return {
+      success: true,
+      data: detail,
+    };
+  } catch (error) {
+    console.error("[getQuizHistoryDetail error]", error);
+
+    return {
+      success: false,
+      error: "Failed to load quiz detail",
+    };
+  }
+}

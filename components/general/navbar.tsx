@@ -83,6 +83,7 @@ const NAV_CONFIG: Record<
       { label: "Home", href: "/worker/home" },
       { label: "Reward", href: "/worker/reward-users" },
       { label: "Material", href: "/worker/materials" },
+      { label: "Quiz History", href: "/worker/quiz-history" },
     ],
   },
 };
