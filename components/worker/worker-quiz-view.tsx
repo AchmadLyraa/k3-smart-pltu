@@ -10,39 +10,74 @@ import WorkerQuizResult from "./worker-quiz-result";
 interface WorkerQuizViewProps {
   session: any;
   quizConfig: any;
+  existingAnswers?: Array<{ questionId: string; answer: string }>; // ← tambah
   onBack: () => void;
 }
 
 export default function WorkerQuizView({
   session,
   quizConfig,
+  existingAnswers = [],
   onBack,
 }: WorkerQuizViewProps) {
   const questions = session.questions;
   const [currentIdx, setCurrentIdx] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [timeLeft, setTimeLeft] = useState(quizConfig.timeLimit);
+  // Inisialisasi dari existingAnswers
+  const [answers, setAnswers] = useState<Record<string, string>>(() => {
+    const initial: Record<string, string> = {};
+    existingAnswers.forEach((a) => {
+      if (a.questionId) initial[a.questionId] = a.answer;
+    });
+    return initial;
+  });
+  const [timeLeft, setTimeLeft] = useState(() => {
+    const startedAt = new Date(session.startedAt).getTime();
+    const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+    return Math.max(0, quizConfig.timeLimit - elapsed);
+  });
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<any>(null);
 
-  const handleComplete = useCallback(async () => {
-    if (submitting) return;
-    setSubmitting(true);
-    try {
-      const res = await completeQuiz(session.id);
-      if (res.success) {
-        setResult({ ...res.data, questions });
+  const handleComplete = useCallback(
+    async (isAutoSubmit = false) => {
+      if (submitting) return;
+
+      // Skip konfirmasi kalau auto-submit (timer habis)
+      if (!isAutoSubmit) {
+        const unanswered = questions.filter((q: any) => {
+          const qId = q?.question?.id;
+          console.log("qId:", qId, "answer:", answers[qId]);
+          return !answers[qId] || answers[qId].trim() === "";
+        });
+
+        console.log("unanswered count:", unanswered.length);
+
+        if (unanswered.length > 0) {
+          const confirmed = window.confirm(
+            `Masih ada ${unanswered.length} soal yang belum dijawab. Yakin mau submit sekarang? Soal yang belum dijawab akan dianggap salah.`,
+          );
+          if (!confirmed) return;
+        }
       }
-    } finally {
-      setSubmitting(false);
-    }
-  }, [session.id, submitting, questions]);
+
+      setSubmitting(true);
+      try {
+        const res = await completeQuiz(session.id);
+        if (res.success) {
+          setResult({ ...res.data, questions });
+        }
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [session.id, submitting, questions, answers],
+  );
 
   // Timer
   useEffect(() => {
     if (result) return;
     if (timeLeft <= 0) {
-      handleComplete();
+      handleComplete(true); // ← auto-submit, skip konfirmasi
       return;
     }
     const timer = setTimeout(() => setTimeLeft((t) => t - 1), 1000);
@@ -50,8 +85,19 @@ export default function WorkerQuizView({
   }, [timeLeft, result, handleComplete]);
 
   const handleSelectAnswer = async (questionId: string, answer: string) => {
-    setAnswers((prev) => ({ ...prev, [questionId]: answer }));
-    await submitQuizAnswer(session.id, questionId, answer);
+    let newAnswer = answer;
+
+    if (question?.type === "MULTIPLE_SELECT") {
+      // Toggle pilihan, simpan sebagai comma-separated
+      const current = answers[questionId] ? answers[questionId].split(",") : [];
+      const updated = current.includes(answer)
+        ? current.filter((a) => a !== answer)
+        : [...current, answer];
+      newAnswer = updated.join(",");
+    }
+
+    setAnswers((prev) => ({ ...prev, [questionId]: newAnswer }));
+    await submitQuizAnswer(session.id, questionId, newAnswer);
   };
 
   const formatTime = (seconds: number) => {
@@ -101,7 +147,10 @@ export default function WorkerQuizView({
             const deadline = new Date(quizConfig.deadline);
             const now = new Date();
             const isLate = now > deadline;
-            const diffMs = Math.abs(deadline.getTime() - now.getTime());
+            const daysLate = Math.ceil(
+              (now.getTime() - deadline.getTime()) / (1000 * 60 * 60 * 24),
+            );
+            const diffMs = deadline.getTime() - now.getTime();
             const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
             const diffHours = Math.floor(
               (diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
@@ -117,8 +166,8 @@ export default function WorkerQuizView({
               >
                 {isLate ? (
                   <>
-                    ⚠️ Terlambat {diffDays} hari — penalti -
-                    {Math.min(diffDays * 5, 40)}%
+                    ⚠️ Terlambat {daysLate} hari — penalti -
+                    {Math.min(daysLate * 5, 40)}%
                   </>
                 ) : (
                   <>
@@ -147,7 +196,12 @@ export default function WorkerQuizView({
         </CardHeader>
         <CardContent className="space-y-2">
           {question?.answerOptions?.map((opt: any) => {
-            const selected = answers[question.id] === opt.text;
+            const isMultiSelect = question.type === "MULTIPLE_SELECT";
+            const selectedValues = answers[question.id]?.split(",") ?? [];
+            const selected = isMultiSelect
+              ? selectedValues.includes(opt.text)
+              : answers[question.id] === opt.text;
+
             return (
               <button
                 key={opt.id}
@@ -167,15 +221,10 @@ export default function WorkerQuizView({
               </button>
             );
           })}
-
-          {/* SHORT ANSWER */}
-          {question?.type === "SHORT_ANSWER" && (
-            <input
-              className="w-full border rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="Tulis jawaban kamu..."
-              value={answers[question.id] ?? ""}
-              onChange={(e) => handleSelectAnswer(question.id, e.target.value)}
-            />
+          {question?.type === "MULTIPLE_SELECT" && (
+            <p className="text-xs text-muted-foreground">
+              Pilih semua jawaban yang benar
+            </p>
           )}
         </CardContent>
       </Card>
@@ -200,7 +249,7 @@ export default function WorkerQuizView({
           </Button>
         ) : (
           <Button
-            onClick={handleComplete}
+            onClick={() => handleComplete(false)}
             disabled={submitting}
             className="bg-green-600 hover:bg-green-700"
           >

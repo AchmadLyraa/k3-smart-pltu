@@ -286,7 +286,7 @@ model MediaFile {
 enum QuestionType {
   MULTIPLE_CHOICE
   TRUE_FALSE
-  SHORT_ANSWER
+  MULTIPLE_SELECT
 }
 
 model QuestionBank {

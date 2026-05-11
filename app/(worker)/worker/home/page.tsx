@@ -8,12 +8,14 @@ import {
 } from "@/components/ui/card";
 import { BookOpen, Trophy, Award, Star, CheckCircle2 } from "lucide-react";
 import { getWorkerStats } from "@/app/actions/worker";
+import { checkAndSubmitExpiredSessions } from "@/app/actions/worker";
 
 export const metadata = {
   title: "Home - K3 SMART",
 };
 
 export default async function WorkerHomePage() {
+  await checkAndSubmitExpiredSessions();
   const session = await auth();
   const statsResult = await getWorkerStats();
   const stats = statsResult.success ? statsResult.data : null;

@@ -18,11 +18,18 @@ export async function createQuestion(data: {
   await requireAuth(["SUPER_ADMIN"]);
 
   try {
-    // Find the correct answer
-    const correctAnswer = data.answers.find((a) => a.isCorrect)?.text;
-    if (!correctAnswer) {
-      return { success: false, error: "Must have exactly one correct answer" };
+    const correctAnswers = data.answers
+      .filter((a) => a.isCorrect)
+      .map((a) => a.text);
+    if (correctAnswers.length === 0) {
+      return { success: false, error: "Harus ada minimal satu jawaban benar" };
     }
+
+    // Untuk MULTIPLE_SELECT simpan comma-separated, yang lain simpan satu
+    const correctAnswer =
+      data.type === "MULTIPLE_SELECT"
+        ? correctAnswers.sort().join(",")
+        : correctAnswers[0];
 
     const question = await prisma.questionBank.create({
       data: {
@@ -41,9 +48,7 @@ export async function createQuestion(data: {
           },
         },
       },
-      include: {
-        answerOptions: true,
-      },
+      include: { answerOptions: true },
     });
 
     return { success: true, data: question };
@@ -57,6 +62,7 @@ export async function updateQuestion(
   id: string,
   data: {
     text?: string;
+    type?: string;
     difficulty?: string;
     points?: number;
     answers?: Array<{ text: string; isCorrect: boolean }>;
@@ -65,7 +71,17 @@ export async function updateQuestion(
   await requireAuth(["SUPER_ADMIN"]);
 
   try {
-    const correctAnswer = data.answers?.find((a) => a.isCorrect)?.text;
+    let correctAnswer: string | undefined;
+
+    if (data.answers) {
+      const correctAnswers = data.answers
+        .filter((a) => a.isCorrect)
+        .map((a) => a.text);
+      correctAnswer =
+        data.type === "MULTIPLE_SELECT"
+          ? correctAnswers.sort().join(",")
+          : correctAnswers[0];
+    }
 
     const question = await prisma.questionBank.update({
       where: { id },
@@ -204,186 +220,3 @@ export async function getQuizByMaterial(materialId: string) {
     return { success: false, error: "Failed to fetch quiz" };
   }
 }
-
-// ============================================================================
-// QUIZ SESSION ACTIONS (WORKER)
-// ============================================================================
-
-// export async function startQuizSession(quizConfigId: string) {
-//   const user = await getCurrentUser();
-//   if (!user) return { success: false, error: "Unauthorized" };
-
-//   try {
-//     const quizConfig = await prisma.quizConfig.findUnique({
-//       where: { id: quizConfigId },
-//       include: { questionBankIds: true },
-//     });
-
-//     if (!quizConfig) {
-//       return { success: false, error: "Quiz config not found" };
-//     }
-
-//     // Check material progress
-//     const materialProgress = await prisma.materialProgress.findFirst({
-//       where: {
-//         userId: user.id,
-//         materialId: quizConfig.materialId,
-//       },
-//     });
-
-//     if (!materialProgress?.isCompleted) {
-//       return { success: false, error: "You must complete the material first" };
-//     }
-
-//     // Check retry limit
-//     const previousSessions = await prisma.quizSession.count({
-//       where: {
-//         userId: user.id,
-//         quizConfigId,
-//       },
-//     });
-
-//     if (!quizConfig.allowRetake && previousSessions > 0) {
-//       return { success: false, error: "Retake not allowed" };
-//     }
-
-//     if (previousSessions >= quizConfig.maxRetries) {
-//       return { success: false, error: "Max retries exceeded" };
-//     }
-
-//     // Create session
-//     const session = await prisma.quizSession.create({
-//       data: {
-//         userId: user.id,
-//         quizConfigId,
-//         status: "ACTIVE",
-//         startedAt: new Date(),
-//         expiresAt: new Date(Date.now() + quizConfig.timeLimit * 1000),
-//       },
-//     });
-
-//     return { success: true, data: session };
-//   } catch (error) {
-//     console.error("[startQuizSession error]", error);
-//     return { success: false, error: "Failed to start quiz" };
-//   }
-// }
-
-// export async function submitAnswer(
-//   sessionId: string,
-//   questionId: string,
-//   answerId: string,
-// ) {
-//   const user = await getCurrentUser();
-//   if (!user) return { success: false, error: "Unauthorized" };
-
-//   try {
-//     const answer = await prisma.userAnswer.create({
-//       data: {
-//         userId: user.id,
-//         quizSessionId: sessionId,
-//         questionId,
-//         selectedAnswerId: answerId,
-//         answeredAt: new Date(),
-//       },
-//     });
-
-//     return { success: true, data: answer };
-//   } catch (error) {
-//     console.error("[submitAnswer error]", error);
-//     return { success: false, error: "Failed to submit answer" };
-//   }
-// }
-
-// export async function submitQuiz(sessionId: string) {
-//   const user = await getCurrentUser();
-//   if (!user) return { success: false, error: "Unauthorized" };
-
-//   try {
-//     const session = await prisma.quizSession.findUnique({
-//       where: { id: sessionId },
-//       include: {
-//         userAnswers: {
-//           include: {
-//             question: true,
-//             selectedAnswer: true,
-//           },
-//         },
-//         quizConfig: true,
-//       },
-//     });
-
-//     if (!session) return { success: false, error: "Session not found" };
-
-//     // Calculate score
-//     let correctCount = 0;
-//     const userAnswers = session.userAnswers || [];
-
-//     for (const userAnswer of userAnswers) {
-//       if (userAnswer.selectedAnswer?.isCorrect) {
-//         correctCount++;
-//       }
-//     }
-
-//     const totalQuestions = session.quizConfig.totalQuestions;
-//     const score = Math.round((correctCount / totalQuestions) * 100);
-//     const passed = score >= session.quizConfig.passingScore;
-
-//     // Update session
-//     const updatedSession = await prisma.quizSession.update({
-//       where: { id: sessionId },
-//       data: {
-//         status: "COMPLETED",
-//         completedAt: new Date(),
-//         score,
-//         passed,
-//       },
-//     });
-
-//     // Award points if passed
-//     if (passed) {
-//       const pointValue = session.quizConfig.totalQuestions * 10; // 10 pts per question
-//       await prisma.pointTransaction.create({
-//         data: {
-//           userId: user.id,
-//           amount: pointValue,
-//           type: "QUIZ_COMPLETION",
-//           referenceId: sessionId,
-//           description: `Quiz passed: ${session.quizConfig.name}`,
-//         },
-//       });
-
-//       // Update monthly summary
-//       const now = new Date();
-//       const monthKey = `${now.getFullYear()}-${now.getMonth() + 1}`;
-
-//       await prisma.monthlyPointSummary.upsert({
-//         where: {
-//           userId_month: {
-//             userId: user.id,
-//             month: monthKey,
-//           },
-//         },
-//         create: {
-//           userId: user.id,
-//           month: monthKey,
-//           totalPoints: pointValue,
-//           quizCompleted: 1,
-//         },
-//         update: {
-//           totalPoints: {
-//             increment: pointValue,
-//           },
-//           quizCompleted: {
-//             increment: 1,
-//           },
-//         },
-//       });
-//     }
-
-//     return { success: true, data: updatedSession };
-//   } catch (error) {
-//     console.error("[submitQuiz error]", error);
-//     return { success: false, error: "Failed to submit quiz" };
-//   }
-// }

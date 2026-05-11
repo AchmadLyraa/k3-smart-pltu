@@ -36,8 +36,8 @@ const difficultyColor = {
 
 const typeLabel = {
   MULTIPLE_CHOICE: "Multiple Choice",
+  MULTIPLE_SELECT: "Multiple Select",
   TRUE_FALSE: "True / False",
-  SHORT_ANSWER: "Short Answer",
 };
 
 export default function CMSQuestionsTab({ questions }) {
@@ -77,13 +77,24 @@ export default function CMSQuestionsTab({ questions }) {
   };
 
   const handleSetCorrect = (idx: number) => {
-    setEditData({
-      ...editData,
-      answers: editData.answers.map((a: any, i: number) => ({
-        ...a,
-        isCorrect: i === idx,
-      })),
-    });
+    if (editData.type === "MULTIPLE_SELECT") {
+      // Toggle — tidak reset yang lain
+      setEditData({
+        ...editData,
+        answers: editData.answers.map((a: any, i: number) =>
+          i === idx ? { ...a, isCorrect: !a.isCorrect } : a,
+        ),
+      });
+    } else {
+      // Reset semua, set yang dipilih
+      setEditData({
+        ...editData,
+        answers: editData.answers.map((a: any, i: number) => ({
+          ...a,
+          isCorrect: i === idx,
+        })),
+      });
+    }
   };
 
   const addAnswer = () => {
@@ -275,11 +286,16 @@ export default function CMSQuestionsTab({ questions }) {
                           { text: "", isCorrect: false },
                           { text: "", isCorrect: false },
                         ],
+                        MULTIPLE_SELECT: [
+                          { text: "", isCorrect: true },
+                          { text: "", isCorrect: false },
+                          { text: "", isCorrect: false },
+                          { text: "", isCorrect: false },
+                        ],
                         TRUE_FALSE: [
                           { text: "True", isCorrect: true },
                           { text: "False", isCorrect: false },
                         ],
-                        SHORT_ANSWER: [{ text: "", isCorrect: true }],
                       };
                       setEditData({
                         ...editData,
@@ -295,8 +311,10 @@ export default function CMSQuestionsTab({ questions }) {
                       <SelectItem value="MULTIPLE_CHOICE">
                         Multiple Choice
                       </SelectItem>
+                      <SelectItem value="MULTIPLE_SELECT">
+                        Multiple Select
+                      </SelectItem>
                       <SelectItem value="TRUE_FALSE">True / False</SelectItem>
-                      <SelectItem value="SHORT_ANSWER">Short Answer</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -418,25 +436,57 @@ export default function CMSQuestionsTab({ questions }) {
                 </div>
               )}
 
-              {/* SHORT ANSWER */}
-              {editData.type === "SHORT_ANSWER" && (
+              {/* MULTIPLE SELECT */}
+              {editData.type === "MULTIPLE_SELECT" && (
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Expected Answer
+                    Answer Options{" "}
+                    <span className="text-xs text-muted-foreground font-normal">
+                      (bisa pilih lebih dari 1 benar)
+                    </span>
                   </label>
-                  <Input
-                    value={editData.answers[0]?.text ?? ""}
-                    onChange={(e) =>
-                      setEditData({
-                        ...editData,
-                        answers: [{ text: e.target.value, isCorrect: true }],
-                      })
-                    }
-                    placeholder="Jawaban yang diharapkan"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Jawaban worker akan dicocokkan dengan teks ini
-                  </p>
+                  <div className="space-y-2">
+                    {editData.answers.map((answer: any, idx: number) => (
+                      <div key={idx} className="flex gap-2 items-center">
+                        <Input
+                          value={answer.text}
+                          onChange={(e) =>
+                            handleAnswerChange(idx, e.target.value)
+                          }
+                          placeholder={`Option ${idx + 1}`}
+                        />
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant={answer.isCorrect ? "default" : "outline"}
+                          onClick={() => handleSetCorrect(idx)}
+                          className="shrink-0 text-xs px-2"
+                        >
+                          {answer.isCorrect ? "✓" : "Set"}
+                        </Button>
+                        {editData.answers.length > 2 && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeAnswer(idx)}
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  {editData.answers.length < 6 && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={addAnswer}
+                      className="w-full mt-2"
+                    >
+                      <Plus className="w-4 h-4 mr-2" /> Add Option
+                    </Button>
+                  )}
                 </div>
               )}
 

@@ -179,6 +179,15 @@ export default function WorkerMaterialView({
                     : null;
                   const now = new Date();
                   const isOverdue = deadline && now > deadline;
+
+                  // Hitung hari telat pakai ceil dari selisih positif
+                  const daysLate = deadline
+                    ? Math.ceil(
+                        (now.getTime() - deadline.getTime()) /
+                          (1000 * 60 * 60 * 24),
+                      )
+                    : 0;
+
                   const daysLeft = deadline
                     ? Math.ceil(
                         (deadline.getTime() - now.getTime()) /
@@ -196,7 +205,7 @@ export default function WorkerMaterialView({
                           }
                         >
                           {isOverdue
-                            ? `⚠️ Terlambat ${Math.abs(daysLeft || 0)} hari (Poin berkurang ${Math.min(Math.abs(daysLeft || 0) * 5, 40)}%)`
+                            ? `⚠️ Terlambat ${daysLate} hari (Poin berkurang ${Math.min(daysLate * 5, 40)}%)`
                             : `📅 Deadline: ${deadline.toLocaleDateString("id-ID")} (${daysLeft} hari lagi)`}
                         </p>
                       )}

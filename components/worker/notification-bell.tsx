@@ -57,24 +57,17 @@ export function NotificationBell() {
 
   const handleOpenChange = async (open: boolean) => {
     if (open) {
-      await loadNotifications(); // load dulu yang pending
+      await loadUnreadCount(); // refresh count saat dibuka
+      await loadNotifications(); // refresh list saat dibuka
       if (unreadCount > 0) {
         await markAllNotificationsAsRead();
         setUnreadCount(0);
       }
     }
   };
-
   useEffect(() => {
+    // Load sekali saat mount
     loadUnreadCount();
-    loadNotifications();
-
-    const interval = setInterval(() => {
-      loadUnreadCount();
-      loadNotifications();
-    }, 10000);
-
-    return () => clearInterval(interval);
   }, []);
 
   const getNotificationIcon = (type: string) => {

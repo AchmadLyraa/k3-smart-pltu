@@ -39,6 +39,36 @@ export async function getWorkerMaterials() {
   }
 }
 
+// app/actions/worker.ts
+export async function checkAndSubmitExpiredSessions() {
+  const user = await getCurrentUser();
+  if (!user) return;
+
+  try {
+    // Cari semua session IN_PROGRESS yang sudah expired
+    const expiredSessions = await prisma.quizSession.findMany({
+      where: {
+        userId: user.id,
+        status: "IN_PROGRESS",
+      },
+      include: { quizConfig: true },
+    });
+
+    for (const session of expiredSessions) {
+      const elapsed = Math.floor(
+        (Date.now() - new Date(session.startedAt).getTime()) / 1000,
+      );
+
+      if (elapsed >= session.quizConfig.timeLimit) {
+        // Auto submit dengan jawaban yang sudah ada
+        await completeQuiz(session.id);
+      }
+    }
+  } catch (error) {
+    console.error("[checkAndSubmitExpiredSessions error]", error);
+  }
+}
+
 export async function markMaterialComplete(materialId: string) {
   const user = await getCurrentUser();
   if (!user) return { success: false, error: "Not authenticated" };
@@ -117,6 +147,49 @@ export async function startQuiz(quizConfigId: string) {
     if (!progress?.completedAt)
       return { success: false, error: "Please complete the material first" };
 
+    await checkAndSubmitExpiredSessions();
+
+    // ← Cek apakah ada session IN_PROGRESS yang belum expired
+    const existingSession = await prisma.quizSession.findFirst({
+      where: {
+        userId: user.id,
+        quizConfigId,
+        status: "IN_PROGRESS",
+      },
+      include: {
+        questions: {
+          include: {
+            question: { include: { answerOptions: true } },
+          },
+          orderBy: { orderIndex: "asc" },
+        },
+      },
+    });
+
+    if (existingSession) {
+      const elapsed = Math.floor(
+        (Date.now() - new Date(existingSession.startedAt).getTime()) / 1000,
+      );
+      const timeLeft = quizConfig.timeLimit - elapsed;
+
+      if (timeLeft > 0) {
+        // Fetch jawaban yang sudah diisi
+        const existingAnswers = await prisma.userAnswer.findMany({
+          where: { quizSessionId: existingSession.id },
+          select: { questionId: true, answer: true },
+        });
+
+        return {
+          success: true,
+          data: {
+            session: existingSession,
+            quizConfig,
+            existingAnswers, // ← tambah ini
+          },
+        };
+      }
+    }
+
     // Check attempt limit
     const attemptCount = await prisma.quizSession.count({
       where: {
@@ -126,13 +199,11 @@ export async function startQuiz(quizConfigId: string) {
       },
     });
 
-    if (!quizConfig.allowRetake && attemptCount > 0) {
+    if (!quizConfig.allowRetake && attemptCount > 0)
       return { success: false, error: "Retake tidak diizinkan" };
-    }
 
-    if (quizConfig.allowRetake && attemptCount >= quizConfig.maxRetries) {
+    if (quizConfig.allowRetake && attemptCount >= quizConfig.maxRetries)
       return { success: false, error: "Batas percobaan telah habis" };
-    }
 
     const questions = quizConfig.shuffleQuestions
       ? quizConfig.questions.sort(() => Math.random() - 0.5)
@@ -156,9 +227,7 @@ export async function startQuiz(quizConfigId: string) {
       include: {
         questions: {
           include: {
-            question: {
-              include: { answerOptions: true },
-            },
+            question: { include: { answerOptions: true } },
           },
           orderBy: { orderIndex: "asc" },
         },
@@ -223,20 +292,43 @@ export async function completeQuiz(sessionId: string) {
 
     if (!session) return { success: false, error: "Session not found" };
 
+    // Filter null — soal mungkin sudah dihapus
+    const validAnswers = userAnswers.filter((a) => a.question !== null);
+
     let totalPoints = 0;
     let correctCount = 0;
-    const maxPossiblePoints = userAnswers.reduce(
-      (sum, a) => sum + a.question.points,
-      0,
-    );
+
+    // Ambil semua soal di session ini
+    const sessionQuestions = await prisma.quizSessionQuestion.findMany({
+      where: { quizSessionId: sessionId },
+      include: {
+        question: { select: { id: true, points: true } },
+      },
+    });
+
+    // maxPossiblePoints dari SEMUA soal di session, bukan cuma yang dijawab
+    const maxPossiblePoints = sessionQuestions
+      .filter((sq) => sq.question !== null)
+      .reduce((sum, sq) => sum + sq.question.points, 0);
 
     const updatedAnswers = await Promise.all(
-      userAnswers.map(async (a) => {
-        const isCorrect = a.answer === a.question.correctAnswer;
+      validAnswers.map(async (a) => {
+        const correctAnswers = a.question.correctAnswer
+          .split(",")
+          .map((s) => s.trim())
+          .sort();
+        const userAnswerList = a.answer
+          .split(",")
+          .map((s) => s.trim())
+          .sort();
+        const isCorrect =
+          JSON.stringify(correctAnswers) === JSON.stringify(userAnswerList);
+
         if (isCorrect) {
           correctCount++;
           totalPoints += a.question.points;
         }
+
         return prisma.userAnswer.update({
           where: { id: a.id },
           data: { isCorrect, pointsEarned: isCorrect ? a.question.points : 0 },
@@ -261,14 +353,13 @@ export async function completeQuiz(sessionId: string) {
     const unusedPercentage = unusedTime / timeLimit;
     const timeBonus = Math.floor(unusedPercentage * 100);
 
-    // Deklarasi di luar block if — biar bisa direturn
     let deadlinePenalty = 0;
     let daysLate = 0;
     let penaltyPoints = 0;
     let adjustedPoints = totalPoints;
     let totalPointsWithBonus = 0;
 
-    const updatedSession = await prisma.quizSession.update({
+    await prisma.quizSession.update({
       where: { id: sessionId },
       data: {
         status: "GRADED",
@@ -332,7 +423,7 @@ export async function completeQuiz(sessionId: string) {
         passed,
         percentage,
         correctCount,
-        totalQuestions: userAnswers.length,
+        totalQuestions: sessionQuestions.length,
         totalPoints,
         timeBonus,
         penaltyPercent: deadlinePenalty,

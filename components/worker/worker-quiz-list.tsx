@@ -26,6 +26,7 @@ export default function WorkerQuizList({
   const [activeConfig, setActiveConfig] = useState<any>(null);
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [existingAnswers, setExistingAnswers] = useState<any[]>([]);
 
   const handleStart = async (quizConfigId: string) => {
     setLoading(quizConfigId);
@@ -35,6 +36,7 @@ export default function WorkerQuizList({
       if (result.success) {
         setActiveSession(result.data.session);
         setActiveConfig(result.data.quizConfig);
+        setExistingAnswers(result.data.existingAnswers ?? []);
       } else {
         setError(result.error ?? "Gagal memulai quiz");
       }
@@ -48,9 +50,11 @@ export default function WorkerQuizList({
       <WorkerQuizView
         session={activeSession}
         quizConfig={activeConfig}
+        existingAnswers={existingAnswers} // ← tambah
         onBack={() => {
           setActiveSession(null);
           setActiveConfig(null);
+          setExistingAnswers([]);
         }}
       />
     );

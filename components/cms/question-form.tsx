@@ -28,11 +28,16 @@ const defaultAnswers = {
     { text: "", isCorrect: false },
     { text: "", isCorrect: false },
   ],
+  MULTIPLE_SELECT: [
+    { text: "", isCorrect: true },
+    { text: "", isCorrect: false },
+    { text: "", isCorrect: false },
+    { text: "", isCorrect: false },
+  ],
   TRUE_FALSE: [
     { text: "True", isCorrect: true },
     { text: "False", isCorrect: false },
   ],
-  SHORT_ANSWER: [],
 };
 
 export default function QuestionForm({ onSuccess }: { onSuccess: () => void }) {
@@ -85,12 +90,10 @@ export default function QuestionForm({ onSuccess }: { onSuccess: () => void }) {
 
     if (!formData.text.trim()) return alert("Question text wajib diisi");
 
-    if (formData.type !== "SHORT_ANSWER") {
-      if (!formData.answers.some((a) => a.isCorrect))
-        return alert("Mesti ada satu jawapan betul");
-      if (!formData.answers.every((a) => a.text.trim()))
-        return alert("Semua option mesti diisi");
-    }
+    if (!formData.answers.some((a) => a.isCorrect))
+      return alert("Mesti ada satu jawapan betul");
+    if (!formData.answers.every((a) => a.text.trim()))
+      return alert("Semua option mesti diisi");
 
     setLoading(true);
     try {
@@ -152,8 +155,10 @@ export default function QuestionForm({ onSuccess }: { onSuccess: () => void }) {
                   <SelectItem value="MULTIPLE_CHOICE">
                     Multiple Choice
                   </SelectItem>
+                  <SelectItem value="MULTIPLE_SELECT">
+                    Multiple Select
+                  </SelectItem>
                   <SelectItem value="TRUE_FALSE">True / False</SelectItem>
-                  <SelectItem value="SHORT_ANSWER">Short Answer</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -261,25 +266,60 @@ export default function QuestionForm({ onSuccess }: { onSuccess: () => void }) {
             </div>
           )}
 
-          {/* SHORT ANSWER */}
-          {formData.type === "SHORT_ANSWER" && (
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Expected Answer
+          {/* MULTIPLE SELECT */}
+          {formData.type === "MULTIPLE_SELECT" && (
+            <div className="space-y-3">
+              <label className="block text-sm font-medium">
+                Answer Options{" "}
+                <span className="text-xs text-muted-foreground font-normal">
+                  (bisa pilih lebih dari 1 benar)
+                </span>
               </label>
-              <Input
-                value={formData.answers[0]?.text ?? ""}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    answers: [{ text: e.target.value, isCorrect: true }],
-                  })
-                }
-                placeholder="Jawaban yang diharapkan"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Jawaban worker akan dicocokkan dengan teks ini
-              </p>
+              {formData.answers.map((answer, idx) => (
+                <div key={idx} className="flex gap-2 items-center">
+                  <Input
+                    value={answer.text}
+                    onChange={(e) => handleAnswerChange(idx, e.target.value)}
+                    placeholder={`Option ${idx + 1}`}
+                  />
+                  {/* Toggle — tidak reset yang lain */}
+                  <Button
+                    type="button"
+                    variant={answer.isCorrect ? "default" : "outline"}
+                    onClick={() =>
+                      setFormData({
+                        ...formData,
+                        answers: formData.answers.map((a, i) =>
+                          i === idx ? { ...a, isCorrect: !a.isCorrect } : a,
+                        ),
+                      })
+                    }
+                    className="whitespace-nowrap"
+                  >
+                    {answer.isCorrect ? "✓ Benar" : "Set Benar"}
+                  </Button>
+                  {formData.answers.length > 2 && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeAnswer(idx)}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  )}
+                </div>
+              ))}
+              {formData.answers.length < 6 && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={addAnswer}
+                  className="w-full"
+                >
+                  <Plus className="w-4 h-4 mr-2" /> Add Option
+                </Button>
+              )}
             </div>
           )}
 

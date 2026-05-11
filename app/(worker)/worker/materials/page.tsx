@@ -1,8 +1,10 @@
 import { getWorkerMaterialsByPeriod } from "@/app/actions/academic-period";
 import { Card, CardContent } from "@/components/ui/card";
 import WorkerMaterialList from "@/components/worker/worker-material-list";
+import { checkAndSubmitExpiredSessions } from "@/app/actions/worker";
 
 export default async function WorkerMaterialsPage() {
+  await checkAndSubmitExpiredSessions();
   const result = await getWorkerMaterialsByPeriod();
 
   const periods = result.success ? result.data.periods : [];

@@ -49,7 +49,7 @@ export type MaterialStatus = (typeof MaterialStatus)[keyof typeof MaterialStatus
 export const QuestionType = {
   MULTIPLE_CHOICE: 'MULTIPLE_CHOICE',
   TRUE_FALSE: 'TRUE_FALSE',
-  SHORT_ANSWER: 'SHORT_ANSWER'
+  MULTIPLE_SELECT: 'MULTIPLE_SELECT'
 } as const
 
 export type QuestionType = (typeof QuestionType)[keyof typeof QuestionType]
