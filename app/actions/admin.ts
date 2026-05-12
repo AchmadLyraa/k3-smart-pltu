@@ -113,46 +113,113 @@ export async function getWorkerPerformanceList() {
   }
 }
 
-export async function getWorkerDetail(userId: string) {
+export async function getWorkerDetail(userId: string, page = 1, limit = 10) {
   await requireAuth(["SUPER_ADMIN"]);
 
   try {
-    const worker = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        nip: true,
-        unit: { select: { name: true } },
-        division: { select: { name: true } },
-        quizSessions: {
-          where: { status: "GRADED" },
-          include: {
-            quizConfig: {
-              select: { name: true, passingScore: true },
+    const skip = (page - 1) * limit;
+
+    const [worker, totalQuizSessions] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: userId },
+
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          nip: true,
+
+          unit: {
+            select: {
+              name: true,
             },
-            userAnswers: {
-              include: {
-                question: {
-                  select: { text: true, points: true },
+          },
+
+          division: {
+            select: {
+              name: true,
+            },
+          },
+
+          quizSessions: {
+            where: {
+              status: "GRADED",
+            },
+
+            include: {
+              quizConfig: {
+                select: {
+                  name: true,
+                  passingScore: true,
+                },
+              },
+
+              userAnswers: {
+                include: {
+                  question: {
+                    select: {
+                      text: true,
+                      points: true,
+                    },
+                  },
                 },
               },
             },
+
+            orderBy: {
+              submittedAt: "desc",
+            },
+
+            skip,
+            take: limit,
           },
-          orderBy: { submittedAt: "desc" },
+
+          pointTransactions: {
+            orderBy: {
+              createdAt: "desc",
+            },
+
+            take: 20,
+          },
         },
-        pointTransactions: {
-          orderBy: { createdAt: "desc" },
+      }),
+
+      prisma.quizSession.count({
+        where: {
+          userId,
+          status: "GRADED",
+        },
+      }),
+    ]);
+
+    if (!worker) {
+      return {
+        success: false,
+        error: "Worker not found",
+      };
+    }
+
+    return {
+      success: true,
+
+      data: {
+        ...worker,
+
+        pagination: {
+          page,
+          limit,
+          total: totalQuizSessions,
+          totalPages: Math.ceil(totalQuizSessions / limit),
+          hasMore: skip + worker.quizSessions.length < totalQuizSessions,
         },
       },
-    });
-
-    if (!worker) return { success: false, error: "Worker not found" };
-
-    return { success: true, data: worker };
+    };
   } catch (error) {
     console.error("[getWorkerDetail error]", error);
-    return { success: false, error: "Failed to fetch worker detail" };
+
+    return {
+      success: false,
+      error: "Failed to fetch worker detail",
+    };
   }
 }

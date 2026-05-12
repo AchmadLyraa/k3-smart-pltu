@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
 import {
   Card,
   CardContent,
@@ -8,13 +9,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+
 import { Button } from "@/components/ui/button";
+
 import {
   Users,
   BookOpen,
@@ -23,7 +27,9 @@ import {
   CheckCircle2,
   XCircle,
   Clock,
+  Loader2,
 } from "lucide-react";
+
 import { getWorkerDetail } from "@/app/actions/admin";
 
 export default function AdminDashboard({
@@ -34,24 +40,63 @@ export default function AdminDashboard({
   workers: any[];
 }) {
   const [selectedWorker, setSelectedWorker] = useState<any>(null);
+
   const [workerDetail, setWorkerDetail] = useState<any>(null);
+
   const [loadingDetail, setLoadingDetail] = useState(false);
+
+  const [page, setPage] = useState(1);
 
   const openWorkerDetail = async (worker: any) => {
     setSelectedWorker(worker);
+    setWorkerDetail(null);
+    setPage(1);
+
+    await fetchWorkerDetail(worker.id, 1, false);
+  };
+
+  const fetchWorkerDetail = async (
+    userId: string,
+    targetPage: number,
+    append = false,
+  ) => {
     setLoadingDetail(true);
+
     try {
-      const result = await getWorkerDetail(worker.id);
-      if (result.success) setWorkerDetail(result.data);
+      const result = await getWorkerDetail(userId, targetPage, 10);
+
+      if (result.success) {
+        if (append) {
+          setWorkerDetail((prev: any) => ({
+            ...result.data,
+
+            quizSessions: [
+              ...(prev?.quizSessions || []),
+              ...result.data.quizSessions,
+            ],
+          }));
+        } else {
+          setWorkerDetail(result.data);
+        }
+
+        setPage(targetPage);
+      }
     } finally {
       setLoadingDetail(false);
     }
+  };
+
+  const loadMoreQuiz = async () => {
+    if (!selectedWorker) return;
+
+    await fetchWorkerDetail(selectedWorker.id, page + 1, true);
   };
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-1">Admin Dashboard</h1>
+
         <p className="text-muted-foreground">
           Monitor performa karyawan dan aktivitas platform
         </p>
@@ -63,37 +108,48 @@ export default function AdminDashboard({
           <CardContent className="pt-6">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm text-muted-foreground">Total Worker</p>
+
               <Users className="w-5 h-5 text-blue-500" />
             </div>
+
             <p className="text-3xl font-bold">{stats?.totalWorkers ?? 0}</p>
           </CardContent>
         </Card>
+
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm text-muted-foreground">Materi Aktif</p>
+
               <BookOpen className="w-5 h-5 text-blue-500" />
             </div>
+
             <p className="text-3xl font-bold">{stats?.totalMaterials ?? 0}</p>
           </CardContent>
         </Card>
+
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm text-muted-foreground">Total Quiz</p>
+
               <Trophy className="w-5 h-5 text-yellow-500" />
             </div>
+
             <p className="text-3xl font-bold">{stats?.totalQuizConfigs ?? 0}</p>
           </CardContent>
         </Card>
+
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm text-muted-foreground">
                 Total Poin Dibagikan
               </p>
+
               <Star className="w-5 h-5 text-yellow-500" />
             </div>
+
             <p className="text-3xl font-bold">
               {stats?.totalPointsAwarded ?? 0}
             </p>
@@ -105,8 +161,10 @@ export default function AdminDashboard({
       <Card>
         <CardHeader>
           <CardTitle>Performa Karyawan</CardTitle>
+
           <CardDescription>{workers.length} worker terdaftar</CardDescription>
         </CardHeader>
+
         <CardContent>
           {workers.length === 0 ? (
             <p className="text-center text-muted-foreground py-8">
@@ -114,7 +172,6 @@ export default function AdminDashboard({
             </p>
           ) : (
             <div className="space-y-2">
-              {/* Header */}
               <div className="grid grid-cols-7 gap-2 text-xs font-medium text-muted-foreground px-3 pb-1 border-b">
                 <span className="col-span-2">Nama</span>
                 <span>Unit</span>
@@ -127,25 +184,31 @@ export default function AdminDashboard({
               {workers.map((w) => (
                 <div
                   key={w.id}
-                  className="grid grid-cols-7 gap-2 items-center px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors cursor-pointer"
                   onClick={() => openWorkerDetail(w)}
+                  className="grid grid-cols-7 gap-2 items-center px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors cursor-pointer"
                 >
                   <div className="col-span-2 min-w-0">
                     <p className="text-sm font-medium truncate">{w.name}</p>
+
                     <p className="text-xs text-muted-foreground truncate">
                       {w.email}
                     </p>
                   </div>
+
                   <span className="text-xs text-muted-foreground truncate">
                     {w.unit}
                   </span>
+
                   <span className="text-sm text-center">
                     {w.materialsCompleted}/{w.totalMaterials}
                   </span>
+
                   <span className="text-sm text-center">{w.quizAttempted}</span>
+
                   <span className="text-sm text-center text-green-600 font-medium">
                     {w.quizPassed}
                   </span>
+
                   <span className="text-sm text-center font-bold text-yellow-600">
                     {w.totalPoints}
                   </span>
@@ -156,156 +219,170 @@ export default function AdminDashboard({
         </CardContent>
       </Card>
 
-      {/* Worker Detail Dialog */}
+      {/* Detail Dialog */}
       <Dialog
         open={!!selectedWorker}
-        onOpenChange={(open) => !open && setSelectedWorker(null)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelectedWorker(null);
+            setWorkerDetail(null);
+          }
+        }}
       >
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{selectedWorker?.name}</DialogTitle>
+
             <p className="text-sm text-muted-foreground">
-              {selectedWorker?.email}{" "}
-              {selectedWorker?.nip ? `• NIP: ${selectedWorker.nip}` : ""}
+              {selectedWorker?.email}
             </p>
           </DialogHeader>
 
-          {loadingDetail ? (
-            <p className="text-center py-8 text-muted-foreground">
-              Memuat data...
-            </p>
+          {loadingDetail && !workerDetail ? (
+            <div className="py-10 flex justify-center">
+              <Loader2 className="w-5 h-5 animate-spin" />
+            </div>
           ) : workerDetail ? (
             <div className="space-y-6">
-              {/* Quiz sessions */}
+              {/* Quiz */}
               <div>
-                <h3 className="font-semibold mb-3">Riwayat Quiz</h3>
-                {workerDetail.quizSessions.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">
-                    Belum ada quiz dikerjakan
-                  </p>
-                ) : (
-                  <div className="space-y-3">
-                    {workerDetail.quizSessions.map((session: any) => {
-                      const duration =
-                        session.submittedAt && session.startedAt
-                          ? Math.round(
-                              (new Date(session.submittedAt).getTime() -
-                                new Date(session.startedAt).getTime()) /
-                                1000,
-                            )
-                          : null;
-                      const correctCount = session.userAnswers.filter(
-                        (a: any) => a.isCorrect,
-                      ).length;
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-semibold">Riwayat Quiz</h3>
 
-                      return (
-                        <div key={session.id} className="border rounded-lg p-3">
-                          <div className="flex justify-between items-start mb-2">
-                            <div>
-                              <p className="text-sm font-medium">
-                                {session.quizConfig.name}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                {new Date(
-                                  session.submittedAt,
-                                ).toLocaleDateString("id-ID", {
-                                  day: "numeric",
-                                  month: "short",
-                                  year: "numeric",
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })}
-                                {duration && (
-                                  <span className="ml-2 inline-flex items-center gap-1">
-                                    <Clock className="w-3 h-3" />
-                                    {duration < 60
-                                      ? `${duration}d`
-                                      : `${Math.floor(duration / 60)}m ${duration % 60}d`}
-                                  </span>
-                                )}
-                              </p>
-                            </div>
-                            <div className="text-right">
-                              <span
-                                className={`text-xs px-2 py-0.5 rounded-full ${session.passed ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}
-                              >
-                                {session.passed ? "Lulus" : "Tidak Lulus"}
-                              </span>
-                              <p className="text-sm font-bold mt-1">
-                                {session.score} pts
-                              </p>
-                            </div>
+                  <span className="text-xs text-muted-foreground">
+                    {workerDetail.pagination.total} total
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  {workerDetail.quizSessions.map((session: any) => {
+                    const duration =
+                      session.submittedAt && session.startedAt
+                        ? Math.round(
+                            (new Date(session.submittedAt).getTime() -
+                              new Date(session.startedAt).getTime()) /
+                              1000,
+                          )
+                        : null;
+
+                    const correctCount = session.userAnswers.filter(
+                      (a: any) => a.isCorrect,
+                    ).length;
+
+                    return (
+                      <div key={session.id} className="border rounded-lg p-3">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <p className="text-sm font-medium">
+                              {session.quizConfig.name}
+                            </p>
+
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(session.submittedAt).toLocaleString(
+                                "id-ID",
+                              )}
+                            </p>
                           </div>
 
-                          {/* Answer breakdown */}
-                          <div className="space-y-1 mt-2">
-                            {session.userAnswers.map((a: any) => (
-                              <div
-                                key={a.id}
-                                className="flex items-start gap-2 text-xs"
-                              >
-                                {a.isCorrect ? (
-                                  <CheckCircle2 className="w-3.5 h-3.5 text-green-600 shrink-0 mt-0.5" />
-                                ) : (
-                                  <XCircle className="w-3.5 h-3.5 text-red-500 shrink-0 mt-0.5" />
-                                )}
-                                <span className="text-muted-foreground line-clamp-1">
-                                  {a.question?.text ?? "Soal dihapus"}
-                                </span>
-                                {a.isCorrect && (
-                                  <span className="text-green-600 shrink-0">
-                                    +{a.pointsEarned}
-                                  </span>
-                                )}
-                              </div>
-                            ))}
-                          </div>
+                          <div className="text-right">
+                            <span
+                              className={`text-xs px-2 py-1 rounded-full ${
+                                session.passed
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-red-100 text-red-600"
+                              }`}
+                            >
+                              {session.passed ? "Lulus" : "Tidak Lulus"}
+                            </span>
 
-                          <p className="text-xs text-muted-foreground mt-2">
-                            {correctCount}/{session.userAnswers.length} soal
-                            benar
-                          </p>
+                            <p className="text-sm font-bold mt-1">
+                              {session.score} pts
+                            </p>
+                          </div>
                         </div>
-                      );
-                    })}
-                  </div>
+
+                        <div className="space-y-1">
+                          {session.userAnswers.map((a: any) => (
+                            <div
+                              key={a.id}
+                              className="flex items-start gap-2 text-xs"
+                            >
+                              {a.isCorrect ? (
+                                <CheckCircle2 className="w-3.5 h-3.5 text-green-600 shrink-0 mt-0.5" />
+                              ) : (
+                                <XCircle className="w-3.5 h-3.5 text-red-500 shrink-0 mt-0.5" />
+                              )}
+
+                              <span className="text-muted-foreground line-clamp-1">
+                                {a.question?.text ?? "Soal dihapus"}
+                              </span>
+
+                              {a.isCorrect && (
+                                <span className="text-green-600 shrink-0">
+                                  +{a.pointsEarned}
+                                </span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+
+                        <p className="text-xs text-muted-foreground mt-2">
+                          {correctCount}/{session.userAnswers.length} benar
+                          {duration && ` • ${duration} detik`}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {workerDetail.pagination.hasMore && (
+                  <Button
+                    variant="outline"
+                    className="w-full mt-4"
+                    onClick={loadMoreQuiz}
+                    disabled={loadingDetail}
+                  >
+                    {loadingDetail ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Loading...
+                      </>
+                    ) : (
+                      "Load More"
+                    )}
+                  </Button>
                 )}
               </div>
 
-              {/* Point transactions */}
+              {/* Point */}
               <div>
                 <h3 className="font-semibold mb-3">Riwayat Poin</h3>
-                {workerDetail.pointTransactions.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">
-                    Belum ada transaksi poin
-                  </p>
-                ) : (
-                  <div className="space-y-2">
-                    {workerDetail.pointTransactions.map((t: any) => (
-                      <div
-                        key={t.id}
-                        className="flex justify-between items-center text-sm"
-                      >
-                        <div>
-                          <p className="font-medium">{t.description}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {new Date(t.createdAt).toLocaleDateString("id-ID", {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            })}
-                          </p>
-                        </div>
-                        <span
-                          className={`font-bold ${t.points > 0 ? "text-green-600" : "text-red-500"}`}
-                        >
-                          {t.points > 0 ? "+" : ""}
-                          {t.points}
-                        </span>
+
+                <div className="space-y-2">
+                  {workerDetail.pointTransactions.map((t: any) => (
+                    <div
+                      key={t.id}
+                      className="flex justify-between items-center text-sm"
+                    >
+                      <div>
+                        <p className="font-medium">{t.description}</p>
+
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(t.createdAt).toLocaleDateString("id-ID")}
+                        </p>
                       </div>
-                    ))}
-                  </div>
-                )}
+
+                      <span
+                        className={`font-bold ${
+                          t.points > 0 ? "text-green-600" : "text-red-500"
+                        }`}
+                      >
+                        {t.points > 0 ? "+" : ""}
+                        {t.points}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           ) : null}

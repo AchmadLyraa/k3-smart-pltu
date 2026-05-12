@@ -1,38 +1,68 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { NextResponse } from "next/server";
+import { s3 } from "@/lib/s3";
+import { randomUUID } from "crypto";
 
-/**
- * POST /api/upload
- * Handle file uploads (multipart/form-data)
- * Returns: { success: boolean, fileId: string, url: string }
- */
-export async function POST(request: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const formData = await request.formData();
+    const formData = await req.formData();
     const file = formData.get("file") as File;
 
     if (!file) {
-      return NextResponse.json({ error: "No file provided" }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: "No file" },
+        { status: 400 },
+      );
     }
 
-    // TODO: Implement file upload to storage (S3, R2, Vercel Blob, etc)
-    // For now, return mock response
-    const fileId = Math.random().toString(36).substring(7);
+    const allowedTypes = [
+      "video/mp4",
+      "video/webm",
+      "video/ogg",
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Tipe file tidak didukung. Hanya video dan gambar.",
+        },
+        { status: 400 },
+      );
+    }
+
+    const ext = file.name.split(".").pop();
+    const folder = file.type.startsWith("video/") ? "videos" : "images";
+    const key = `${folder}/${randomUUID()}.${ext}`;
+    const buffer = Buffer.from(await file.arrayBuffer());
+
+    await s3
+      .putObject({
+        Bucket: process.env.S3_BUCKET!,
+        Key: key,
+        Body: buffer,
+        ContentType: file.type,
+        ACL: "public-read",
+      })
+      .promise();
+
+    const endpoint = new URL(process.env.S3_ENDPOINT_URL!).host;
+    const publicUrl = `https://${process.env.S3_BUCKET}.${endpoint}/${key}`;
 
     return NextResponse.json({
       success: true,
-      fileId,
-      url: `/api/media/${fileId}`,
-      name: file.name,
-      size: file.size,
+      url: publicUrl,
+      fileName: file.name,
+      type: file.type.startsWith("video/") ? "video" : "image",
     });
-  } catch (error) {
-    console.error("[upload error]", error);
-    return NextResponse.json({ error: "Upload failed" }, { status: 500 });
+  } catch (err) {
+    console.error("[UPLOAD ERROR]", err);
+    return NextResponse.json(
+      { success: false, error: "Upload gagal" },
+      { status: 500 },
+    );
   }
 }
