@@ -125,18 +125,28 @@ export async function deleteQuestion(id: string) {
   }
 }
 
-export async function getQuestions(page: number = 1, limit: number = 20) {
+export async function getQuestions(
+  page: number = 1,
+  limit: number = 20,
+  search: string = "",
+) {
   await requireAuth(["SUPER_ADMIN"]);
 
   try {
+    const where: any = {};
+    if (search) {
+      where.text = { contains: search, mode: "insensitive" };
+    }
+
     const [questions, total] = await Promise.all([
       prisma.questionBank.findMany({
+        where,
         include: { answerOptions: true },
         orderBy: { createdAt: "desc" },
         skip: (page - 1) * limit,
         take: limit,
       }),
-      prisma.questionBank.count(),
+      prisma.questionBank.count({ where }),
     ]);
 
     return {
@@ -218,5 +228,49 @@ export async function getQuizByMaterial(materialId: string) {
   } catch (error) {
     console.error("[getQuizByMaterial error]", error);
     return { success: false, error: "Failed to fetch quiz" };
+  }
+}
+
+export async function getQuizConfigs(
+  materialId: string,
+  page: number = 1,
+  limit: number = 10,
+  search: string = "",
+) {
+  await requireAuth(["SUPER_ADMIN"]);
+
+  try {
+    const where: any = {
+      materialId,
+    };
+    
+    if (search) {
+      where.name = { contains: search, mode: "insensitive" };
+    }
+
+    const [quizConfigs, total] = await Promise.all([
+      prisma.quizConfig.findMany({
+        where,
+        include: {
+          questions: { select: { id: true } },
+        },
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.quizConfig.count({ where }),
+    ]);
+
+    return {
+      success: true,
+      data: quizConfigs.map((q: any) => ({
+        ...q,
+        questionCount: q.questions.length,
+      })),
+      pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+    };
+  } catch (error) {
+    console.error("[getQuizConfigs error]", error);
+    return { success: false, error: "Failed to fetch quiz configs" };
   }
 }

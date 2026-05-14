@@ -35,6 +35,7 @@ export async function getWorkerRewardDashboard() {
         select: {
           id: true,
           status: true,
+          shippingStatus: true,
           pointsUsed: true,
           createdAt: true,
           completedAt: true,
@@ -150,12 +151,14 @@ export async function redeemReward(rewardId: string) {
           userId,
           rewardId,
           status: "COMPLETED",
+          shippingStatus: "Sedang diproses",
           pointsUsed: reward.pointCost,
           completedAt: new Date(),
         },
         select: {
           id: true,
           status: true,
+          shippingStatus: true,
           pointsUsed: true,
           createdAt: true,
           completedAt: true,

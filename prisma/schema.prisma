@@ -578,7 +578,9 @@ model UserBadge {
 // ============================================================================
 
 enum RewardStatus {
+  PENDING
   AVAILABLE
+  REJECTED
   DISCONTINUED
 }
 
@@ -595,7 +597,10 @@ model Reward {
   description String?
   pointCost   Int
   quantity    Int
-  status      RewardStatus  @default(AVAILABLE)
+  status      RewardStatus  @default(PENDING)
+  approvalNotes String?
+  approvedAt  DateTime?
+  approvedBy  String?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
@@ -609,6 +614,7 @@ model Redemption {
   userId    String
   rewardId  String
   status    RedemptionStatus   @default(PENDING)
+  shippingStatus String        @default("Sedang diproses")
   pointsUsed Int
   approvedBy String?
   approvedAt DateTime?

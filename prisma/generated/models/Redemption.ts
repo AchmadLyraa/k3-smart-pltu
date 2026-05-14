@@ -39,6 +39,7 @@ export type RedemptionMinAggregateOutputType = {
   userId: string | null
   rewardId: string | null
   status: $Enums.RedemptionStatus | null
+  shippingStatus: string | null
   pointsUsed: number | null
   approvedBy: string | null
   approvedAt: Date | null
@@ -53,6 +54,7 @@ export type RedemptionMaxAggregateOutputType = {
   userId: string | null
   rewardId: string | null
   status: $Enums.RedemptionStatus | null
+  shippingStatus: string | null
   pointsUsed: number | null
   approvedBy: string | null
   approvedAt: Date | null
@@ -67,6 +69,7 @@ export type RedemptionCountAggregateOutputType = {
   userId: number
   rewardId: number
   status: number
+  shippingStatus: number
   pointsUsed: number
   approvedBy: number
   approvedAt: number
@@ -91,6 +94,7 @@ export type RedemptionMinAggregateInputType = {
   userId?: true
   rewardId?: true
   status?: true
+  shippingStatus?: true
   pointsUsed?: true
   approvedBy?: true
   approvedAt?: true
@@ -105,6 +109,7 @@ export type RedemptionMaxAggregateInputType = {
   userId?: true
   rewardId?: true
   status?: true
+  shippingStatus?: true
   pointsUsed?: true
   approvedBy?: true
   approvedAt?: true
@@ -119,6 +124,7 @@ export type RedemptionCountAggregateInputType = {
   userId?: true
   rewardId?: true
   status?: true
+  shippingStatus?: true
   pointsUsed?: true
   approvedBy?: true
   approvedAt?: true
@@ -220,6 +226,7 @@ export type RedemptionGroupByOutputType = {
   userId: string
   rewardId: string
   status: $Enums.RedemptionStatus
+  shippingStatus: string
   pointsUsed: number
   approvedBy: string | null
   approvedAt: Date | null
@@ -257,6 +264,7 @@ export type RedemptionWhereInput = {
   userId?: Prisma.StringFilter<"Redemption"> | string
   rewardId?: Prisma.StringFilter<"Redemption"> | string
   status?: Prisma.EnumRedemptionStatusFilter<"Redemption"> | $Enums.RedemptionStatus
+  shippingStatus?: Prisma.StringFilter<"Redemption"> | string
   pointsUsed?: Prisma.IntFilter<"Redemption"> | number
   approvedBy?: Prisma.StringNullableFilter<"Redemption"> | string | null
   approvedAt?: Prisma.DateTimeNullableFilter<"Redemption"> | Date | string | null
@@ -273,6 +281,7 @@ export type RedemptionOrderByWithRelationInput = {
   userId?: Prisma.SortOrder
   rewardId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  shippingStatus?: Prisma.SortOrder
   pointsUsed?: Prisma.SortOrder
   approvedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   approvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -292,6 +301,7 @@ export type RedemptionWhereUniqueInput = Prisma.AtLeast<{
   userId?: Prisma.StringFilter<"Redemption"> | string
   rewardId?: Prisma.StringFilter<"Redemption"> | string
   status?: Prisma.EnumRedemptionStatusFilter<"Redemption"> | $Enums.RedemptionStatus
+  shippingStatus?: Prisma.StringFilter<"Redemption"> | string
   pointsUsed?: Prisma.IntFilter<"Redemption"> | number
   approvedBy?: Prisma.StringNullableFilter<"Redemption"> | string | null
   approvedAt?: Prisma.DateTimeNullableFilter<"Redemption"> | Date | string | null
@@ -308,6 +318,7 @@ export type RedemptionOrderByWithAggregationInput = {
   userId?: Prisma.SortOrder
   rewardId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  shippingStatus?: Prisma.SortOrder
   pointsUsed?: Prisma.SortOrder
   approvedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   approvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -330,6 +341,7 @@ export type RedemptionScalarWhereWithAggregatesInput = {
   userId?: Prisma.StringWithAggregatesFilter<"Redemption"> | string
   rewardId?: Prisma.StringWithAggregatesFilter<"Redemption"> | string
   status?: Prisma.EnumRedemptionStatusWithAggregatesFilter<"Redemption"> | $Enums.RedemptionStatus
+  shippingStatus?: Prisma.StringWithAggregatesFilter<"Redemption"> | string
   pointsUsed?: Prisma.IntWithAggregatesFilter<"Redemption"> | number
   approvedBy?: Prisma.StringNullableWithAggregatesFilter<"Redemption"> | string | null
   approvedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Redemption"> | Date | string | null
@@ -342,6 +354,7 @@ export type RedemptionScalarWhereWithAggregatesInput = {
 export type RedemptionCreateInput = {
   id?: string
   status?: $Enums.RedemptionStatus
+  shippingStatus?: string
   pointsUsed: number
   approvedBy?: string | null
   approvedAt?: Date | string | null
@@ -358,6 +371,7 @@ export type RedemptionUncheckedCreateInput = {
   userId: string
   rewardId: string
   status?: $Enums.RedemptionStatus
+  shippingStatus?: string
   pointsUsed: number
   approvedBy?: string | null
   approvedAt?: Date | string | null
@@ -370,6 +384,7 @@ export type RedemptionUncheckedCreateInput = {
 export type RedemptionUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumRedemptionStatusFieldUpdateOperationsInput | $Enums.RedemptionStatus
+  shippingStatus?: Prisma.StringFieldUpdateOperationsInput | string
   pointsUsed?: Prisma.IntFieldUpdateOperationsInput | number
   approvedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -386,6 +401,7 @@ export type RedemptionUncheckedUpdateInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   rewardId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumRedemptionStatusFieldUpdateOperationsInput | $Enums.RedemptionStatus
+  shippingStatus?: Prisma.StringFieldUpdateOperationsInput | string
   pointsUsed?: Prisma.IntFieldUpdateOperationsInput | number
   approvedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -400,6 +416,7 @@ export type RedemptionCreateManyInput = {
   userId: string
   rewardId: string
   status?: $Enums.RedemptionStatus
+  shippingStatus?: string
   pointsUsed: number
   approvedBy?: string | null
   approvedAt?: Date | string | null
@@ -412,6 +429,7 @@ export type RedemptionCreateManyInput = {
 export type RedemptionUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumRedemptionStatusFieldUpdateOperationsInput | $Enums.RedemptionStatus
+  shippingStatus?: Prisma.StringFieldUpdateOperationsInput | string
   pointsUsed?: Prisma.IntFieldUpdateOperationsInput | number
   approvedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -426,6 +444,7 @@ export type RedemptionUncheckedUpdateManyInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   rewardId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumRedemptionStatusFieldUpdateOperationsInput | $Enums.RedemptionStatus
+  shippingStatus?: Prisma.StringFieldUpdateOperationsInput | string
   pointsUsed?: Prisma.IntFieldUpdateOperationsInput | number
   approvedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -450,6 +469,7 @@ export type RedemptionCountOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   rewardId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  shippingStatus?: Prisma.SortOrder
   pointsUsed?: Prisma.SortOrder
   approvedBy?: Prisma.SortOrder
   approvedAt?: Prisma.SortOrder
@@ -468,6 +488,7 @@ export type RedemptionMaxOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   rewardId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  shippingStatus?: Prisma.SortOrder
   pointsUsed?: Prisma.SortOrder
   approvedBy?: Prisma.SortOrder
   approvedAt?: Prisma.SortOrder
@@ -482,6 +503,7 @@ export type RedemptionMinOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   rewardId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  shippingStatus?: Prisma.SortOrder
   pointsUsed?: Prisma.SortOrder
   approvedBy?: Prisma.SortOrder
   approvedAt?: Prisma.SortOrder
@@ -586,6 +608,7 @@ export type EnumRedemptionStatusFieldUpdateOperationsInput = {
 export type RedemptionCreateWithoutUserInput = {
   id?: string
   status?: $Enums.RedemptionStatus
+  shippingStatus?: string
   pointsUsed: number
   approvedBy?: string | null
   approvedAt?: Date | string | null
@@ -600,6 +623,7 @@ export type RedemptionUncheckedCreateWithoutUserInput = {
   id?: string
   rewardId: string
   status?: $Enums.RedemptionStatus
+  shippingStatus?: string
   pointsUsed: number
   approvedBy?: string | null
   approvedAt?: Date | string | null
@@ -643,6 +667,7 @@ export type RedemptionScalarWhereInput = {
   userId?: Prisma.StringFilter<"Redemption"> | string
   rewardId?: Prisma.StringFilter<"Redemption"> | string
   status?: Prisma.EnumRedemptionStatusFilter<"Redemption"> | $Enums.RedemptionStatus
+  shippingStatus?: Prisma.StringFilter<"Redemption"> | string
   pointsUsed?: Prisma.IntFilter<"Redemption"> | number
   approvedBy?: Prisma.StringNullableFilter<"Redemption"> | string | null
   approvedAt?: Prisma.DateTimeNullableFilter<"Redemption"> | Date | string | null
@@ -655,6 +680,7 @@ export type RedemptionScalarWhereInput = {
 export type RedemptionCreateWithoutRewardInput = {
   id?: string
   status?: $Enums.RedemptionStatus
+  shippingStatus?: string
   pointsUsed: number
   approvedBy?: string | null
   approvedAt?: Date | string | null
@@ -669,6 +695,7 @@ export type RedemptionUncheckedCreateWithoutRewardInput = {
   id?: string
   userId: string
   status?: $Enums.RedemptionStatus
+  shippingStatus?: string
   pointsUsed: number
   approvedBy?: string | null
   approvedAt?: Date | string | null
@@ -708,6 +735,7 @@ export type RedemptionCreateManyUserInput = {
   id?: string
   rewardId: string
   status?: $Enums.RedemptionStatus
+  shippingStatus?: string
   pointsUsed: number
   approvedBy?: string | null
   approvedAt?: Date | string | null
@@ -720,6 +748,7 @@ export type RedemptionCreateManyUserInput = {
 export type RedemptionUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumRedemptionStatusFieldUpdateOperationsInput | $Enums.RedemptionStatus
+  shippingStatus?: Prisma.StringFieldUpdateOperationsInput | string
   pointsUsed?: Prisma.IntFieldUpdateOperationsInput | number
   approvedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -734,6 +763,7 @@ export type RedemptionUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   rewardId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumRedemptionStatusFieldUpdateOperationsInput | $Enums.RedemptionStatus
+  shippingStatus?: Prisma.StringFieldUpdateOperationsInput | string
   pointsUsed?: Prisma.IntFieldUpdateOperationsInput | number
   approvedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -747,6 +777,7 @@ export type RedemptionUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   rewardId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumRedemptionStatusFieldUpdateOperationsInput | $Enums.RedemptionStatus
+  shippingStatus?: Prisma.StringFieldUpdateOperationsInput | string
   pointsUsed?: Prisma.IntFieldUpdateOperationsInput | number
   approvedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -760,6 +791,7 @@ export type RedemptionCreateManyRewardInput = {
   id?: string
   userId: string
   status?: $Enums.RedemptionStatus
+  shippingStatus?: string
   pointsUsed: number
   approvedBy?: string | null
   approvedAt?: Date | string | null
@@ -772,6 +804,7 @@ export type RedemptionCreateManyRewardInput = {
 export type RedemptionUpdateWithoutRewardInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumRedemptionStatusFieldUpdateOperationsInput | $Enums.RedemptionStatus
+  shippingStatus?: Prisma.StringFieldUpdateOperationsInput | string
   pointsUsed?: Prisma.IntFieldUpdateOperationsInput | number
   approvedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -786,6 +819,7 @@ export type RedemptionUncheckedUpdateWithoutRewardInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumRedemptionStatusFieldUpdateOperationsInput | $Enums.RedemptionStatus
+  shippingStatus?: Prisma.StringFieldUpdateOperationsInput | string
   pointsUsed?: Prisma.IntFieldUpdateOperationsInput | number
   approvedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -799,6 +833,7 @@ export type RedemptionUncheckedUpdateManyWithoutRewardInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumRedemptionStatusFieldUpdateOperationsInput | $Enums.RedemptionStatus
+  shippingStatus?: Prisma.StringFieldUpdateOperationsInput | string
   pointsUsed?: Prisma.IntFieldUpdateOperationsInput | number
   approvedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -815,6 +850,7 @@ export type RedemptionSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   userId?: boolean
   rewardId?: boolean
   status?: boolean
+  shippingStatus?: boolean
   pointsUsed?: boolean
   approvedBy?: boolean
   approvedAt?: boolean
@@ -831,6 +867,7 @@ export type RedemptionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   userId?: boolean
   rewardId?: boolean
   status?: boolean
+  shippingStatus?: boolean
   pointsUsed?: boolean
   approvedBy?: boolean
   approvedAt?: boolean
@@ -847,6 +884,7 @@ export type RedemptionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   userId?: boolean
   rewardId?: boolean
   status?: boolean
+  shippingStatus?: boolean
   pointsUsed?: boolean
   approvedBy?: boolean
   approvedAt?: boolean
@@ -863,6 +901,7 @@ export type RedemptionSelectScalar = {
   userId?: boolean
   rewardId?: boolean
   status?: boolean
+  shippingStatus?: boolean
   pointsUsed?: boolean
   approvedBy?: boolean
   approvedAt?: boolean
@@ -872,7 +911,7 @@ export type RedemptionSelectScalar = {
   updatedAt?: boolean
 }
 
-export type RedemptionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "rewardId" | "status" | "pointsUsed" | "approvedBy" | "approvedAt" | "completedAt" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["redemption"]>
+export type RedemptionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "rewardId" | "status" | "shippingStatus" | "pointsUsed" | "approvedBy" | "approvedAt" | "completedAt" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["redemption"]>
 export type RedemptionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   reward?: boolean | Prisma.RewardDefaultArgs<ExtArgs>
@@ -897,6 +936,7 @@ export type $RedemptionPayload<ExtArgs extends runtime.Types.Extensions.Internal
     userId: string
     rewardId: string
     status: $Enums.RedemptionStatus
+    shippingStatus: string
     pointsUsed: number
     approvedBy: string | null
     approvedAt: Date | null
@@ -1333,6 +1373,7 @@ export interface RedemptionFieldRefs {
   readonly userId: Prisma.FieldRef<"Redemption", 'String'>
   readonly rewardId: Prisma.FieldRef<"Redemption", 'String'>
   readonly status: Prisma.FieldRef<"Redemption", 'RedemptionStatus'>
+  readonly shippingStatus: Prisma.FieldRef<"Redemption", 'String'>
   readonly pointsUsed: Prisma.FieldRef<"Redemption", 'Int'>
   readonly approvedBy: Prisma.FieldRef<"Redemption", 'String'>
   readonly approvedAt: Prisma.FieldRef<"Redemption", 'DateTime'>

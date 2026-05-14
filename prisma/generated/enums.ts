@@ -86,7 +86,9 @@ export type TransactionType = (typeof TransactionType)[keyof typeof TransactionT
 
 
 export const RewardStatus = {
+  PENDING: 'PENDING',
   AVAILABLE: 'AVAILABLE',
+  REJECTED: 'REJECTED',
   DISCONTINUED: 'DISCONTINUED'
 } as const
 

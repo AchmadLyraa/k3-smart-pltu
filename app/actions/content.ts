@@ -143,13 +143,18 @@ export async function getMaterials(
   topicId?: string,
   page: number = 1,
   limit: number = 10,
+  search: string = "",
 ) {
   await requireAuth(["SUPER_ADMIN"]);
 
   try {
+    const skip = (page - 1) * limit;
     const where: any = {};
     if (status) where.status = status;
     if (topicId) where.topicId = topicId;
+    if (search) {
+      where.title = { contains: search, mode: "insensitive" };
+    }
 
     const [materials, total] = await Promise.all([
       prisma.material.findMany({

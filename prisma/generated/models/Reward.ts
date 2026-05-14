@@ -43,6 +43,9 @@ export type RewardMinAggregateOutputType = {
   pointCost: number | null
   quantity: number | null
   status: $Enums.RewardStatus | null
+  approvalNotes: string | null
+  approvedAt: Date | null
+  approvedBy: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -54,6 +57,9 @@ export type RewardMaxAggregateOutputType = {
   pointCost: number | null
   quantity: number | null
   status: $Enums.RewardStatus | null
+  approvalNotes: string | null
+  approvedAt: Date | null
+  approvedBy: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -65,6 +71,9 @@ export type RewardCountAggregateOutputType = {
   pointCost: number
   quantity: number
   status: number
+  approvalNotes: number
+  approvedAt: number
+  approvedBy: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -88,6 +97,9 @@ export type RewardMinAggregateInputType = {
   pointCost?: true
   quantity?: true
   status?: true
+  approvalNotes?: true
+  approvedAt?: true
+  approvedBy?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -99,6 +111,9 @@ export type RewardMaxAggregateInputType = {
   pointCost?: true
   quantity?: true
   status?: true
+  approvalNotes?: true
+  approvedAt?: true
+  approvedBy?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -110,6 +125,9 @@ export type RewardCountAggregateInputType = {
   pointCost?: true
   quantity?: true
   status?: true
+  approvalNotes?: true
+  approvedAt?: true
+  approvedBy?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -208,6 +226,9 @@ export type RewardGroupByOutputType = {
   pointCost: number
   quantity: number
   status: $Enums.RewardStatus
+  approvalNotes: string | null
+  approvedAt: Date | null
+  approvedBy: string | null
   createdAt: Date
   updatedAt: Date
   _count: RewardCountAggregateOutputType | null
@@ -242,6 +263,9 @@ export type RewardWhereInput = {
   pointCost?: Prisma.IntFilter<"Reward"> | number
   quantity?: Prisma.IntFilter<"Reward"> | number
   status?: Prisma.EnumRewardStatusFilter<"Reward"> | $Enums.RewardStatus
+  approvalNotes?: Prisma.StringNullableFilter<"Reward"> | string | null
+  approvedAt?: Prisma.DateTimeNullableFilter<"Reward"> | Date | string | null
+  approvedBy?: Prisma.StringNullableFilter<"Reward"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Reward"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Reward"> | Date | string
   redemptions?: Prisma.RedemptionListRelationFilter
@@ -254,6 +278,9 @@ export type RewardOrderByWithRelationInput = {
   pointCost?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  approvalNotes?: Prisma.SortOrderInput | Prisma.SortOrder
+  approvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  approvedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   redemptions?: Prisma.RedemptionOrderByRelationAggregateInput
@@ -269,6 +296,9 @@ export type RewardWhereUniqueInput = Prisma.AtLeast<{
   pointCost?: Prisma.IntFilter<"Reward"> | number
   quantity?: Prisma.IntFilter<"Reward"> | number
   status?: Prisma.EnumRewardStatusFilter<"Reward"> | $Enums.RewardStatus
+  approvalNotes?: Prisma.StringNullableFilter<"Reward"> | string | null
+  approvedAt?: Prisma.DateTimeNullableFilter<"Reward"> | Date | string | null
+  approvedBy?: Prisma.StringNullableFilter<"Reward"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Reward"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Reward"> | Date | string
   redemptions?: Prisma.RedemptionListRelationFilter
@@ -281,6 +311,9 @@ export type RewardOrderByWithAggregationInput = {
   pointCost?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  approvalNotes?: Prisma.SortOrderInput | Prisma.SortOrder
+  approvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  approvedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.RewardCountOrderByAggregateInput
@@ -300,6 +333,9 @@ export type RewardScalarWhereWithAggregatesInput = {
   pointCost?: Prisma.IntWithAggregatesFilter<"Reward"> | number
   quantity?: Prisma.IntWithAggregatesFilter<"Reward"> | number
   status?: Prisma.EnumRewardStatusWithAggregatesFilter<"Reward"> | $Enums.RewardStatus
+  approvalNotes?: Prisma.StringNullableWithAggregatesFilter<"Reward"> | string | null
+  approvedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Reward"> | Date | string | null
+  approvedBy?: Prisma.StringNullableWithAggregatesFilter<"Reward"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Reward"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Reward"> | Date | string
 }
@@ -311,6 +347,9 @@ export type RewardCreateInput = {
   pointCost: number
   quantity: number
   status?: $Enums.RewardStatus
+  approvalNotes?: string | null
+  approvedAt?: Date | string | null
+  approvedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   redemptions?: Prisma.RedemptionCreateNestedManyWithoutRewardInput
@@ -323,6 +362,9 @@ export type RewardUncheckedCreateInput = {
   pointCost: number
   quantity: number
   status?: $Enums.RewardStatus
+  approvalNotes?: string | null
+  approvedAt?: Date | string | null
+  approvedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   redemptions?: Prisma.RedemptionUncheckedCreateNestedManyWithoutRewardInput
@@ -335,6 +377,9 @@ export type RewardUpdateInput = {
   pointCost?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumRewardStatusFieldUpdateOperationsInput | $Enums.RewardStatus
+  approvalNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  approvedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   redemptions?: Prisma.RedemptionUpdateManyWithoutRewardNestedInput
@@ -347,6 +392,9 @@ export type RewardUncheckedUpdateInput = {
   pointCost?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumRewardStatusFieldUpdateOperationsInput | $Enums.RewardStatus
+  approvalNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  approvedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   redemptions?: Prisma.RedemptionUncheckedUpdateManyWithoutRewardNestedInput
@@ -359,6 +407,9 @@ export type RewardCreateManyInput = {
   pointCost: number
   quantity: number
   status?: $Enums.RewardStatus
+  approvalNotes?: string | null
+  approvedAt?: Date | string | null
+  approvedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -370,6 +421,9 @@ export type RewardUpdateManyMutationInput = {
   pointCost?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumRewardStatusFieldUpdateOperationsInput | $Enums.RewardStatus
+  approvalNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  approvedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -381,6 +435,9 @@ export type RewardUncheckedUpdateManyInput = {
   pointCost?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumRewardStatusFieldUpdateOperationsInput | $Enums.RewardStatus
+  approvalNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  approvedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -392,6 +449,9 @@ export type RewardCountOrderByAggregateInput = {
   pointCost?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  approvalNotes?: Prisma.SortOrder
+  approvedAt?: Prisma.SortOrder
+  approvedBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -408,6 +468,9 @@ export type RewardMaxOrderByAggregateInput = {
   pointCost?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  approvalNotes?: Prisma.SortOrder
+  approvedAt?: Prisma.SortOrder
+  approvedBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -419,6 +482,9 @@ export type RewardMinOrderByAggregateInput = {
   pointCost?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  approvalNotes?: Prisma.SortOrder
+  approvedAt?: Prisma.SortOrder
+  approvedBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -458,6 +524,9 @@ export type RewardCreateWithoutRedemptionsInput = {
   pointCost: number
   quantity: number
   status?: $Enums.RewardStatus
+  approvalNotes?: string | null
+  approvedAt?: Date | string | null
+  approvedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -469,6 +538,9 @@ export type RewardUncheckedCreateWithoutRedemptionsInput = {
   pointCost: number
   quantity: number
   status?: $Enums.RewardStatus
+  approvalNotes?: string | null
+  approvedAt?: Date | string | null
+  approvedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -496,6 +568,9 @@ export type RewardUpdateWithoutRedemptionsInput = {
   pointCost?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumRewardStatusFieldUpdateOperationsInput | $Enums.RewardStatus
+  approvalNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  approvedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -507,6 +582,9 @@ export type RewardUncheckedUpdateWithoutRedemptionsInput = {
   pointCost?: Prisma.IntFieldUpdateOperationsInput | number
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumRewardStatusFieldUpdateOperationsInput | $Enums.RewardStatus
+  approvalNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  approvedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -549,6 +627,9 @@ export type RewardSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   pointCost?: boolean
   quantity?: boolean
   status?: boolean
+  approvalNotes?: boolean
+  approvedAt?: boolean
+  approvedBy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   redemptions?: boolean | Prisma.Reward$redemptionsArgs<ExtArgs>
@@ -562,6 +643,9 @@ export type RewardSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   pointCost?: boolean
   quantity?: boolean
   status?: boolean
+  approvalNotes?: boolean
+  approvedAt?: boolean
+  approvedBy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["reward"]>
@@ -573,6 +657,9 @@ export type RewardSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   pointCost?: boolean
   quantity?: boolean
   status?: boolean
+  approvalNotes?: boolean
+  approvedAt?: boolean
+  approvedBy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["reward"]>
@@ -584,11 +671,14 @@ export type RewardSelectScalar = {
   pointCost?: boolean
   quantity?: boolean
   status?: boolean
+  approvalNotes?: boolean
+  approvedAt?: boolean
+  approvedBy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type RewardOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "pointCost" | "quantity" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["reward"]>
+export type RewardOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "pointCost" | "quantity" | "status" | "approvalNotes" | "approvedAt" | "approvedBy" | "createdAt" | "updatedAt", ExtArgs["result"]["reward"]>
 export type RewardInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   redemptions?: boolean | Prisma.Reward$redemptionsArgs<ExtArgs>
   _count?: boolean | Prisma.RewardCountOutputTypeDefaultArgs<ExtArgs>
@@ -608,6 +698,9 @@ export type $RewardPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     pointCost: number
     quantity: number
     status: $Enums.RewardStatus
+    approvalNotes: string | null
+    approvedAt: Date | null
+    approvedBy: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["reward"]>
@@ -1040,6 +1133,9 @@ export interface RewardFieldRefs {
   readonly pointCost: Prisma.FieldRef<"Reward", 'Int'>
   readonly quantity: Prisma.FieldRef<"Reward", 'Int'>
   readonly status: Prisma.FieldRef<"Reward", 'RewardStatus'>
+  readonly approvalNotes: Prisma.FieldRef<"Reward", 'String'>
+  readonly approvedAt: Prisma.FieldRef<"Reward", 'DateTime'>
+  readonly approvedBy: Prisma.FieldRef<"Reward", 'String'>
   readonly createdAt: Prisma.FieldRef<"Reward", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Reward", 'DateTime'>
 }

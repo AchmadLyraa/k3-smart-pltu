@@ -201,7 +201,9 @@ export default function RewardEditDialog({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="PENDING">Pending Approval</SelectItem>
                 <SelectItem value="AVAILABLE">Tersedia</SelectItem>
+                <SelectItem value="REJECTED">Ditolak</SelectItem>
                 <SelectItem value="DISCONTINUED">Tidak Tersedia</SelectItem>
               </SelectContent>
             </Select>

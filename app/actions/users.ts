@@ -396,3 +396,226 @@ export async function deleteUser(userId: string) {
     };
   }
 }
+
+/**
+ * Generate random strong password
+ */
+function generateRandomPassword(length: number = 12): string {
+  const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const lowercase = "abcdefghijklmnopqrstuvwxyz";
+  const numbers = "0123456789";
+  const special = "!@#$%^&*";
+
+  let password = "";
+  password += uppercase[Math.floor(Math.random() * uppercase.length)];
+  password += lowercase[Math.floor(Math.random() * lowercase.length)];
+  password += numbers[Math.floor(Math.random() * numbers.length)];
+  password += special[Math.floor(Math.random() * special.length)];
+
+  const all = uppercase + lowercase + numbers + special;
+  for (let i = password.length; i < length; i++) {
+    password += all[Math.floor(Math.random() * all.length)];
+  }
+
+  return password.split("").sort(() => Math.random() - 0.5).join("");
+}
+
+/**
+ * Get user profile (with full details)
+ */
+export async function getUserProfile(userId: string) {
+  await requireAuth();
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        image: true,
+        nip: true,
+        role: true,
+        status: true,
+        lastLogin: true,
+        createdAt: true,
+        updatedAt: true,
+        unitId: true,
+        divisionId: true,
+        shiftId: true,
+        unit: {
+          select: { id: true, name: true },
+        },
+        division: {
+          select: { id: true, name: true },
+        },
+        shift: {
+          select: { id: true, name: true },
+        },
+      },
+    });
+
+    if (!user) {
+      return {
+        success: false,
+        error: "User not found",
+      };
+    }
+
+    return {
+      success: true,
+      data: user,
+    };
+  } catch (error) {
+    console.error("[getUserProfile error]", error);
+    return {
+      success: false,
+      error: "Failed to fetch profile",
+    };
+  }
+}
+
+/**
+ * Change password (user action)
+ */
+export async function changePassword(
+  userId: string,
+  oldPassword: string,
+  newPassword: string,
+) {
+  await requireAuth();
+
+  const user = await getUserProfile(userId);
+  if (!user.success || !user.data) {
+    return {
+      success: false,
+      error: "User not found",
+    };
+  }
+
+  try {
+    // Get current user's password hash
+    const userWithPassword = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { password: true },
+    });
+
+    if (!userWithPassword || !userWithPassword.password) {
+      return {
+        success: false,
+        error: "User password not set",
+      };
+    }
+
+    // Verify old password
+    const { verifyPassword } = await import("@/auth");
+    const isPasswordCorrect = await verifyPassword(
+      oldPassword,
+      userWithPassword.password,
+    );
+
+    if (!isPasswordCorrect) {
+      return {
+        success: false,
+        error: "Current password is incorrect",
+      };
+    }
+
+    // Validate new password strength
+    if (newPassword.length < 8) {
+      return {
+        success: false,
+        error: "New password must be at least 8 characters",
+      };
+    }
+
+    if (!/[A-Z]/.test(newPassword)) {
+      return {
+        success: false,
+        error: "New password must contain uppercase letter",
+      };
+    }
+
+    if (!/[a-z]/.test(newPassword)) {
+      return {
+        success: false,
+        error: "New password must contain lowercase letter",
+      };
+    }
+
+    if (!/[0-9]/.test(newPassword)) {
+      return {
+        success: false,
+        error: "New password must contain number",
+      };
+    }
+
+    // Hash new password
+    const hashedPassword = await hashPassword(newPassword);
+
+    // Update password
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    });
+
+    return {
+      success: true,
+      message: "Password changed successfully",
+    };
+  } catch (error) {
+    console.error("[changePassword error]", error);
+    return {
+      success: false,
+      error: "Failed to change password",
+    };
+  }
+}
+
+/**
+ * Reset password (admin only) - generates new password
+ */
+export async function resetPassword(userId: string) {
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, email: true, name: true },
+    });
+
+    if (!user) {
+      return {
+        success: false,
+        error: "User not found",
+      };
+    }
+
+    // Generate new password
+    const newPassword = generateRandomPassword();
+    const hashedPassword = await hashPassword(newPassword);
+
+    // Update user password
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    });
+
+    return {
+      success: true,
+      data: {
+        userId: user.id,
+        email: user.email,
+        name: user.name,
+        newPassword: newPassword,
+      },
+      message: "Password reset successfully. New password generated.",
+    };
+  } catch (error) {
+    console.error("[resetPassword error]", error);
+    return {
+      success: false,
+      error: "Failed to reset password",
+    };
+  }
+}

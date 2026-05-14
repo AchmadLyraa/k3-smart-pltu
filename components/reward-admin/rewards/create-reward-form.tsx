@@ -13,13 +13,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 
 interface CreateRewardFormProps {
@@ -34,7 +27,6 @@ export default function CreateRewardForm({ onSuccess }: CreateRewardFormProps) {
     description: "",
     pointCost: "",
     quantity: "",
-    status: "AVAILABLE",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -55,13 +47,6 @@ export default function CreateRewardForm({ onSuccess }: CreateRewardFormProps) {
     }
   };
 
-  const handleStatusChange = (value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      status: value,
-    }));
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -73,7 +58,6 @@ export default function CreateRewardForm({ onSuccess }: CreateRewardFormProps) {
         description: formData.description || undefined,
         pointCost: parseInt(formData.pointCost),
         quantity: parseInt(formData.quantity),
-        status: formData.status,
       });
 
       if (result.success) {
@@ -86,7 +70,6 @@ export default function CreateRewardForm({ onSuccess }: CreateRewardFormProps) {
           description: "",
           pointCost: "",
           quantity: "",
-          status: "AVAILABLE",
         });
         onSuccess?.();
       } else {
@@ -117,7 +100,7 @@ export default function CreateRewardForm({ onSuccess }: CreateRewardFormProps) {
       <CardHeader>
         <CardTitle>Tambah Reward Baru</CardTitle>
         <CardDescription>
-          Buat reward baru yang dapat ditukar dengan poin worker
+          Buat reward baru yang akan masuk antrian approval admin sebelum tersedia.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -175,41 +158,25 @@ export default function CreateRewardForm({ onSuccess }: CreateRewardFormProps) {
             )}
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            {/* Quantity */}
-            <div className="space-y-2">
-              <Label htmlFor="quantity">Jumlah Stok *</Label>
-              <Input
-                id="quantity"
-                name="quantity"
-                type="number"
-                value={formData.quantity}
-                onChange={handleChange}
-                placeholder="misal: 10"
-                disabled={loading}
-                min="0"
-              />
-              {errors.quantity && (
-                <p className="text-sm text-destructive">{errors.quantity}</p>
-              )}
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="quantity">Jumlah Stok *</Label>
+            <Input
+              id="quantity"
+              name="quantity"
+              type="number"
+              value={formData.quantity}
+              onChange={handleChange}
+              placeholder="misal: 10"
+              disabled={loading}
+              min="0"
+            />
+            {errors.quantity && (
+              <p className="text-sm text-destructive">{errors.quantity}</p>
+            )}
+          </div>
 
-            {/* Status */}
-            <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
-              <Select value={formData.status} onValueChange={handleStatusChange}>
-                <SelectTrigger id="status" disabled={loading}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="AVAILABLE">Tersedia</SelectItem>
-                  <SelectItem value="DISCONTINUED">Tidak Tersedia</SelectItem>
-                </SelectContent>
-              </Select>
-              {errors.status && (
-                <p className="text-sm text-destructive">{errors.status}</p>
-              )}
-            </div>
+          <div className="rounded-lg border border-dashed bg-muted/30 p-3 text-sm text-muted-foreground">
+            Reward yang dibuat akan otomatis berstatus pending dan menunggu approval admin.
           </div>
 
           <Button type="submit" disabled={loading} className="w-full md:w-auto">

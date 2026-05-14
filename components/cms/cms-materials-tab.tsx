@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -36,6 +36,8 @@ import {
   X,
   CheckCircle2,
   Circle,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import MaterialForm from "./material-form";
 import {
@@ -45,10 +47,12 @@ import {
   archiveMaterial,
   addMediaFile,
   removeMediaFile,
+  getMaterials as fetchMaterials,
 } from "@/app/actions/content";
 import {
   createQuizConfig,
   getQuizByMaterial,
+  getQuizConfigs,
   deleteQuestion,
 } from "@/app/actions/quiz";
 
@@ -73,7 +77,19 @@ const difficultyColor = {
   hard: "bg-red-100 text-red-700",
 };
 
-export default function CMSMaterialsTab({ topics, materials, questions }) {
+export default function CMSMaterialsTab({ topics, materials: initialMaterials, questions }) {
+  // Material state
+  const [materials, setMaterials] = useState(initialMaterials || []);
+  const [materialPagination, setMaterialPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    pages: 0,
+  });
+  const [materialSearch, setMaterialSearch] = useState("");
+  const [materialLoading, setMaterialLoading] = useState(false);
+
+  // Form state
   const [showForm, setShowForm] = useState(false);
   const [editMaterial, setEditMaterial] = useState<any>(null);
   const [editData, setEditData] = useState<any>(null);
@@ -81,7 +97,15 @@ export default function CMSMaterialsTab({ topics, materials, questions }) {
 
   // Quiz dialog state
   const [quizMaterial, setQuizMaterial] = useState<any>(null);
-  const [existingQuizzes, setExistingQuizzes] = useState<any[]>([]);
+  const [quizConfigs, setQuizConfigs] = useState<any[]>([]);
+  const [quizPagination, setQuizPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    pages: 0,
+  });
+  const [quizSearch, setQuizSearch] = useState("");
+  const [quizLoading, setQuizLoading] = useState(false);
   const [showQuizForm, setShowQuizForm] = useState(false);
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   const [quizFormData, setQuizFormData] = useState({
@@ -98,13 +122,55 @@ export default function CMSMaterialsTab({ topics, materials, questions }) {
   });
   const [savingQuiz, setSavingQuiz] = useState(false);
 
+  // Load materials
+  const loadMaterials = useCallback(
+    async (page: number = 1) => {
+      setMaterialLoading(true);
+      try {
+        const result = await fetchMaterials(undefined, undefined, page, 10, materialSearch);
+        if (result.success) {
+          setMaterials(result.data);
+          setMaterialPagination(result.pagination);
+        }
+      } catch (error) {
+        console.error("Failed to load materials:", error);
+      } finally {
+        setMaterialLoading(false);
+      }
+    },
+    [materialSearch],
+  );
+
+  // Load quiz configs
+  const loadQuizConfigs = useCallback(
+    async (materialId: string, page: number = 1) => {
+      setQuizLoading(true);
+      try {
+        const result = await getQuizConfigs(materialId, page, 10, quizSearch);
+        if (result.success) {
+          setQuizConfigs(result.data);
+          setQuizPagination(result.pagination);
+        }
+      } catch (error) {
+        console.error("Failed to load quiz configs:", error);
+      } finally {
+        setQuizLoading(false);
+      }
+    },
+    [quizSearch],
+  );
+
+  useEffect(() => {
+    loadMaterials(1);
+  }, [materialSearch, loadMaterials]);
+
   const openQuizDialog = async (m: any) => {
     setQuizMaterial(m);
     setShowQuizForm(false);
     setSelectedQuestions([]);
-    const result = await getQuizByMaterial(m.id);
-    if (result.success) setExistingQuizzes(result.data);
-    else setExistingQuizzes([]);
+    setQuizSearch("");
+    setQuizPagination({ page: 1, limit: 10, total: 0, pages: 0 });
+    await loadQuizConfigs(m.id, 1);
   };
 
   const handleCreateQuiz = async () => {
@@ -126,8 +192,7 @@ export default function CMSMaterialsTab({ topics, materials, questions }) {
         questionIds: selectedQuestions,
       });
       if (result.success) {
-        const updated = await getQuizByMaterial(quizMaterial.id);
-        if (updated.success) setExistingQuizzes(updated.data);
+        await loadQuizConfigs(quizMaterial.id, 1);
         setShowQuizForm(false);
         setSelectedQuestions([]);
         setQuizFormData({
@@ -142,7 +207,6 @@ export default function CMSMaterialsTab({ topics, materials, questions }) {
           shuffleQuestions: true,
           deadline: "",
         });
-        window.location.reload();
       } else {
         alert(result.error ?? "Gagal buat quiz");
       }
@@ -250,8 +314,8 @@ export default function CMSMaterialsTab({ topics, materials, questions }) {
             <div>
               <CardTitle>Materials</CardTitle>
               <CardDescription>
-                {materials.length} material{materials.length !== 1 ? "s" : ""}{" "}
-                total
+                Total: {materialPagination.total} material
+                {materialPagination.total !== 1 ? "s" : ""}
               </CardDescription>
             </div>
             <Button onClick={() => setShowForm(!showForm)}>
@@ -260,120 +324,158 @@ export default function CMSMaterialsTab({ topics, materials, questions }) {
           </div>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="space-y-4">
           {showForm && (
             <div className="mb-6">
               <MaterialForm
                 topics={topics}
                 onSuccess={() => {
                   setShowForm(false);
-                  window.location.reload();
+                  loadMaterials(1);
                 }}
               />
             </div>
           )}
 
+          {/* Search Bar */}
+          <Input
+            placeholder="Search materials..."
+            value={materialSearch}
+            onChange={(e) => setMaterialSearch(e.target.value)}
+            className="flex-1"
+          />
+
           {materials.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
-              No materials yet.
+              No materials found.
             </div>
           ) : (
-            <div className="space-y-3">
-              {materials.map((m: any, idx: number) => {
-                const Icon = typeIcon[m.type] ?? FileText;
-                return (
-                  <div
-                    key={m.id}
-                    className="border rounded-lg p-4 hover:bg-muted/40 transition-colors"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex gap-3 items-start flex-1 min-w-0">
-                        <span className="text-sm text-muted-foreground mt-0.5 shrink-0">
-                          #{idx + 1}
-                        </span>
-                        <Icon className="w-4 h-4 mt-0.5 shrink-0 text-muted-foreground" />
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm">{m.title}</p>
-                          {m.description && (
-                            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-                              {m.description}
-                            </p>
-                          )}
-                          <div className="flex gap-2 mt-1.5 text-xs text-muted-foreground">
-                            <span>{m.topic?.name ?? "-"}</span>
-                            <span>•</span>
-                            <span>
-                              {Math.floor(m.duration / 60)}m {m.duration % 60}s
-                            </span>
-                            <span>•</span>
-                            <span>{m.mediaFiles?.length ?? 0} files</span>
-                            <span>•</span>
-                            <span>{m.quizConfigs?.length ?? 0} quiz</span>
+            <>
+              <div className="space-y-3">
+                {materials.map((m: any, idx: number) => {
+                  const Icon = typeIcon[m.type] ?? FileText;
+                  return (
+                    <div
+                      key={m.id}
+                      className="border rounded-lg p-4 hover:bg-muted/40 transition-colors"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex gap-3 items-start flex-1 min-w-0">
+                          <span className="text-sm text-muted-foreground mt-0.5 shrink-0">
+                            #{(materialPagination.page - 1) * materialPagination.limit + idx + 1}
+                          </span>
+                          <Icon className="w-4 h-4 mt-0.5 shrink-0 text-muted-foreground" />
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm">{m.title}</p>
+                            {m.description && (
+                              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                                {m.description}
+                              </p>
+                            )}
+                            <div className="flex gap-2 mt-1.5 text-xs text-muted-foreground">
+                              <span>{m.topic?.name ?? "-"}</span>
+                              <span>•</span>
+                              <span>
+                                {Math.floor(m.duration / 60)}m {m.duration % 60}s
+                              </span>
+                              <span>•</span>
+                              <span>{m.mediaFiles?.length ?? 0} files</span>
+                              <span>•</span>
+                              <span>{m.quizConfigs?.length ?? 0} quiz</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col gap-1 items-end shrink-0">
+                          <span
+                            className={`text-xs px-2 py-0.5 rounded-full ${statusColor[m.status]}`}
+                          >
+                            {m.status}
+                          </span>
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                            {typeLabel[m.type] ?? m.type}
+                          </span>
+                          <div className="flex gap-1 mt-1 flex-wrap justify-end">
+                            {m.status !== "PUBLISHED" && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-7 px-2 text-xs text-green-600 hover:text-green-700 hover:bg-green-50"
+                                onClick={() => handlePublish(m.id)}
+                              >
+                                Publish
+                              </Button>
+                            )}
+                            {m.status === "PUBLISHED" && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-7 px-2 text-xs text-gray-600 hover:bg-gray-50"
+                                onClick={() => handleArchive(m.id)}
+                              >
+                                Archive
+                              </Button>
+                            )}
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-7 px-2 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                              onClick={() => openQuizDialog(m)}
+                            >
+                              <ClipboardList className="w-3 h-3 mr-1" /> Quiz
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-7 px-2 text-xs"
+                              onClick={() => openEdit(m)}
+                            >
+                              <Pencil className="w-3 h-3 mr-1" /> Edit
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-7 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+                              onClick={() => handleDelete(m.id)}
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </Button>
                           </div>
                         </div>
                       </div>
-
-                      <div className="flex flex-col gap-1 items-end shrink-0">
-                        <span
-                          className={`text-xs px-2 py-0.5 rounded-full ${statusColor[m.status]}`}
-                        >
-                          {m.status}
-                        </span>
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-                          {typeLabel[m.type] ?? m.type}
-                        </span>
-                        <div className="flex gap-1 mt-1 flex-wrap justify-end">
-                          {m.status !== "PUBLISHED" && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="h-7 px-2 text-xs text-green-600 hover:text-green-700 hover:bg-green-50"
-                              onClick={() => handlePublish(m.id)}
-                            >
-                              Publish
-                            </Button>
-                          )}
-                          {m.status === "PUBLISHED" && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="h-7 px-2 text-xs text-gray-600 hover:bg-gray-50"
-                              onClick={() => handleArchive(m.id)}
-                            >
-                              Archive
-                            </Button>
-                          )}
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-7 px-2 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                            onClick={() => openQuizDialog(m)}
-                          >
-                            <ClipboardList className="w-3 h-3 mr-1" /> Quiz
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-7 px-2 text-xs"
-                            onClick={() => openEdit(m)}
-                          >
-                            <Pencil className="w-3 h-3 mr-1" /> Edit
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-7 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
-                            onClick={() => handleDelete(m.id)}
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+
+              {/* Pagination */}
+              <div className="flex justify-between items-center mt-4">
+                <p className="text-sm text-muted-foreground">
+                  Page {materialPagination.page} of {materialPagination.pages}
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => loadMaterials(materialPagination.page - 1)}
+                    disabled={materialPagination.page === 1 || materialLoading}
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => loadMaterials(materialPagination.page + 1)}
+                    disabled={
+                      materialPagination.page >= materialPagination.pages ||
+                      materialLoading
+                    }
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
@@ -389,12 +491,20 @@ export default function CMSMaterialsTab({ topics, materials, questions }) {
           </DialogHeader>
 
           <div className="space-y-4">
+            {/* Search Quiz */}
+            <Input
+              placeholder="Search quiz by name..."
+              value={quizSearch}
+              onChange={(e) => setQuizSearch(e.target.value)}
+              className="flex-1"
+            />
+
             {/* Existing quizzes */}
-            {existingQuizzes.length > 0 && (
+            {quizConfigs.length > 0 && (
               <div>
                 <p className="text-sm font-medium mb-2">Quiz yang sudah ada:</p>
                 <div className="space-y-2">
-                  {existingQuizzes.map((quiz: any) => (
+                  {quizConfigs.map((quiz: any) => (
                     <div
                       key={quiz.id}
                       className="border rounded-lg p-3 flex justify-between items-center"
@@ -427,7 +537,39 @@ export default function CMSMaterialsTab({ topics, materials, questions }) {
                     </div>
                   ))}
                 </div>
+
+                {/* Quiz Pagination */}
+                <div className="flex justify-between items-center mt-3">
+                  <p className="text-xs text-muted-foreground">
+                    Page {quizPagination.page} of {quizPagination.pages}
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => loadQuizConfigs(quizMaterial.id, quizPagination.page - 1)}
+                      disabled={quizPagination.page === 1 || quizLoading}
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => loadQuizConfigs(quizMaterial.id, quizPagination.page + 1)}
+                      disabled={
+                        quizPagination.page >= quizPagination.pages ||
+                        quizLoading
+                      }
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
               </div>
+            )}
+
+            {quizConfigs.length === 0 && !quizLoading && (
+              <p className="text-sm text-muted-foreground">Belum ada quiz config.</p>
             )}
 
             {/* Toggle form */}

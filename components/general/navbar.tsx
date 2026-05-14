@@ -11,6 +11,7 @@ import {
   Leaf,
   Award,
   HardHat,
+  User,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -73,7 +74,10 @@ const NAV_CONFIG: Record<
     label: "Reward Admin",
     color: "bg-amber-500",
     icon: <Award className="w-4 h-4" />,
-    items: [{ label: "Dashboard", href: "/reward/dashboard" }],
+    items: [
+      { label: "Dashboard", href: "/reward/dashboard" },
+      { label: "Manajemen Reward", href: "/reward/rewards" },
+    ],
   },
   WORKER: {
     label: "Worker",
@@ -92,6 +96,22 @@ export default function Navbar({ session }: NavbarProps) {
   const pathname = usePathname();
   const role = (session?.user as any)?.role as Role;
   const config = NAV_CONFIG[role];
+  // Determine profile path based on role
+  const getProfilePath = () => {
+    switch (role) {
+      case "SUPER_ADMIN":
+        return "/admin/profile";
+      case "HSE_ADMIN":
+        return "/hse/profile";
+      case "REWARD_ADMIN":
+        return "/reward/profile";
+      case "WORKER":
+      default:
+        return "/worker/profile";
+    }
+  };
+  
+  const profilePath = getProfilePath();
 
   if (!session || !config) return null;
 
@@ -179,6 +199,13 @@ export default function Navbar({ session }: NavbarProps) {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href={profilePath} className="cursor-pointer">
+                  <User className="w-4 h-4 mr-2" />
+                  My Profile
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-destructive focus:text-destructive cursor-pointer"
                 onClick={() => signOut({ callbackUrl: "/login" })}
@@ -247,8 +274,17 @@ export default function Navbar({ session }: NavbarProps) {
 
                 <Separator />
 
-                {/* Logout */}
-                <div className="p-3">
+                {/* Profile and Logout */}
+                <div className="p-3 flex flex-col gap-2">
+                  <Link href={profilePath} className="w-full">
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start text-muted-foreground hover:text-foreground"
+                    >
+                      <User className="w-4 h-4 mr-2" />
+                      My Profile
+                    </Button>
+                  </Link>
                   <Button
                     variant="ghost"
                     className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"

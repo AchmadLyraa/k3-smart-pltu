@@ -14,9 +14,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, Key } from "lucide-react";
 import UserEditDialog from "./user-edit-dialog";
 import UserDeleteDialog from "./user-delete-dialog";
+import { ResetPasswordDialog } from "./reset-password-dialog";
 
 interface UserTableProps {
   users: any[];
@@ -27,6 +28,7 @@ export default function UserTable({ users, onRefresh }: UserTableProps) {
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
 
   const handleEditUser = (user: any) => {
     setSelectedUser(user);
@@ -36,6 +38,11 @@ export default function UserTable({ users, onRefresh }: UserTableProps) {
   const handleDeleteUser = (user: any) => {
     setSelectedUser(user);
     setDeleteDialogOpen(true);
+  };
+
+  const handleResetPassword = (user: any) => {
+    setSelectedUser(user);
+    setResetPasswordDialogOpen(true);
   };
 
   const handleRoleChange = async (userId: string, newRole: string) => {
@@ -123,7 +130,16 @@ export default function UserTable({ users, onRefresh }: UserTableProps) {
                     : "Never"}
                 </td>
                 <td className="py-3 px-4">
-                  <div className="flex gap-2">
+                  <div className="flex gap-1">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleResetPassword(user)}
+                      className="h-8 px-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                      title="Reset Password"
+                    >
+                      <Key className="w-4 h-4" />
+                    </Button>
                     <Button
                       size="sm"
                       variant="outline"
@@ -169,6 +185,16 @@ export default function UserTable({ users, onRefresh }: UserTableProps) {
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleConfirmDelete}
+      />
+
+      <ResetPasswordDialog
+        open={resetPasswordDialogOpen}
+        onOpenChange={setResetPasswordDialogOpen}
+        user={selectedUser}
+        onSuccess={() => {
+          setResetPasswordDialogOpen(false);
+          onRefresh();
+        }}
       />
     </>
   );

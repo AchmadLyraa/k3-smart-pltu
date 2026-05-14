@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
 	getWorkerRewardDashboard,
 	redeemReward,
@@ -35,6 +35,7 @@ type RewardItem = {
 type RedemptionItem = {
 	id: string;
 	status: string;
+	shippingStatus?: string | null;
 	pointsUsed: number;
 	createdAt: string | Date;
 	completedAt?: string | Date | null;
@@ -47,6 +48,7 @@ type RedemptionItem = {
 
 export default function RewardUsersPage() {
 	const { toast } = useToast();
+	const [mounted, setMounted] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [redeeming, setRedeeming] = useState(false);
 	const [refreshKey, setRefreshKey] = useState(0);
@@ -56,7 +58,11 @@ export default function RewardUsersPage() {
 	const [selectedReward, setSelectedReward] = useState<RewardItem | null>(null);
 	const [error, setError] = useState<string | null>(null);
 
-	const fetchDashboard = async () => {
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	const fetchDashboard = useCallback(async () => {
 		setLoading(true);
 		setError(null);
 
@@ -76,13 +82,45 @@ export default function RewardUsersPage() {
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, []);
 
 	useEffect(() => {
 		fetchDashboard();
-	}, [refreshKey]);
+	}, [fetchDashboard, refreshKey]);
+
+	useEffect(() => {
+		const interval = setInterval(() => {
+			fetchDashboard();
+		}, 10000);
+
+		return () => clearInterval(interval);
+	}, [fetchDashboard]);
 
 	const totalRewards = useMemo(() => rewards.length, [rewards.length]);
+
+	if (!mounted) {
+		return (
+			<div className="space-y-6">
+				<div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+					<div className="space-y-3">
+						<div className="h-5 w-40 rounded-full bg-muted" />
+						<div className="h-10 w-72 rounded-lg bg-muted" />
+						<div className="h-5 w-96 rounded-full bg-muted" />
+					</div>
+					<div className="h-9 w-24 rounded-md bg-muted" />
+				</div>
+				<div className="grid gap-4 md:grid-cols-3">
+					<div className="h-24 rounded-lg border bg-muted/40" />
+					<div className="h-24 rounded-lg border bg-muted/40" />
+					<div className="h-24 rounded-lg border bg-muted/40" />
+				</div>
+				<div className="grid gap-6 lg:grid-cols-[1.4fr_0.9fr]">
+					<div className="h-[420px] rounded-lg border bg-muted/30" />
+					<div className="h-[420px] rounded-lg border bg-muted/30" />
+				</div>
+			</div>
+		);
+	}
 
 	const handleRedeem = async () => {
 		if (!selectedReward) return;
@@ -277,7 +315,12 @@ export default function RewardUsersPage() {
 													{item.pointsUsed.toLocaleString("id-ID")} poin
 												</p>
 											</div>
-											<Badge variant="outline">{item.status}</Badge>
+											<div className="flex flex-col items-end gap-1">
+												<Badge variant="outline">{item.status}</Badge>
+												<Badge variant="secondary">
+													{item.shippingStatus || "Sedang diproses"}
+												</Badge>
+											</div>
 										</div>
 										<p className="mt-2 text-xs text-muted-foreground">
 											{new Date(item.createdAt).toLocaleString("id-ID")}

@@ -40,6 +40,36 @@ export default function RewardTable({ rewards, onRefresh }: RewardTableProps) {
     console.log("Update status:", rewardId, newStatus);
   };
 
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case "AVAILABLE":
+        return "Tersedia";
+      case "PENDING":
+        return "Pending Approval";
+      case "REJECTED":
+        return "Ditolak";
+      case "DISCONTINUED":
+        return "Tidak Tersedia";
+      default:
+        return status;
+    }
+  };
+
+  const getStatusVariant = (status: string) => {
+    switch (status) {
+      case "AVAILABLE":
+        return "default";
+      case "PENDING":
+        return "secondary";
+      case "REJECTED":
+        return "destructive";
+      case "DISCONTINUED":
+        return "outline";
+      default:
+        return "secondary";
+    }
+  };
+
   return (
     <>
       <div className="border rounded-lg overflow-hidden">
@@ -73,14 +103,8 @@ export default function RewardTable({ rewards, onRefresh }: RewardTableProps) {
                   </TableCell>
                   <TableCell className="text-right">{reward.quantity}</TableCell>
                   <TableCell>
-                    <Badge
-                      variant={
-                        reward.status === "AVAILABLE" ? "default" : "secondary"
-                      }
-                    >
-                      {reward.status === "AVAILABLE"
-                        ? "Tersedia"
-                        : "Tidak Tersedia"}
+                    <Badge variant={getStatusVariant(reward.status)}>
+                      {getStatusLabel(reward.status)}
                     </Badge>
                   </TableCell>
                   <TableCell>

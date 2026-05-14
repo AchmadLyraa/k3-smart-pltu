@@ -1,15 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import CreateRewardForm from "@/components/reward-admin/rewards/create-reward-form";
+import PendingRewardApprovalList from "@/components/reward-admin/rewards/pending-reward-approval-list";
 import RewardList from "@/components/reward-admin/rewards/reward-list";
+import RewardRedemptionList from "@/components/reward-admin/redemptions/reward-redemption-list";
 
 export default function RewardManagementPage() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -29,7 +24,9 @@ export default function RewardManagementPage() {
       </div>
 
       <CreateRewardForm onSuccess={handleRewardCreated} />
+      <PendingRewardApprovalList onRefresh={handleRewardCreated} />
       <RewardList refreshTrigger={refreshTrigger} />
+      <RewardRedemptionList />
     </div>
   );
 }

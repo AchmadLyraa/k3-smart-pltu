@@ -141,7 +141,7 @@ export const rewardSchema = z.object({
   description: z.string().optional(),
   pointCost: z.number().int().positive("Point cost must be a positive number"),
   quantity: z.number().int().nonnegative("Quantity cannot be negative"),
-  status: z.enum(["AVAILABLE", "DISCONTINUED"]).optional(),
+  status: z.enum(["PENDING", "AVAILABLE", "REJECTED", "DISCONTINUED"]).optional(),
 });
 
 export const redeemRewardSchema = z.object({

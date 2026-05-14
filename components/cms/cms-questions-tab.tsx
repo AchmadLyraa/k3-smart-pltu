@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -24,9 +24,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CheckCircle2, Circle, Pencil, X, Plus, Trash2 } from "lucide-react";
+import { CheckCircle2, Circle, Pencil, X, Plus, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import QuestionForm from "./question-form";
-import { updateQuestion, deleteQuestion } from "@/app/actions/quiz";
+import { updateQuestion, deleteQuestion, getQuestions as fetchQuestions } from "@/app/actions/quiz";
 
 const difficultyColor = {
   easy: "bg-green-100 text-green-700",
@@ -40,11 +40,46 @@ const typeLabel = {
   TRUE_FALSE: "True / False",
 };
 
-export default function CMSQuestionsTab({ questions }) {
+export default function CMSQuestionsTab({ questions: initialQuestions }) {
+  // State untuk questions
+  const [questions, setQuestions] = useState(initialQuestions || []);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 20,
+    total: 0,
+    pages: 0,
+  });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // Form state
   const [showForm, setShowForm] = useState(false);
   const [editQuestion, setEditQuestion] = useState<any>(null);
   const [editData, setEditData] = useState<any>(null);
   const [saving, setSaving] = useState(false);
+
+  // Load questions dengan search
+  const loadQuestions = useCallback(
+    async (page: number = 1) => {
+      setLoading(true);
+      try {
+        const result = await fetchQuestions(page, 20, searchQuery);
+        if (result.success) {
+          setQuestions(result.data);
+          setPagination(result.pagination);
+        }
+      } catch (error) {
+        console.error("Failed to load questions:", error);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [searchQuery],
+  );
+
+  useEffect(() => {
+    loadQuestions(1);
+  }, [searchQuery, loadQuestions]);
 
   const openEdit = (q: any) => {
     setEditQuestion(q);
@@ -64,7 +99,7 @@ export default function CMSQuestionsTab({ questions }) {
     if (!confirm("Yakin mau hapus soal ini?")) return;
     const result = await deleteQuestion(id);
     if (result.success) {
-      window.location.reload();
+      loadQuestions(pagination.page);
     } else {
       alert("Gagal hapus soal");
     }
@@ -124,7 +159,7 @@ export default function CMSQuestionsTab({ questions }) {
       const result = await updateQuestion(editQuestion.id, editData);
       if (result.success) {
         setEditQuestion(null);
-        window.location.reload();
+        loadQuestions(pagination.page);
       } else {
         alert(result.error);
       }
@@ -141,8 +176,8 @@ export default function CMSQuestionsTab({ questions }) {
             <div>
               <CardTitle>Question Bank</CardTitle>
               <CardDescription>
-                {questions.length} question{questions.length !== 1 ? "s" : ""}{" "}
-                total
+                Total: {pagination.total} question
+                {pagination.total !== 1 ? "s" : ""}
               </CardDescription>
             </div>
             <Button onClick={() => setShowForm(!showForm)}>
@@ -151,99 +186,134 @@ export default function CMSQuestionsTab({ questions }) {
           </div>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="space-y-4">
           {showForm && (
             <div className="mb-6">
               <QuestionForm
                 onSuccess={() => {
                   setShowForm(false);
-                  window.location.reload();
+                  loadQuestions(1);
                 }}
               />
             </div>
           )}
 
+          {/* Search Bar */}
+          <Input
+            placeholder="Search questions..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="flex-1"
+          />
+
           {questions.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
-              No questions yet. Create your first question.
+              No questions found. Create your first question.
             </div>
           ) : (
-            <div className="space-y-3">
-              {questions.map((q: any, idx: number) => (
-                <div
-                  key={q.id}
-                  className="border rounded-lg p-4 hover:bg-muted/40 transition-colors"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex gap-3 items-start flex-1 min-w-0">
-                      <span className="text-sm text-muted-foreground mt-0.5 shrink-0">
-                        #{idx + 1}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm leading-snug">
-                          {q.text}
-                        </p>
-                        {q.answerOptions?.length > 0 && (
-                          <div className="mt-2 space-y-1">
-                            {q.answerOptions.map((opt: any) => (
-                              <div
-                                key={opt.id}
-                                className="flex items-center gap-2 text-xs text-muted-foreground"
-                              >
-                                {opt.isCorrect ? (
-                                  <CheckCircle2 className="w-3.5 h-3.5 text-green-600 shrink-0" />
-                                ) : (
-                                  <Circle className="w-3.5 h-3.5 shrink-0" />
-                                )}
-                                <span
-                                  className={
-                                    opt.isCorrect
-                                      ? "text-green-700 font-medium"
-                                      : ""
-                                  }
+            <>
+              <div className="space-y-3">
+                {questions.map((q: any, idx: number) => (
+                  <div
+                    key={q.id}
+                    className="border rounded-lg p-4 hover:bg-muted/40 transition-colors"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex gap-3 items-start flex-1 min-w-0">
+                        <span className="text-sm text-muted-foreground mt-0.5 shrink-0">
+                          #{(pagination.page - 1) * pagination.limit + idx + 1}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm leading-snug">
+                            {q.text}
+                          </p>
+                          {q.answerOptions?.length > 0 && (
+                            <div className="mt-2 space-y-1">
+                              {q.answerOptions.map((opt: any) => (
+                                <div
+                                  key={opt.id}
+                                  className="flex items-center gap-2 text-xs text-muted-foreground"
                                 >
-                                  {opt.text}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                                  {opt.isCorrect ? (
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-green-600 shrink-0" />
+                                  ) : (
+                                    <Circle className="w-3.5 h-3.5 shrink-0" />
+                                  )}
+                                  <span
+                                    className={
+                                      opt.isCorrect
+                                        ? "text-green-700 font-medium"
+                                        : ""
+                                    }
+                                  >
+                                    {opt.text}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-1 items-end shrink-0">
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                          {typeLabel[q.type] ?? q.type}
+                        </span>
+                        <span
+                          className={`text-xs px-2 py-0.5 rounded-full ${difficultyColor[q.difficulty] ?? "bg-muted text-muted-foreground"}`}
+                        >
+                          {q.difficulty}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {q.points} pts
+                        </span>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="mt-1 h-7 px-2 text-xs"
+                          onClick={() => openEdit(q)}
+                        >
+                          <Pencil className="w-3 h-3 mr-1" /> Edit
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="mt-1 h-7 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+                          onClick={() => handleDelete(q.id)}
+                        >
+                          <Trash2 className="w-3 h-3 mr-1" /> Delete
+                        </Button>
                       </div>
                     </div>
-
-                    <div className="flex flex-col gap-1 items-end shrink-0">
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-                        {typeLabel[q.type] ?? q.type}
-                      </span>
-                      <span
-                        className={`text-xs px-2 py-0.5 rounded-full ${difficultyColor[q.difficulty] ?? "bg-muted text-muted-foreground"}`}
-                      >
-                        {q.difficulty}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {q.points} pts
-                      </span>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="mt-1 h-7 px-2 text-xs"
-                        onClick={() => openEdit(q)}
-                      >
-                        <Pencil className="w-3 h-3 mr-1" /> Edit
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="mt-1 h-7 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
-                        onClick={() => handleDelete(q.id)}
-                      >
-                        <Trash2 className="w-3 h-3 mr-1" /> Delete
-                      </Button>
-                    </div>
                   </div>
+                ))}
+              </div>
+
+              {/* Pagination */}
+              <div className="flex justify-between items-center mt-4">
+                <p className="text-sm text-muted-foreground">
+                  Page {pagination.page} of {pagination.pages}
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => loadQuestions(pagination.page - 1)}
+                    disabled={pagination.page === 1 || loading}
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => loadQuestions(pagination.page + 1)}
+                    disabled={pagination.page >= pagination.pages || loading}
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
                 </div>
-              ))}
-            </div>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

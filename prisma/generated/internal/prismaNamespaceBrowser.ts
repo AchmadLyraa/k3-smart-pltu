@@ -477,6 +477,9 @@ export const RewardScalarFieldEnum = {
   pointCost: 'pointCost',
   quantity: 'quantity',
   status: 'status',
+  approvalNotes: 'approvalNotes',
+  approvedAt: 'approvedAt',
+  approvedBy: 'approvedBy',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -489,6 +492,7 @@ export const RedemptionScalarFieldEnum = {
   userId: 'userId',
   rewardId: 'rewardId',
   status: 'status',
+  shippingStatus: 'shippingStatus',
   pointsUsed: 'pointsUsed',
   approvedBy: 'approvedBy',
   approvedAt: 'approvedAt',
