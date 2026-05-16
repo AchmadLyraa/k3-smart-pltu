@@ -74,7 +74,13 @@ export default function CreateRewardForm({ onSuccess }: CreateRewardFormProps) {
         onSuccess?.();
       } else {
         if (result.errors) {
-          setErrors(result.errors);
+          const fieldErrors: Record<string, string> = {};
+          Object.entries(result.errors).forEach(([key, value]) => {
+            if (Array.isArray(value) && value.length > 0) {
+              fieldErrors[key] = value[0];
+            }
+          });
+          setErrors(fieldErrors);
         } else {
           toast({
             title: "Error",
@@ -100,7 +106,7 @@ export default function CreateRewardForm({ onSuccess }: CreateRewardFormProps) {
       <CardHeader>
         <CardTitle>Tambah Reward Baru</CardTitle>
         <CardDescription>
-          Buat reward baru yang akan masuk antrian approval admin sebelum tersedia.
+          Buat reward baru yang akan langsung tersedia untuk ditukar oleh worker.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -176,7 +182,7 @@ export default function CreateRewardForm({ onSuccess }: CreateRewardFormProps) {
           </div>
 
           <div className="rounded-lg border border-dashed bg-muted/30 p-3 text-sm text-muted-foreground">
-            Reward yang dibuat akan otomatis berstatus pending dan menunggu approval admin.
+            Reward yang dibuat akan langsung tersedia (Available) untuk ditukar.
           </div>
 
           <Button type="submit" disabled={loading} className="w-full md:w-auto">

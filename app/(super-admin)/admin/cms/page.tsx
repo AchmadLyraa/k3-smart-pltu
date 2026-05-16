@@ -15,11 +15,12 @@ export default async function CMSDashboard() {
   const topics = topicsResult.success ? topicsResult.data : [];
   const materials = materialsResult.success ? materialsResult.data : [];
   const questions = questionsResult.success ? questionsResult.data : [];
-  const periods = periodsResult.success ? periodsResult.data.periods : [];
+  const periodsData = periodsResult.success
+    ? periodsResult.data ?? { periods: [], unassigned: [] }
+    : { periods: [], unassigned: [] };
 
-  const unassignedMaterials = periodsResult.success
-    ? periodsResult.data.unassigned
-    : [];
+  const periods = periodsData.periods;
+  const unassignedMaterials = periodsData.unassigned;
 
   return (
     <div className="container mx-auto px-4 py-8">

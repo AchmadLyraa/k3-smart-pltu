@@ -139,13 +139,13 @@ export default function RewardTable({ rewards, onRefresh }: RewardTableProps) {
             reward={selectedReward}
             open={editDialogOpen}
             onOpenChange={setEditDialogOpen}
-            onRefresh={onRefresh}
+            onRefresh={onRefresh || (() => {})}
           />
           <RewardDeleteDialog
             reward={selectedReward}
             open={deleteDialogOpen}
             onOpenChange={setDeleteDialogOpen}
-            onRefresh={onRefresh}
+            onRefresh={onRefresh || (() => {})}
           />
         </>
       )}

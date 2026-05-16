@@ -24,9 +24,11 @@ export default function RewardList({ refreshTrigger = 0 }: RewardListProps) {
     try {
       const result = await getRewards(page, 10);
 
-      if (result.success) {
+      if (result.success && result.data) {
         setRewards(result.data);
-        setPagination(result.pagination);
+        if (result.pagination) {
+          setPagination(result.pagination);
+        }
       } else {
         setError(result.error || "Failed to load rewards");
       }

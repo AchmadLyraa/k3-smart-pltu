@@ -597,7 +597,7 @@ model Reward {
   description String?
   pointCost   Int
   quantity    Int
-  status      RewardStatus  @default(PENDING)
+  status      RewardStatus  @default(AVAILABLE)
   approvalNotes String?
   approvedAt  DateTime?
   approvedBy  String?

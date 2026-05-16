@@ -88,14 +88,6 @@ export default function RewardUsersPage() {
 		fetchDashboard();
 	}, [fetchDashboard, refreshKey]);
 
-	useEffect(() => {
-		const interval = setInterval(() => {
-			fetchDashboard();
-		}, 10000);
-
-		return () => clearInterval(interval);
-	}, [fetchDashboard]);
-
 	const totalRewards = useMemo(() => rewards.length, [rewards.length]);
 
 	if (!mounted) {

@@ -31,7 +31,7 @@ export async function createReward(data: {
         description: validated.data.description,
         pointCost: validated.data.pointCost,
         quantity: validated.data.quantity,
-        status: "PENDING",
+        status: "AVAILABLE",
       },
       select: {
         id: true,
@@ -113,7 +113,7 @@ export async function getRewards(page = 1, limit = 10) {
  * Get single reward by ID
  */
 export async function getReward(rewardId: string) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "REWARD_ADMIN"]);
 
   try {
     const reward = await prisma.reward.findUnique({
@@ -158,14 +158,24 @@ export async function getReward(rewardId: string) {
 /**
  * Get reward redemptions for shipping status tracking.
  */
-export async function getRedemptions(page = 1, limit = 20) {
-  await requireAuth(["SUPER_ADMIN"]);
+export async function getRedemptions(page = 1, limit = 20, search?: string) {
+  await requireAuth(["SUPER_ADMIN", "REWARD_ADMIN"]);
 
   const skip = (page - 1) * limit;
+
+  const where: any = {};
+  if (search) {
+    where.OR = [
+      { user: { name: { contains: search, mode: "insensitive" } } },
+      { user: { email: { contains: search, mode: "insensitive" } } },
+      { reward: { name: { contains: search, mode: "insensitive" } } },
+    ];
+  }
 
   try {
     const [redemptions, total] = await Promise.all([
       prisma.redemption.findMany({
+        where,
         skip,
         take: limit,
         select: {
@@ -195,7 +205,7 @@ export async function getRedemptions(page = 1, limit = 20) {
         },
         orderBy: { updatedAt: "desc" },
       }),
-      prisma.redemption.count(),
+      prisma.redemption.count({ where }),
     ]);
 
     return {
@@ -224,7 +234,7 @@ export async function updateRedemptionShippingStatus(
   redemptionId: string,
   shippingStatus: string,
 ) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "REWARD_ADMIN"]);
 
   const cleanedStatus = shippingStatus.trim();
   if (!cleanedStatus) {
@@ -306,7 +316,7 @@ export async function updateReward(
     status?: string;
   },
 ) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "REWARD_ADMIN"]);
 
   const validated = rewardSchema.partial().safeParse(data);
   if (!validated.success) {
@@ -367,7 +377,7 @@ export async function updateReward(
  * Delete reward (super admin only)
  */
 export async function deleteReward(rewardId: string) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "REWARD_ADMIN"]);
 
   try {
     // Check if reward exists
@@ -400,187 +410,164 @@ export async function deleteReward(rewardId: string) {
 }
 
 /**
- * Approve a pending reward (super admin only)
+ * Approve a pending redemption (super admin or reward admin)
  */
-export async function approveReward(rewardId: string, notes?: string) {
-  const session = await requireAuth(["SUPER_ADMIN"]);
+export async function approveRedemption(redemptionId: string, notes?: string) {
+  const session = await requireAuth(["SUPER_ADMIN", "REWARD_ADMIN"]);
+  if (!session?.user) return { success: false, error: "Unauthorized" };
+  const adminId = (session.user as any).id;
 
   try {
-    const reward = await prisma.reward.findUnique({
-      where: { id: rewardId },
+    const redemption = await prisma.redemption.findUnique({
+      where: { id: redemptionId },
       select: { id: true, status: true },
     });
 
-    if (!reward) {
-      return {
-        success: false,
-        error: "Reward not found",
-      };
+    if (!redemption) {
+      return { success: false, error: "Redemption not found" };
     }
 
-    if (reward.status !== "PENDING") {
-      return {
-        success: false,
-        error: "Only pending rewards can be approved",
-      };
+    if (redemption.status !== "PENDING") {
+      return { success: false, error: "Only pending redemptions can be approved" };
     }
 
-    const updatedReward = await prisma.reward.update({
-      where: { id: rewardId },
+    const updated = await prisma.redemption.update({
+      where: { id: redemptionId },
       data: {
-        status: "AVAILABLE",
-        approvalNotes: notes?.trim() || null,
+        status: "APPROVED",
+        notes: notes?.trim() || null,
         approvedAt: new Date(),
-        approvedBy: session.user.id,
-      },
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        pointCost: true,
-        quantity: true,
-        status: true,
-        approvalNotes: true,
-        approvedAt: true,
-        approvedBy: true,
-        createdAt: true,
-        updatedAt: true,
+        approvedBy: adminId,
       },
     });
 
     return {
       success: true,
-      data: updatedReward,
-      message: "Reward approved successfully",
+      data: updated,
+      message: "Redemption approved successfully",
     };
   } catch (error) {
-    console.error("[approveReward error]", error);
-    return {
-      success: false,
-      error: "Failed to approve reward",
-    };
+    console.error("[approveRedemption error]", error);
+    return { success: false, error: "Failed to approve redemption" };
   }
 }
 
 /**
- * Reject a pending reward (super admin only)
+ * Reject a pending redemption (super admin or reward admin)
  */
-export async function rejectReward(rewardId: string, rejectionNotes: string) {
-  const session = await requireAuth(["SUPER_ADMIN"]);
+export async function rejectRedemption(redemptionId: string, rejectionNotes: string) {
+  const session = await requireAuth(["SUPER_ADMIN", "REWARD_ADMIN"]);
+  if (!session?.user) return { success: false, error: "Unauthorized" };
+  const adminId = (session.user as any).id;
 
   const notes = rejectionNotes.trim();
   if (!notes) {
-    return {
-      success: false,
-      error: "Rejection notes are required",
-    };
+    return { success: false, error: "Rejection notes are required" };
   }
 
   try {
-    const reward = await prisma.reward.findUnique({
-      where: { id: rewardId },
-      select: { id: true, status: true },
+    const redemption = await prisma.redemption.findUnique({
+      where: { id: redemptionId },
+      select: { 
+        id: true, 
+        status: true, 
+        userId: true, 
+        rewardId: true, 
+        pointsUsed: true,
+        reward: { select: { name: true } }
+      },
     });
 
-    if (!reward) {
-      return {
-        success: false,
-        error: "Reward not found",
-      };
+    if (!redemption) {
+      return { success: false, error: "Redemption not found" };
     }
 
-    if (reward.status !== "PENDING") {
-      return {
-        success: false,
-        error: "Only pending rewards can be rejected",
-      };
+    if (redemption.status !== "PENDING") {
+      return { success: false, error: "Only pending redemptions can be rejected" };
     }
 
-    const updatedReward = await prisma.reward.update({
-      where: { id: rewardId },
-      data: {
-        status: "REJECTED",
-        approvalNotes: notes,
-        approvedAt: new Date(),
-        approvedBy: session.user.id,
-      },
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        pointCost: true,
-        quantity: true,
-        status: true,
-        approvalNotes: true,
-        approvedAt: true,
-        approvedBy: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+    // Run in transaction: Update redemption, refund points, restore stock
+    await prisma.$transaction(async (tx) => {
+      // 1. Update redemption status
+      await tx.redemption.update({
+        where: { id: redemptionId },
+        data: {
+          status: "REJECTED",
+          notes: notes,
+          shippingStatus: `${notes}`,
+          approvedAt: new Date(),
+          approvedBy: adminId,
+        },
+      });
+
+      // 2. Refund points
+      await tx.pointTransaction.create({
+        data: {
+          userId: redemption.userId,
+          points: redemption.pointsUsed,
+          transactionType: "MANUAL_ADJUSTMENT",
+          reference: redemption.id,
+          description: `Refund: Redemption rejected for ${redemption.reward.name}`,
+        },
+      });
+
+      // 3. Restore stock
+      await tx.reward.update({
+        where: { id: redemption.rewardId },
+        data: {
+          quantity: { increment: 1 },
+        },
+      });
     });
 
     return {
       success: true,
-      data: updatedReward,
-      message: "Reward rejected successfully",
+      message: "Redemption rejected and points refunded successfully",
     };
   } catch (error) {
-    console.error("[rejectReward error]", error);
-    return {
-      success: false,
-      error: "Failed to reject reward",
-    };
+    console.error("[rejectRedemption error]", error);
+    return { success: false, error: "Failed to reject redemption" };
   }
 }
 
 /**
- * Get pending rewards for admin approval.
+ * Complete a reward redemption (mark as finished/received)
  */
-export async function getPendingRewards(page = 1, limit = 10) {
-  await requireAuth(["SUPER_ADMIN"]);
-
-  const skip = (page - 1) * limit;
+export async function completeRedemption(redemptionId: string) {
+  const session = await requireAuth(["SUPER_ADMIN", "REWARD_ADMIN"]);
+  if (!session?.user) return { success: false, error: "Unauthorized" };
 
   try {
-    const [rewards, total] = await Promise.all([
-      prisma.reward.findMany({
-        where: { status: "PENDING" },
-        skip,
-        take: limit,
-        select: {
-          id: true,
-          name: true,
-          description: true,
-          pointCost: true,
-          quantity: true,
-          status: true,
-          approvalNotes: true,
-          approvedAt: true,
-          approvedBy: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-        orderBy: { createdAt: "asc" },
-      }),
-      prisma.reward.count({ where: { status: "PENDING" } }),
-    ]);
+    const redemption = await prisma.redemption.findUnique({
+      where: { id: redemptionId },
+      select: { id: true, status: true },
+    });
+
+    if (!redemption) {
+      return { success: false, error: "Redemption not found" };
+    }
+
+    if (redemption.status !== "APPROVED") {
+      return { success: false, error: "Only approved redemptions can be completed" };
+    }
+
+    const updated = await prisma.redemption.update({
+      where: { id: redemptionId },
+      data: {
+        status: "COMPLETED",
+        shippingStatus: "Reward sudah diterima",
+        completedAt: new Date(),
+      },
+    });
 
     return {
       success: true,
-      data: rewards,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
+      data: updated,
+      message: "Redemption marked as completed successfully",
     };
   } catch (error) {
-    console.error("[getPendingRewards error]", error);
-    return {
-      success: false,
-      error: "Failed to fetch pending rewards",
-    };
+    console.error("[completeRedemption error]", error);
+    return { success: false, error: "Failed to complete redemption" };
   }
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import {
   Card,
   CardContent,
@@ -50,20 +50,39 @@ export default function CMSQuestionsTab({ questions: initialQuestions }) {
     pages: 0,
   });
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
+  const [saving, setSaving] = useState(false);
 
   // Form state
   const [showForm, setShowForm] = useState(false);
   const [editQuestion, setEditQuestion] = useState<any>(null);
   const [editData, setEditData] = useState<any>(null);
-  const [saving, setSaving] = useState(false);
+
+  // Debounce search query
+  useEffect(() => {
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+
+    debounceTimer.current = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 500);
+
+    return () => {
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
+    };
+  }, [searchQuery]);
 
   // Load questions dengan search
   const loadQuestions = useCallback(
     async (page: number = 1) => {
       setLoading(true);
       try {
-        const result = await fetchQuestions(page, 20, searchQuery);
+        const result = await fetchQuestions(page, 20, debouncedSearchQuery);
         if (result.success) {
           setQuestions(result.data);
           setPagination(result.pagination);
@@ -74,12 +93,12 @@ export default function CMSQuestionsTab({ questions: initialQuestions }) {
         setLoading(false);
       }
     },
-    [searchQuery],
+    [debouncedSearchQuery],
   );
 
   useEffect(() => {
     loadQuestions(1);
-  }, [searchQuery, loadQuestions]);
+  }, [debouncedSearchQuery, loadQuestions]);
 
   const openEdit = (q: any) => {
     setEditQuestion(q);

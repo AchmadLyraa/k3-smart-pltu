@@ -94,7 +94,13 @@ export default function RewardEditDialog({
         onRefresh();
       } else {
         if (result.errors) {
-          setErrors(result.errors);
+          const fieldErrors: Record<string, string> = {};
+          Object.entries(result.errors).forEach(([key, value]) => {
+            if (Array.isArray(value) && value.length > 0) {
+              fieldErrors[key] = value[0];
+            }
+          });
+          setErrors(fieldErrors);
         } else {
           toast({
             title: "Error",
@@ -201,7 +207,6 @@ export default function RewardEditDialog({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="PENDING">Pending Approval</SelectItem>
                 <SelectItem value="AVAILABLE">Tersedia</SelectItem>
                 <SelectItem value="REJECTED">Ditolak</SelectItem>
                 <SelectItem value="DISCONTINUED">Tidak Tersedia</SelectItem>

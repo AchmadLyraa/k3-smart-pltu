@@ -34,12 +34,14 @@ export default function RewardAdminList({ refreshTrigger = 0 }: RewardAdminListP
     try {
       const result = await getRewards(page, 10);
 
-      if (result.success) {
+      if (result.success && result.data) {
         const filtered = filterStatus
           ? result.data.filter((r: any) => r.status === filterStatus)
           : result.data;
         setRewards(filtered);
-        setPagination(result.pagination);
+        if (result.pagination) {
+          setPagination(result.pagination);
+        }
       } else {
         setError(result.error || "Gagal memuat reward");
       }
@@ -106,13 +108,6 @@ export default function RewardAdminList({ refreshTrigger = 0 }: RewardAdminListP
             onClick={() => setFilterStatus(null)}
           >
             Semua
-          </Button>
-          <Button
-            variant={filterStatus === "PENDING" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setFilterStatus("PENDING")}
-          >
-            Pending
           </Button>
           <Button
             variant={filterStatus === "AVAILABLE" ? "default" : "outline"}

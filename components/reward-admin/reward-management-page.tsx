@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import CreateRewardForm from "@/components/reward-admin/rewards/create-reward-form";
-import PendingRewardApprovalList from "@/components/reward-admin/rewards/pending-reward-approval-list";
 import RewardList from "@/components/reward-admin/rewards/reward-list";
 import RewardRedemptionList from "@/components/reward-admin/redemptions/reward-redemption-list";
 
@@ -19,12 +18,11 @@ export default function RewardManagementPage() {
       <div>
         <h1 className="text-3xl font-bold">Manajemen Reward</h1>
         <p className="text-muted-foreground mt-2">
-          Kelola reward yang dapat ditukar dengan poin worker
+          Buat reward baru dan kelola daftar reward yang tersedia
         </p>
       </div>
 
       <CreateRewardForm onSuccess={handleRewardCreated} />
-      <PendingRewardApprovalList onRefresh={handleRewardCreated} />
       <RewardList refreshTrigger={refreshTrigger} />
       <RewardRedemptionList />
     </div>

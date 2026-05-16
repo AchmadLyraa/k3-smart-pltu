@@ -6,6 +6,7 @@ import { redeemRewardSchema } from "@/lib/validations";
 
 export async function getWorkerRewardDashboard() {
   const session = await requireAuth(["WORKER"]);
+  if (!session?.user) return { success: false, error: "Unauthorized" };
   const userId = (session.user as any).id as string;
 
   try {
@@ -81,6 +82,7 @@ export async function getWorkerRewardDashboard() {
 
 export async function redeemReward(rewardId: string) {
   const session = await requireAuth(["WORKER"]);
+  if (!session?.user) return { success: false, error: "Unauthorized" };
   const userId = (session.user as any).id as string;
 
   const validated = redeemRewardSchema.safeParse({ rewardId });
@@ -150,10 +152,9 @@ export async function redeemReward(rewardId: string) {
         data: {
           userId,
           rewardId,
-          status: "COMPLETED",
+          status: "PENDING",
           shippingStatus: "Sedang diproses",
           pointsUsed: reward.pointCost,
-          completedAt: new Date(),
         },
         select: {
           id: true,

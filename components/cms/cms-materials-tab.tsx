@@ -77,9 +77,72 @@ const difficultyColor = {
   hard: "bg-red-100 text-red-700",
 };
 
-export default function CMSMaterialsTab({ topics, materials: initialMaterials, questions }) {
+type MaterialType = keyof typeof typeIcon;
+type MaterialStatus = keyof typeof statusColor;
+type DifficultyLevel = keyof typeof difficultyColor;
+
+type TopicItem = {
+  id: string;
+  name: string;
+};
+
+type MaterialItem = {
+  id: string;
+  title: string;
+  description?: string | null;
+  type: MaterialType;
+  status: MaterialStatus;
+  duration: number;
+  topicId?: string;
+  thumbnail?: string | null;
+  topic?: {
+    name: string;
+  } | null;
+  mediaFiles?: {
+    id: string;
+    type: string;
+    url: string;
+  }[];
+  quizConfigs?: {
+    id: string;
+  }[];
+};
+
+type QuestionItem = {
+  id: string;
+  text: string;
+  type: "MULTIPLE_CHOICE" | "MULTIPLE_SELECT" | "TRUE_FALSE";
+  difficulty: DifficultyLevel;
+  points: number;
+  answerOptions?: {
+    id: string;
+    text: string;
+    isCorrect: boolean;
+  }[];
+};
+
+type QuizConfigItem = {
+  id: string;
+  name: string;
+  questionCount?: number;
+  timeLimit: number;
+  passingScore: number;
+  deadline?: string | Date | null;
+};
+
+type CMSMaterialsTabProps = {
+  topics: TopicItem[];
+  materials: MaterialItem[];
+  questions: QuestionItem[];
+};
+
+export default function CMSMaterialsTab({
+  topics,
+  materials: initialMaterials,
+  questions,
+}: CMSMaterialsTabProps) {
   // Material state
-  const [materials, setMaterials] = useState(initialMaterials || []);
+  const [materials, setMaterials] = useState<MaterialItem[]>(initialMaterials || []);
   const [materialPagination, setMaterialPagination] = useState({
     page: 1,
     limit: 10,
@@ -91,13 +154,13 @@ export default function CMSMaterialsTab({ topics, materials: initialMaterials, q
 
   // Form state
   const [showForm, setShowForm] = useState(false);
-  const [editMaterial, setEditMaterial] = useState<any>(null);
+  const [editMaterial, setEditMaterial] = useState<MaterialItem | null>(null);
   const [editData, setEditData] = useState<any>(null);
   const [saving, setSaving] = useState(false);
 
   // Quiz dialog state
-  const [quizMaterial, setQuizMaterial] = useState<any>(null);
-  const [quizConfigs, setQuizConfigs] = useState<any[]>([]);
+  const [quizMaterial, setQuizMaterial] = useState<MaterialItem | null>(null);
+  const [quizConfigs, setQuizConfigs] = useState<QuizConfigItem[]>([]);
   const [quizPagination, setQuizPagination] = useState({
     page: 1,
     limit: 10,
@@ -108,6 +171,7 @@ export default function CMSMaterialsTab({ topics, materials: initialMaterials, q
   const [quizLoading, setQuizLoading] = useState(false);
   const [showQuizForm, setShowQuizForm] = useState(false);
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
+  const [questionSearch, setQuestionSearch] = useState("");
   const [quizFormData, setQuizFormData] = useState({
     name: "",
     description: "",
@@ -129,8 +193,10 @@ export default function CMSMaterialsTab({ topics, materials: initialMaterials, q
       try {
         const result = await fetchMaterials(undefined, undefined, page, 10, materialSearch);
         if (result.success) {
-          setMaterials(result.data);
-          setMaterialPagination(result.pagination);
+          setMaterials((result.data as MaterialItem[]) ?? []);
+          setMaterialPagination(
+            result.pagination ?? { page: 1, limit: 10, total: 0, pages: 0 },
+          );
         }
       } catch (error) {
         console.error("Failed to load materials:", error);
@@ -148,8 +214,10 @@ export default function CMSMaterialsTab({ topics, materials: initialMaterials, q
       try {
         const result = await getQuizConfigs(materialId, page, 10, quizSearch);
         if (result.success) {
-          setQuizConfigs(result.data);
-          setQuizPagination(result.pagination);
+          setQuizConfigs((result.data as QuizConfigItem[]) ?? []);
+          setQuizPagination(
+            result.pagination ?? { page: 1, limit: 10, total: 0, pages: 0 },
+          );
         }
       } catch (error) {
         console.error("Failed to load quiz configs:", error);
@@ -164,16 +232,18 @@ export default function CMSMaterialsTab({ topics, materials: initialMaterials, q
     loadMaterials(1);
   }, [materialSearch, loadMaterials]);
 
-  const openQuizDialog = async (m: any) => {
+  const openQuizDialog = async (m: MaterialItem) => {
     setQuizMaterial(m);
     setShowQuizForm(false);
     setSelectedQuestions([]);
+    setQuestionSearch("");
     setQuizSearch("");
     setQuizPagination({ page: 1, limit: 10, total: 0, pages: 0 });
     await loadQuizConfigs(m.id, 1);
   };
 
   const handleCreateQuiz = async () => {
+    if (!quizMaterial) return;
     if (!quizFormData.name.trim()) return alert("Nama quiz wajib diisi");
     if (selectedQuestions.length === 0) return alert("Pilih minimal 1 soal");
 
@@ -231,6 +301,7 @@ export default function CMSMaterialsTab({ topics, materials: initialMaterials, q
   };
 
   const handleSave = async () => {
+    if (!editMaterial) return;
     if (!editData.title.trim()) return alert("Title wajib diisi");
     if (!editData.topicId) return alert("Topic wajib diisi");
     setSaving(true);
@@ -352,7 +423,7 @@ export default function CMSMaterialsTab({ topics, materials: initialMaterials, q
           ) : (
             <>
               <div className="space-y-3">
-                {materials.map((m: any, idx: number) => {
+                {materials.map((m: MaterialItem, idx: number) => {
                   const Icon = typeIcon[m.type] ?? FileText;
                   return (
                     <div
@@ -491,14 +562,6 @@ export default function CMSMaterialsTab({ topics, materials: initialMaterials, q
           </DialogHeader>
 
           <div className="space-y-4">
-            {/* Search Quiz */}
-            <Input
-              placeholder="Search quiz by name..."
-              value={quizSearch}
-              onChange={(e) => setQuizSearch(e.target.value)}
-              className="flex-1"
-            />
-
             {/* Existing quizzes */}
             {quizConfigs.length > 0 && (
               <div>
@@ -547,7 +610,10 @@ export default function CMSMaterialsTab({ topics, materials: initialMaterials, q
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => loadQuizConfigs(quizMaterial.id, quizPagination.page - 1)}
+                      onClick={() =>
+                        quizMaterial &&
+                        loadQuizConfigs(quizMaterial.id, quizPagination.page - 1)
+                      }
                       disabled={quizPagination.page === 1 || quizLoading}
                     >
                       <ChevronLeft className="w-4 h-4" />
@@ -555,7 +621,10 @@ export default function CMSMaterialsTab({ topics, materials: initialMaterials, q
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => loadQuizConfigs(quizMaterial.id, quizPagination.page + 1)}
+                      onClick={() =>
+                        quizMaterial &&
+                        loadQuizConfigs(quizMaterial.id, quizPagination.page + 1)
+                      }
                       disabled={
                         quizPagination.page >= quizPagination.pages ||
                         quizLoading
@@ -717,45 +786,60 @@ export default function CMSMaterialsTab({ topics, materials: initialMaterials, q
                   <p className="text-sm font-medium mb-2">
                     Pilih Soal ({selectedQuestions.length} dipilih)
                   </p>
+                  
+                  {/* Search bar untuk soal */}
+                  <Input
+                    placeholder="Search soal..."
+                    value={questionSearch}
+                    onChange={(e) => setQuestionSearch(e.target.value)}
+                    className="mb-2"
+                  />
+
                   {questions.length === 0 ? (
                     <p className="text-sm text-muted-foreground">
                       Belum ada soal di bank soal.
                     </p>
                   ) : (
                     <div className="space-y-2 max-h-64 overflow-y-auto border rounded-lg p-2">
-                      {questions.map((q: any) => (
-                        <label
-                          key={q.id}
-                          className="flex items-start gap-2 p-2 hover:bg-muted rounded cursor-pointer"
-                        >
-                          <Checkbox
-                            checked={selectedQuestions.includes(q.id)}
-                            onCheckedChange={(checked) => {
-                              setSelectedQuestions((prev) =>
-                                checked
-                                  ? [...prev, q.id]
-                                  : prev.filter((id) => id !== q.id),
-                              );
-                            }}
-                          />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm">{q.text}</p>
-                            <div className="flex gap-2 mt-0.5">
-                              <span className="text-xs text-muted-foreground">
-                                {q.type}
-                              </span>
-                              <span
-                                className={`text-xs px-1.5 rounded-full ${difficultyColor[q.difficulty] ?? ""}`}
-                              >
-                                {q.difficulty}
-                              </span>
-                              <span className="text-xs text-muted-foreground">
-                                {q.points} pts
-                              </span>
+                      {questions
+                        .filter((q: any) =>
+                          q.text
+                            .toLowerCase()
+                            .includes(questionSearch.toLowerCase())
+                        )
+                        .map((q: QuestionItem) => (
+                          <label
+                            key={q.id}
+                            className="flex items-start gap-2 p-2 hover:bg-muted rounded cursor-pointer"
+                          >
+                            <Checkbox
+                              checked={selectedQuestions.includes(q.id)}
+                              onCheckedChange={(checked) => {
+                                setSelectedQuestions((prev) =>
+                                  checked
+                                    ? [...prev, q.id]
+                                    : prev.filter((id) => id !== q.id),
+                                );
+                              }}
+                            />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm">{q.text}</p>
+                              <div className="flex gap-2 mt-0.5">
+                                <span className="text-xs text-muted-foreground">
+                                  {q.type}
+                                </span>
+                                <span
+                                  className={`text-xs px-1.5 rounded-full ${difficultyColor[q.difficulty] ?? ""}`}
+                                >
+                                  {q.difficulty}
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                  {q.points} pts
+                                </span>
+                              </div>
                             </div>
-                          </div>
-                        </label>
-                      ))}
+                          </label>
+                        ))}
                     </div>
                   )}
                 </div>
