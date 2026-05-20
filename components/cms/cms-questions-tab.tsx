@@ -28,21 +28,38 @@ import { CheckCircle2, Circle, Pencil, X, Plus, Trash2, ChevronLeft, ChevronRigh
 import QuestionForm from "./question-form";
 import { updateQuestion, deleteQuestion, getQuestions as fetchQuestions } from "@/app/actions/quiz";
 
-const difficultyColor = {
+type QuestionItem = {
+  id: string;
+  text: string;
+  type: string;
+  difficulty: string;
+  points: number;
+  answerOptions?: {
+    id: string;
+    text: string;
+    isCorrect: boolean;
+  }[];
+};
+
+interface CMSQuestionsTabProps {
+  questions?: QuestionItem[];
+}
+
+const difficultyColor: Record<string, string> = {
   easy: "bg-green-100 text-green-700",
   medium: "bg-yellow-100 text-yellow-700",
   hard: "bg-red-100 text-red-700",
 };
 
-const typeLabel = {
+const typeLabel: Record<string, string> = {
   MULTIPLE_CHOICE: "Multiple Choice",
   MULTIPLE_SELECT: "Multiple Select",
   TRUE_FALSE: "True / False",
 };
 
-export default function CMSQuestionsTab({ questions: initialQuestions }) {
+export default function CMSQuestionsTab({ questions: initialQuestions }: CMSQuestionsTabProps) {
   // State untuk questions
-  const [questions, setQuestions] = useState(initialQuestions || []);
+  const [questions, setQuestions] = useState<QuestionItem[]>(initialQuestions || []);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 20,
@@ -83,9 +100,11 @@ export default function CMSQuestionsTab({ questions: initialQuestions }) {
       setLoading(true);
       try {
         const result = await fetchQuestions(page, 20, debouncedSearchQuery);
-        if (result.success) {
+        if (result.success && result.data) {
           setQuestions(result.data);
-          setPagination(result.pagination);
+          if (result.pagination) {
+            setPagination(result.pagination);
+          }
         }
       } catch (error) {
         console.error("Failed to load questions:", error);
@@ -232,7 +251,7 @@ export default function CMSQuestionsTab({ questions: initialQuestions }) {
           ) : (
             <>
               <div className="space-y-3">
-                {questions.map((q: any, idx: number) => (
+                {questions.map((q: QuestionItem, idx: number) => (
                   <div
                     key={q.id}
                     className="border rounded-lg p-4 hover:bg-muted/40 transition-colors"
@@ -246,7 +265,7 @@ export default function CMSQuestionsTab({ questions: initialQuestions }) {
                           <p className="font-medium text-sm leading-snug">
                             {q.text}
                           </p>
-                          {q.answerOptions?.length > 0 && (
+                          {q.answerOptions && q.answerOptions.length > 0 && (
                             <div className="mt-2 space-y-1">
                               {q.answerOptions.map((opt: any) => (
                                 <div
@@ -368,7 +387,7 @@ export default function CMSQuestionsTab({ questions: initialQuestions }) {
                   <Select
                     value={editData.type}
                     onValueChange={(val) => {
-                      const defaults = {
+                      const defaults: Record<string, { text: string; isCorrect: boolean; }[]> = {
                         MULTIPLE_CHOICE: [
                           { text: "", isCorrect: true },
                           { text: "", isCorrect: false },

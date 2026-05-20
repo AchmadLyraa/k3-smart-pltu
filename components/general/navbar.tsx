@@ -62,13 +62,17 @@ const NAV_CONFIG: Record<
       { label: "Reward Management", href: "/admin/reward-admin" },
       { label: "CMS", href: "/admin/cms" },
       { label: "Riwayat Semester", href: "/admin/semester" },
+      { label: "Leaderboard", href: "/admin/leaderboard" },
     ],
   },
   HSE_ADMIN: {
     label: "HSE Admin",
     color: "bg-emerald-600",
     icon: <Leaf className="w-4 h-4" />,
-    items: [{ label: "Dashboard", href: "/hse/dashboard" }],
+    items: [
+      { label: "Dashboard", href: "/hse/dashboard" },
+      { label: "Leaderboard", href: "/hse/leaderboard" },
+    ],
   },
   REWARD_ADMIN: {
     label: "Reward Admin",
@@ -77,6 +81,7 @@ const NAV_CONFIG: Record<
     items: [
       { label: "Dashboard", href: "/reward/dashboard" },
       { label: "Manajemen Reward", href: "/reward/rewards" },
+      { label: "Leaderboard", href: "/reward/leaderboard" },
     ],
   },
   WORKER: {
@@ -88,6 +93,7 @@ const NAV_CONFIG: Record<
       { label: "Reward", href: "/worker/reward-users" },
       { label: "Material", href: "/worker/materials" },
       { label: "Quiz History", href: "/worker/quiz-history" },
+      { label: "Leaderboard", href: "/worker/leaderboard" },
     ],
   },
 };

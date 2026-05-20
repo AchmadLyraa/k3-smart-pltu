@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import {
   Card,
   CardContent,
@@ -152,8 +152,24 @@ export default function CMSMaterialsTab({
     pages: 0,
   });
   const [materialSearch, setMaterialSearch] = useState("");
+  const [debouncedMaterialSearch, setDebouncedMaterialSearch] = useState("");
+  const materialSearchTimer = useRef<NodeJS.Timeout | null>(null);
   const [materialLoading, setMaterialLoading] = useState(false);
 
+  // Debounce material search query
+  useEffect(() => {
+    if (materialSearchTimer.current) {
+      clearTimeout(materialSearchTimer.current);
+    }
+    materialSearchTimer.current = setTimeout(() => {
+      setDebouncedMaterialSearch(materialSearch);
+    }, 500);
+    return () => {
+      if (materialSearchTimer.current) {
+        clearTimeout(materialSearchTimer.current);
+      }
+    };
+  }, [materialSearch]);
   // Form state
   const [showForm, setShowForm] = useState(false);
   const [editMaterial, setEditMaterial] = useState<MaterialItem | null>(null);
@@ -169,11 +185,44 @@ export default function CMSMaterialsTab({
     total: 0,
     pages: 0,
   });
-  const [quizSearch, setQuizSearch] = useState("");
   const [quizLoading, setQuizLoading] = useState(false);
+  const [quizSearch, setQuizSearch] = useState("");
+  const [debouncedQuizSearch, setDebouncedQuizSearch] = useState("");
+  const quizSearchTimer = useRef<NodeJS.Timeout | null>(null);
+  // Debounce quiz search query
+  useEffect(() => {
+    if (quizSearchTimer.current) {
+      clearTimeout(quizSearchTimer.current);
+    }
+    quizSearchTimer.current = setTimeout(() => {
+      setDebouncedQuizSearch(quizSearch);
+    }, 500);
+    return () => {
+      if (quizSearchTimer.current) {
+        clearTimeout(quizSearchTimer.current);
+      }
+    };
+  }, [quizSearch]);
   const [showQuizForm, setShowQuizForm] = useState(false);
+  // State for question selection and search
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   const [questionSearch, setQuestionSearch] = useState("");
+  const [debouncedQuestionSearch, setDebouncedQuestionSearch] = useState("");
+  const questionSearchTimer = useRef<NodeJS.Timeout | null>(null);
+  // Debounce question search query
+  useEffect(() => {
+    if (questionSearchTimer.current) {
+      clearTimeout(questionSearchTimer.current);
+    }
+    questionSearchTimer.current = setTimeout(() => {
+      setDebouncedQuestionSearch(questionSearch);
+    }, 500);
+    return () => {
+      if (questionSearchTimer.current) {
+        clearTimeout(questionSearchTimer.current);
+      }
+    };
+  }, [questionSearch]);
   const [quizFormData, setQuizFormData] = useState({
     name: "",
     description: "",
@@ -198,7 +247,7 @@ export default function CMSMaterialsTab({
           undefined,
           page,
           10,
-          materialSearch,
+          debouncedMaterialSearch,
         );
         if (result.success) {
           setMaterials((result.data as MaterialItem[]) ?? []);
@@ -212,7 +261,7 @@ export default function CMSMaterialsTab({
         setMaterialLoading(false);
       }
     },
-    [materialSearch],
+    [debouncedMaterialSearch],
   );
 
   // Load quiz configs
@@ -220,7 +269,7 @@ export default function CMSMaterialsTab({
     async (materialId: string, page: number = 1) => {
       setQuizLoading(true);
       try {
-        const result = await getQuizConfigs(materialId, page, 10, quizSearch);
+        const result = await getQuizConfigs(materialId, page, 10, debouncedQuizSearch);
         if (result.success) {
           setQuizConfigs((result.data as QuizConfigItem[]) ?? []);
           setQuizPagination(
@@ -238,7 +287,7 @@ export default function CMSMaterialsTab({
 
   useEffect(() => {
     loadMaterials(1);
-  }, [materialSearch, loadMaterials]);
+  }, [debouncedMaterialSearch, loadMaterials]);
 
   const openQuizDialog = async (m: MaterialItem) => {
     setQuizMaterial(m);
@@ -831,7 +880,7 @@ export default function CMSMaterialsTab({
                         .filter((q: any) =>
                           q.text
                             .toLowerCase()
-                            .includes(questionSearch.toLowerCase()),
+                            .includes(debouncedQuestionSearch.toLowerCase()),
                         )
                         .map((q: QuestionItem) => (
                           <label

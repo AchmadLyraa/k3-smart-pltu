@@ -118,6 +118,7 @@ export async function resetSemesterByPeriod(periodId: string) {
             OR: [
               { reference: { in: quizSessionIds } },
               { points: { lt: 0 } },
+              { transactionType: "MANUAL_ADJUSTMENT"},
             ],
           },
         });
