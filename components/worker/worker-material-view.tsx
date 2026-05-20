@@ -134,7 +134,7 @@ export default function WorkerMaterialView({
         {isComplete && material.quizConfigs?.length > 0 && (
           <Card className="border-amber-200 bg-amber-50">
             <CardContent className="pt-6">
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {material.quizConfigs.map((quiz: any) => {
                   const deadline = quiz.deadline
                     ? new Date(quiz.deadline)
@@ -153,21 +153,38 @@ export default function WorkerMaterialView({
                           (1000 * 60 * 60 * 24),
                       )
                     : null;
+                  const lastSession = quiz.quizSessions?.[0];
+                  const hasPassed = lastSession?.passed;
+                  const hasFailed = lastSession && !lastSession.passed;
 
                   return (
-                    <div key={quiz.id} className="text-sm">
-                      <p className="font-medium">{quiz.name}</p>
-                      {deadline && (
-                        <p
-                          className={
-                            isOverdue ? "text-red-600" : "text-amber-700"
-                          }
-                        >
-                          {isOverdue
-                            ? `⚠️ Terlambat ${daysLate} hari (Poin berkurang ${Math.min(daysLate * 5, 40)}%)`
-                            : `📅 Deadline: ${deadline.toLocaleDateString("id-ID")} (${daysLeft} hari lagi)`}
-                        </p>
-                      )}
+                    <div
+                      key={quiz.id}
+                      className="text-sm flex items-start justify-between gap-2"
+                    >
+                      <div>
+                        <p className="font-medium">{quiz.name}</p>
+                        {hasPassed ? (
+                          <p className="text-green-600 flex items-center gap-1 mt-0.5">
+                            <CheckCircle className="w-3.5 h-3.5" />
+                            Sudah lulus — {lastSession.score} pts
+                          </p>
+                        ) : hasFailed ? (
+                          <p className="text-red-500 mt-0.5">
+                            ❌ Belum lulus — {lastSession.score} pts
+                          </p>
+                        ) : deadline ? (
+                          <p
+                            className={
+                              isOverdue ? "text-red-600" : "text-amber-700"
+                            }
+                          >
+                            {isOverdue
+                              ? `⚠️ Terlambat ${daysLate} hari (Poin berkurang ${Math.min(daysLate * 5, 40)}%)`
+                              : `📅 Deadline: ${deadline.toLocaleDateString("id-ID")} (${daysLeft} hari lagi)`}
+                          </p>
+                        ) : null}
+                      </div>
                     </div>
                   );
                 })}

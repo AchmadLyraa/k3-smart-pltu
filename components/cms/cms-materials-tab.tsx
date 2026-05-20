@@ -142,7 +142,9 @@ export default function CMSMaterialsTab({
   questions,
 }: CMSMaterialsTabProps) {
   // Material state
-  const [materials, setMaterials] = useState<MaterialItem[]>(initialMaterials || []);
+  const [materials, setMaterials] = useState<MaterialItem[]>(
+    initialMaterials || [],
+  );
   const [materialPagination, setMaterialPagination] = useState({
     page: 1,
     limit: 10,
@@ -191,7 +193,13 @@ export default function CMSMaterialsTab({
     async (page: number = 1) => {
       setMaterialLoading(true);
       try {
-        const result = await fetchMaterials(undefined, undefined, page, 10, materialSearch);
+        const result = await fetchMaterials(
+          undefined,
+          undefined,
+          page,
+          10,
+          materialSearch,
+        );
         if (result.success) {
           setMaterials((result.data as MaterialItem[]) ?? []);
           setMaterialPagination(
@@ -433,10 +441,19 @@ export default function CMSMaterialsTab({
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex gap-3 items-start flex-1 min-w-0">
                           <span className="text-sm text-muted-foreground mt-0.5 shrink-0">
-                            #{(materialPagination.page - 1) * materialPagination.limit + idx + 1}
+                            #
+                            {(materialPagination.page - 1) *
+                              materialPagination.limit +
+                              idx +
+                              1}
                           </span>
                           <Icon className="w-4 h-4 mt-0.5 shrink-0 text-muted-foreground" />
                           <div className="flex-1 min-w-0">
+                            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                              {" "}
+                              {process.env.NEXT_PUBLIC_APP_URL}
+                              /worker/materials/{m.id}
+                            </p>
                             <p className="font-medium text-sm">{m.title}</p>
                             {m.description && (
                               <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
@@ -447,7 +464,8 @@ export default function CMSMaterialsTab({
                               <span>{m.topic?.name ?? "-"}</span>
                               <span>•</span>
                               <span>
-                                {Math.floor(m.duration / 60)}m {m.duration % 60}s
+                                {Math.floor(m.duration / 60)}m {m.duration % 60}
+                                s
                               </span>
                               <span>•</span>
                               <span>{m.mediaFiles?.length ?? 0} files</span>
@@ -562,7 +580,7 @@ export default function CMSMaterialsTab({
           </DialogHeader>
 
           <div className="space-y-4">
-            {/* Existing quizzes */}
+            {/* =================================== Existing quizzes ======================================= */}
             {quizConfigs.length > 0 && (
               <div>
                 <p className="text-sm font-medium mb-2">Quiz yang sudah ada:</p>
@@ -612,7 +630,10 @@ export default function CMSMaterialsTab({
                       size="sm"
                       onClick={() =>
                         quizMaterial &&
-                        loadQuizConfigs(quizMaterial.id, quizPagination.page - 1)
+                        loadQuizConfigs(
+                          quizMaterial.id,
+                          quizPagination.page - 1,
+                        )
                       }
                       disabled={quizPagination.page === 1 || quizLoading}
                     >
@@ -623,7 +644,10 @@ export default function CMSMaterialsTab({
                       size="sm"
                       onClick={() =>
                         quizMaterial &&
-                        loadQuizConfigs(quizMaterial.id, quizPagination.page + 1)
+                        loadQuizConfigs(
+                          quizMaterial.id,
+                          quizPagination.page + 1,
+                        )
                       }
                       disabled={
                         quizPagination.page >= quizPagination.pages ||
@@ -638,7 +662,9 @@ export default function CMSMaterialsTab({
             )}
 
             {quizConfigs.length === 0 && !quizLoading && (
-              <p className="text-sm text-muted-foreground">Belum ada quiz config.</p>
+              <p className="text-sm text-muted-foreground">
+                Belum ada quiz config.
+              </p>
             )}
 
             {/* Toggle form */}
@@ -786,7 +812,7 @@ export default function CMSMaterialsTab({
                   <p className="text-sm font-medium mb-2">
                     Pilih Soal ({selectedQuestions.length} dipilih)
                   </p>
-                  
+
                   {/* Search bar untuk soal */}
                   <Input
                     placeholder="Search soal..."
@@ -805,7 +831,7 @@ export default function CMSMaterialsTab({
                         .filter((q: any) =>
                           q.text
                             .toLowerCase()
-                            .includes(questionSearch.toLowerCase())
+                            .includes(questionSearch.toLowerCase()),
                         )
                         .map((q: QuestionItem) => (
                           <label
@@ -857,7 +883,7 @@ export default function CMSMaterialsTab({
         </DialogContent>
       </Dialog>
 
-      {/* Edit Dialog */}
+      {/* ====================== Edit Dialog =============================*/}
       <Dialog
         open={!!editMaterial}
         onOpenChange={(open) => !open && setEditMaterial(null)}

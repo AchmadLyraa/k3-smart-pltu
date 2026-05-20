@@ -199,7 +199,7 @@ export default function NotificationsPage() {
                         {notif.message}
                       </p>
                       {notif.material && (
-                        <Link href="/worker/materials">
+                        <Link href={`/worker/materials/${notif.material.id}`}>
                           <Button variant="outline" size="sm" className="gap-1">
                             Lihat Materi: {notif.material.title}
                           </Button>

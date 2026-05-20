@@ -711,6 +711,13 @@ export async function getWorkerMaterial(materialId: string) {
             maxRetries: true,
             showCorrectAns: true,
             deadline: true,
+            quizSessions: {
+              // ← tambah
+              where: { userId: user.id },
+              select: { passed: true, score: true },
+              orderBy: { createdAt: "desc" },
+              take: 1,
+            },
           },
         },
         progress: {

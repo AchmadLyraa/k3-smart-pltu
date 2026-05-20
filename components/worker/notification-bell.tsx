@@ -119,7 +119,10 @@ export function NotificationBell() {
                   <span className="text-lg">
                     {getNotificationIcon(notif.type)}
                   </span>
-                  <div className="flex-1 min-w-0">
+                  <Link
+                    href={`/worker/materials/${notif.material.id}`}
+                    className="flex-1 min-w-0"
+                  >
                     <p className="font-medium text-sm truncate">
                       {notif.subject}
                     </p>
@@ -127,7 +130,7 @@ export function NotificationBell() {
                       {notif.message}
                     </p>
                     {notif.material && (
-                      <p className="text-xs text-blue-600 mt-1">
+                      <p className="text-xs text-blue-600 mt-1 hover:underline">
                         📚 {notif.material.title}
                       </p>
                     )}
@@ -139,7 +142,7 @@ export function NotificationBell() {
                         minute: "2-digit",
                       })}
                     </p>
-                  </div>
+                  </Link>
                 </div>
               </DropdownMenuItem>
             ))
