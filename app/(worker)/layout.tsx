@@ -1,6 +1,9 @@
+// app/(worker)/layout.tsx
+
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import Navbar from "@/components/general/navbar";
+
+import WorkerMobileNavbar from "@/components/general/worker-mobile-navbar";
 
 export default async function WorkerLayout({
   children,
@@ -14,9 +17,12 @@ export default async function WorkerLayout({
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar session={session} />
-      <div className="container mx-auto px-4 py-6">{children}</div>
+    <div className="min-h-screen bg-zinc-100">
+      <WorkerMobileNavbar session={session} />
+
+      <main className="mx-auto w-full max-w-7xl px-4 pb-28 pt-5 md:px-6 lg:px-8">
+        {children}
+      </main>
     </div>
   );
 }
