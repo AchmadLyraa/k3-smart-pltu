@@ -384,7 +384,7 @@ export default function AdminDashboard({
           </div>
           <div className="sa-aktif-chart">
             {monthlyDataError ? (
-              <div className="flex items-center justify-center h-[140px] text-red-600 bg-red-50 rounded-lg px-4 text-sm font-medium text-center">
+              <div className="flex items-center justify-center h-[140px] text-red-600 bg-red-50 rounded-md px-4 text-sm font-medium text-center">
                 ⚠️ {monthlyDataError}
               </div>
             ) : (

@@ -93,7 +93,7 @@ export default function SuperAdminSidebar() {
       <div className="sa-sidebar__logo">
         <div className="sa-logo-expanded">
           <Image
-            src="/images/logok3new.png"
+            src="/images/logonew-k3.svg"
             alt="K3 SMART"
             width={160}
             height={50}
@@ -102,12 +102,11 @@ export default function SuperAdminSidebar() {
           />
         </div>
         <div className="sa-logo-collapsed">
-          <div className="sa-logo-fallback">K3</div>
           <Image
-            src="/images/logo-icon.png"
+            src="/images/logo-primary-k3.png"
             alt="K3"
-            width={38}
-            height={38}
+            width={35}
+            height={35}
             priority
             className="sa-logo-img"
             style={{ objectFit: "contain" }}

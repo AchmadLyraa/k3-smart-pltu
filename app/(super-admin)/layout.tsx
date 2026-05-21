@@ -32,14 +32,17 @@ export default async function AdminLayout({
         className="sa-main-content"
         style={{
           flex: 1,
-          marginLeft: "var(--sa-sidebar-width, 250px)",
+          marginLeft: "calc(var(--sa-sidebar-width, 250px) + 32px)",
           display: "flex",
           flexDirection: "column",
-          minHeight: "100vh",
+          height: "100vh",
+          padding: "16px 16px 16px 0",
         }}
       >
-        <SuperAdminHeader userName={userName} userEmail={userEmail} />
-        <div style={{ flex: 1, padding: "0 32px 32px" }}>{children}</div>
+        <div className="sa-content-container">
+          <SuperAdminHeader userName={userName} userEmail={userEmail} />
+          <div className="sa-content-body">{children}</div>
+        </div>
       </main>
     </div>
   );
