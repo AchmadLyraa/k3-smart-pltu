@@ -3,6 +3,41 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ── Buckin Font Faces ── */
+@font-face {
+  font-family: 'Buckin';
+  src: url('/fonts/Buckin-Regular%20Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Buckin';
+  src: url('/fonts/Buckin-Bold%20Regular.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ── Super Admin Dashboard Tokens ── */
+:root {
+  --sa-primary: #E74C3C;
+  --sa-primary-light: #FF6B6B;
+  --sa-primary-soft: #FFF0EE;
+  --sa-primary-bg: #FDE8E4;
+  --sa-sidebar-bg: #FFFFFF;
+  --sa-sidebar-width: 250px;
+  --sa-body-bg: #F5F6FA;
+  --sa-card-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  --sa-header-height: 64px;
+  --sa-text-dark: #1A1A2E;
+  --sa-text-muted: #7C8DB5;
+  --sa-table-header-bg: #FFF0EE;
+  --sa-accent-green: #27AE60;
+  --sa-accent-yellow: #F39C12;
+}
+
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);

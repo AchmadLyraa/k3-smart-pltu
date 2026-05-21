@@ -1,75 +1,177 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-
+import { useState, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
 import { Button } from "@/components/ui/button";
-
 import {
-  Users,
-  BookOpen,
-  Trophy,
-  Star,
   CheckCircle2,
   XCircle,
-  Clock,
   Loader2,
+  Search,
+  ChevronDown,
+  Download,
+  MoreVertical,
+  Users,
+  User,
+  HelpCircle,
+  BookOpen,
+  Coins,
+  Calendar,
 } from "lucide-react";
+import { getWorkerDetail, getActiveUsersReport } from "@/app/actions/admin";
+import {
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Area,
+  AreaChart,
+} from "recharts";
 
-import { getWorkerDetail } from "@/app/actions/admin";
+/* ─── Donut Chart Component ─── */
+function DonutChart({
+  percentage,
+  label,
+  color = "var(--sa-primary, #E74C3C)",
+}: {
+  percentage: number;
+  label: string;
+  color?: string;
+}) {
+  const radius = 40;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
+  return (
+    <div className="sa-donut">
+      <svg width="110" height="110" viewBox="0 0 100 100">
+        <circle
+          cx="50"
+          cy="50"
+          r={radius}
+          fill="none"
+          stroke="var(--sa-primary-bg, #FDE8E4)"
+          strokeWidth="10"
+        />
+        <circle
+          cx="50"
+          cy="50"
+          r={radius}
+          fill="none"
+          stroke={color}
+          strokeWidth="10"
+          strokeDasharray={circumference}
+          strokeDashoffset={strokeDashoffset}
+          strokeLinecap="round"
+          transform="rotate(-90 50 50)"
+          style={{ transition: "stroke-dashoffset 1s ease" }}
+        />
+        <text
+          x="50"
+          y="50"
+          textAnchor="middle"
+          dominantBaseline="central"
+          fontSize="16"
+          fontWeight="700"
+          fill="var(--sa-text-dark, #1A1A2E)"
+          fontFamily="'Buckin', sans-serif"
+        >
+          {percentage}%
+        </text>
+      </svg>
+      <span className="sa-donut__label">{label}</span>
+    </div>
+  );
+}
+
+/* ─── Stat Card Component ─── */
+function StatCard({
+  icon,
+  value,
+  label,
+}: {
+  icon: React.ReactNode;
+  value: number | string;
+  label: string;
+}) {
+  return (
+    <div className="sa-stat-card">
+      <div className="sa-stat-card__icon">{icon}</div>
+      <div className="sa-stat-card__info">
+        <span className="sa-stat-card__value">{value}</span>
+        <span className="sa-stat-card__label">{label}</span>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Main Dashboard ─── */
 export default function AdminDashboard({
   stats,
   workers,
+  periods = [],
+  defaultPeriodId = "all",
+  monthlyData = [],
+  monthlyDataError = null,
 }: {
   stats: any;
   workers: any[];
+  periods?: any[];
+  defaultPeriodId?: string;
+  monthlyData?: { name: string; akses: number }[];
+  monthlyDataError?: string | null;
 }) {
   const [selectedWorker, setSelectedWorker] = useState<any>(null);
-
   const [workerDetail, setWorkerDetail] = useState<any>(null);
-
   const [loadingDetail, setLoadingDetail] = useState(false);
-
   const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showValue, setShowValue] = useState(true);
+  const [selectedPeriodId, setSelectedPeriodId] = useState(defaultPeriodId);
+  const [isNavigating, setIsNavigating] = useState(false);
+
+  const handlePeriodChange = (periodId: string) => {
+    setSelectedPeriodId(periodId);
+    setIsNavigating(true);
+    const params = new URLSearchParams(window.location.search);
+    if (periodId && periodId !== "all") {
+      params.set("periodId", periodId);
+    } else {
+      params.delete("periodId");
+    }
+    const newUrl = `${window.location.pathname}${params.toString() ? "?" + params.toString() : ""}`;
+    window.location.href = newUrl;
+  };
+
+  const currentPeriodName =
+    selectedPeriodId === "all"
+      ? "Semua Periode"
+      : periods.find((p) => p.id === selectedPeriodId)?.name || "Pilih Periode";
 
   const openWorkerDetail = async (worker: any) => {
     setSelectedWorker(worker);
     setWorkerDetail(null);
     setPage(1);
-
     await fetchWorkerDetail(worker.id, 1, false);
   };
 
   const fetchWorkerDetail = async (
     userId: string,
     targetPage: number,
-    append = false,
+    append = false
   ) => {
     setLoadingDetail(true);
-
     try {
       const result = await getWorkerDetail(userId, targetPage, 10);
-
-      if (result.success) {
+      if (result.success && result.data) {
         if (append) {
           setWorkerDetail((prev: any) => ({
             ...result.data,
-
             quizSessions: [
               ...(prev?.quizSessions || []),
               ...result.data.quizSessions,
@@ -78,7 +180,6 @@ export default function AdminDashboard({
         } else {
           setWorkerDetail(result.data);
         }
-
         setPage(targetPage);
       }
     } finally {
@@ -88,138 +189,316 @@ export default function AdminDashboard({
 
   const loadMoreQuiz = async () => {
     if (!selectedWorker) return;
-
     await fetchWorkerDetail(selectedWorker.id, page + 1, true);
   };
 
+  const handleSaveReport = async () => {
+    try {
+      const result = await getActiveUsersReport(
+        selectedPeriodId === "all" ? undefined : selectedPeriodId
+      );
+      if (!result.success || !result.data || result.data.length === 0) {
+        alert("Tidak ada data pengguna aktif untuk periode ini.");
+        return;
+      }
+
+      // Get period name
+      const periodName =
+        selectedPeriodId === "all"
+          ? "Semua Periode"
+          : periods.find((p) => p.id === selectedPeriodId)?.name || "Periode";
+
+      // Generate CSV
+      const headers = [
+        "No",
+        "Nama",
+        "NIP",
+        "Unit",
+        "Divisi",
+        "Total Materi Diakses",
+        "Sedang Diproses",
+        "Selesai",
+        "Aktivitas Terakhir",
+      ];
+      const csvRows = result.data.map((row: any) =>
+        [
+          row.no,
+          row.name,
+          row.nip,
+          row.unit,
+          row.division,
+          row.totalMateriDiakses,
+          row.materiDiproses,
+          row.materiSelesai,
+          row.lastAccessed,
+        ].join(",")
+      );
+      const csvContent = [headers.join(","), ...csvRows].join("\n");
+
+      // Trigger download
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      const today = new Date().toLocaleDateString("id-ID").replace(/\//g, "-");
+      link.download = `laporan-aktivitas-${periodName.replace(/\s+/g, "-")}-${today}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("[handleSaveReport error]", error);
+      alert("Gagal mengunduh laporan.");
+    }
+  };
+
+  // Filter workers by search
+  const filteredWorkers = useMemo(() => {
+    if (!searchQuery.trim()) return workers;
+    const q = searchQuery.toLowerCase();
+    return workers.filter(
+      (w) =>
+        w.name?.toLowerCase().includes(q) ||
+        w.email?.toLowerCase().includes(q)
+    );
+  }, [workers, searchQuery]);
+
+  // Calculate progress percentages
+  const progressData = useMemo(() => {
+    if (!workers || workers.length === 0)
+      return { notStarted: 0, inProgress: 0, completed: 0 };
+    const total = workers.length;
+    const completed = workers.filter(
+      (w) => w.materialsCompleted >= w.totalMaterials && w.totalMaterials > 0
+    ).length;
+    const notStarted = workers.filter(
+      (w) => w.materialsCompleted === 0
+    ).length;
+    const inProgress = total - completed - notStarted;
+    return {
+      notStarted: Math.round((notStarted / total) * 100),
+      inProgress: Math.round((inProgress / total) * 100),
+      completed: Math.round((completed / total) * 100),
+    };
+  }, [workers]);
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-1">Admin Dashboard</h1>
-
-        <p className="text-muted-foreground">
-          Monitor performa karyawan dan aktivitas platform
-        </p>
+    <div className="sa-dashboard">
+      {/* Welcome Section */}
+      <div className="sa-welcome">
+        <div>
+          <h1 className="sa-welcome__title">Hai admin!</h1>
+          <p className="sa-welcome__subtitle">
+            Welcome back to K3 Smart Admin
+          </p>
+        </div>
+        <select
+          className="sa-filter-periode"
+          value={selectedPeriodId}
+          onChange={(e) => handlePeriodChange(e.target.value)}
+          style={{
+            appearance: "none",
+            WebkitAppearance: "none",
+            MozAppearance: "none",
+            cursor: "pointer",
+            border: "none",
+            background: "#fff",
+            fontFamily: "inherit",
+            fontSize: "inherit",
+            color: "inherit",
+            outline: "none",
+          }}
+        >
+          <option value="all">Semua Periode</option>
+          {periods.map((p: any) => (
+            <option key={p.id} value={p.id}>
+              {p.name}{p.isActive ? " (Aktif)" : ""}
+            </option>
+          ))}
+        </select>
       </div>
 
-      {/* Stats */}
-      <div className="grid gap-4 grid-cols-4 mb-8">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-muted-foreground">Total Worker</p>
-
-              <Users className="w-5 h-5 text-blue-500" />
-            </div>
-
-            <p className="text-3xl font-bold">{stats?.totalWorkers ?? 0}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-muted-foreground">Materi Aktif</p>
-
-              <BookOpen className="w-5 h-5 text-blue-500" />
-            </div>
-
-            <p className="text-3xl font-bold">{stats?.totalMaterials ?? 0}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-muted-foreground">Total Quiz</p>
-
-              <Trophy className="w-5 h-5 text-yellow-500" />
-            </div>
-
-            <p className="text-3xl font-bold">{stats?.totalQuizConfigs ?? 0}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-muted-foreground">
-                Total Poin Dibagikan
-              </p>
-
-              <Star className="w-5 h-5 text-yellow-500" />
-            </div>
-
-            <p className="text-3xl font-bold">
-              {stats?.totalPointsAwarded ?? 0}
-            </p>
-          </CardContent>
-        </Card>
+      {/* Stat Cards */}
+      <div className="sa-stats-grid">
+        <StatCard
+          icon={<User size={22} />}
+          value={stats?.totalWorkers ?? 0}
+          label="Total Pengguna"
+        />
+        <StatCard
+          icon={<HelpCircle size={22} />}
+          value={stats?.totalMaterials ?? 0}
+          label="Materi Aktif"
+        />
+        <StatCard
+          icon={<BookOpen size={22} />}
+          value={stats?.totalQuizConfigs ?? 0}
+          label="Total Quiz"
+        />
+        <StatCard
+          icon={<Coins size={22} />}
+          value={stats?.totalPointsAwarded ?? 0}
+          label="Point Dibagikan"
+        />
       </div>
 
-      {/* Worker list */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Performa Karyawan</CardTitle>
+      {/* Charts Row */}
+      <div className="sa-charts-row">
+        {/* Progress Belajar */}
+        <div className="sa-card sa-progress-card">
+          <div className="sa-card__header">
+            <h3 className="sa-card__title">Progress Belajar</h3>
+            <div className="sa-card__header-actions">
+            </div>
+          </div>
+          <div className="sa-donut-row">
+            <DonutChart
+              percentage={progressData.notStarted}
+              label="Belum Mulai"
+              color="var(--sa-primary, #E74C3C)"
+            />
+            <DonutChart
+              percentage={progressData.inProgress}
+              label="Sedang Belajar"
+              color="var(--sa-primary-light, #FF6B6B)"
+            />
+            <DonutChart
+              percentage={progressData.completed}
+              label="Selesai"
+              color="var(--sa-primary, #E74C3C)"
+            />
+          </div>
+        </div>
 
-          <CardDescription>{workers.length} worker terdaftar</CardDescription>
-        </CardHeader>
-
-        <CardContent>
-          {workers.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">
-              Belum ada worker terdaftar
-            </p>
-          ) : (
-            <div className="space-y-2">
-              <div className="grid grid-cols-7 gap-2 text-xs font-medium text-muted-foreground px-3 pb-1 border-b">
-                <span className="col-span-2">Nama</span>
-                <span>Unit</span>
-                <span className="text-center">Materi</span>
-                <span className="text-center">Quiz</span>
-                <span className="text-center">Lulus</span>
-                <span className="text-center">Poin</span>
+        {/* Aktif User */}
+        <div className="sa-card sa-aktif-card">
+          <div className="sa-card__header">
+            <div>
+              <h3 className="sa-card__title">Aktif user</h3>
+              <p className="sa-card__desc">Statistik keaktifan pengguna</p>
+            </div>
+            <button className="sa-save-report" onClick={handleSaveReport}>
+              <Download size={14} />
+              <span>Save Report</span>
+            </button>
+          </div>
+          <div className="sa-aktif-chart">
+            {monthlyDataError ? (
+              <div className="flex items-center justify-center h-[140px] text-red-600 bg-red-50 rounded-lg px-4 text-sm font-medium text-center">
+                ⚠️ {monthlyDataError}
               </div>
+            ) : (
+              <ResponsiveContainer width="100%" height={140}>
+                <AreaChart data={monthlyData}>
+                  <defs>
+                    <linearGradient id="colorAkses" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#E74C3C" stopOpacity={0.2} />
+                      <stop offset="95%" stopColor="#E74C3C" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis
+                    dataKey="name"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 11, fill: "#7C8DB5" }}
+                  />
+                  <YAxis hide />
+                  <Tooltip
+                    contentStyle={{
+                      background: "#fff",
+                      border: "1px solid #eee",
+                      borderRadius: 8,
+                      fontSize: 12,
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="akses"
+                    stroke="#E74C3C"
+                    strokeWidth={2}
+                    fillOpacity={1}
+                    fill="url(#colorAkses)"
+                    dot={{ r: 3, fill: "#E74C3C", strokeWidth: 0 }}
+                    activeDot={{ r: 5, fill: "#E74C3C", strokeWidth: 2, stroke: "#fff" }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </div>
+      </div>
 
-              {workers.map((w) => (
-                <div
-                  key={w.id}
-                  onClick={() => openWorkerDetail(w)}
-                  className="grid grid-cols-7 gap-2 items-center px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors cursor-pointer"
-                >
-                  <div className="col-span-2 min-w-0">
-                    <p className="text-sm font-medium truncate">{w.name}</p>
+      {/* Performa Worker */}
+      <div className="sa-card sa-performa-card">
+        <h3 className="sa-card__title" style={{ marginBottom: 16 }}>
+          Performa Worker
+        </h3>
 
-                    <p className="text-xs text-muted-foreground truncate">
-                      {w.email}
-                    </p>
-                  </div>
+        {/* Search */}
+        <div className="sa-search">
+          <input
+            type="text"
+            placeholder="Cari Nama atau Email"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="sa-search__input"
+          />
+          <Search size={18} className="sa-search__icon" />
+        </div>
 
-                  <span className="text-xs text-muted-foreground truncate">
-                    {w.unit}
-                  </span>
+        {/* Table */}
+        <div className="sa-table-wrapper">
+          <table className="sa-table">
+            <thead>
+              <tr>
+                <th>Nama</th>
+                <th>Unit</th>
+                <th>Materi</th>
+                <th>Quiz</th>
+                <th>Lulus</th>
+                <th>Point</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredWorkers.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="sa-table__empty">
+                    {searchQuery
+                      ? "Tidak ada hasil yang ditemukan"
+                      : "Belum ada worker terdaftar"}
+                  </td>
+                </tr>
+              ) : (
+                filteredWorkers.map((w) => (
+                  <tr
+                    key={w.id}
+                    onClick={() => openWorkerDetail(w)}
+                    className="sa-table__row"
+                  >
+                    <td>
+                      <div className="sa-table__name">
+                        <span className="sa-table__name-text">{w.name}</span>
+                        <span className="sa-table__name-email">{w.email}</span>
+                      </div>
+                    </td>
+                    <td className="sa-table__center">{w.unit || "-"}</td>
+                    <td className="sa-table__center">
+                      {w.materialsCompleted}/{w.totalMaterials}
+                    </td>
+                    <td className="sa-table__center">{w.quizAttempted}</td>
+                    <td className="sa-table__center">{w.quizPassed}</td>
+                    <td className="sa-table__center sa-table__point">
+                      {w.totalPoints}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-                  <span className="text-sm text-center">
-                    {w.materialsCompleted}/{w.totalMaterials}
-                  </span>
-
-                  <span className="text-sm text-center">{w.quizAttempted}</span>
-
-                  <span className="text-sm text-center text-green-600 font-medium">
-                    {w.quizPassed}
-                  </span>
-
-                  <span className="text-sm text-center font-bold text-yellow-600">
-                    {w.totalPoints}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Detail Dialog */}
+      {/* Detail Dialog (preserved from original) */}
       <Dialog
         open={!!selectedWorker}
         onOpenChange={(open) => {
@@ -232,7 +511,6 @@ export default function AdminDashboard({
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{selectedWorker?.name}</DialogTitle>
-
             <p className="text-sm text-muted-foreground">
               {selectedWorker?.email}
             </p>
@@ -248,7 +526,6 @@ export default function AdminDashboard({
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-semibold">Riwayat Quiz</h3>
-
                   <span className="text-xs text-muted-foreground">
                     {workerDetail.pagination.total} total
                   </span>
@@ -261,12 +538,12 @@ export default function AdminDashboard({
                         ? Math.round(
                             (new Date(session.submittedAt).getTime() -
                               new Date(session.startedAt).getTime()) /
-                              1000,
+                              1000
                           )
                         : null;
 
                     const correctCount = session.userAnswers.filter(
-                      (a: any) => a.isCorrect,
+                      (a: any) => a.isCorrect
                     ).length;
 
                     return (
@@ -276,10 +553,9 @@ export default function AdminDashboard({
                             <p className="text-sm font-medium">
                               {session.quizConfig.name}
                             </p>
-
                             <p className="text-xs text-muted-foreground">
                               {new Date(session.submittedAt).toLocaleString(
-                                "id-ID",
+                                "id-ID"
                               )}
                             </p>
                           </div>
@@ -294,7 +570,6 @@ export default function AdminDashboard({
                             >
                               {session.passed ? "Lulus" : "Tidak Lulus"}
                             </span>
-
                             <p className="text-sm font-bold mt-1">
                               {session.score} pts
                             </p>
@@ -312,11 +587,9 @@ export default function AdminDashboard({
                               ) : (
                                 <XCircle className="w-3.5 h-3.5 text-red-500 shrink-0 mt-0.5" />
                               )}
-
                               <span className="text-muted-foreground line-clamp-1">
                                 {a.question?.text ?? "Soal dihapus"}
                               </span>
-
                               {a.isCorrect && (
                                 <span className="text-green-600 shrink-0">
                                   +{a.pointsEarned}
@@ -357,7 +630,6 @@ export default function AdminDashboard({
               {/* Point */}
               <div>
                 <h3 className="font-semibold mb-3">Riwayat Poin</h3>
-
                 <div className="space-y-2">
                   {workerDetail.pointTransactions.map((t: any) => (
                     <div
@@ -366,12 +638,10 @@ export default function AdminDashboard({
                     >
                       <div>
                         <p className="font-medium">{t.description}</p>
-
                         <p className="text-xs text-muted-foreground">
                           {new Date(t.createdAt).toLocaleDateString("id-ID")}
                         </p>
                       </div>
-
                       <span
                         className={`font-bold ${
                           t.points > 0 ? "text-green-600" : "text-red-500"

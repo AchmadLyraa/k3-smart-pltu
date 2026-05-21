@@ -41,6 +41,7 @@ import {
   archiveMaterial,
   deleteMaterial,
 } from "@/app/actions/content";
+import SemesterResetDialog from "@/components/admin/semester-reset-dialog";
 import { useRouter } from "next/navigation";
 
 const typeIcon = {
@@ -231,10 +232,13 @@ export default function CmsAcademicPeriodTab({
       {/* Header + Create */}
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-semibold">Academic Periods</h2>
-        <Button onClick={() => setShowCreateForm(!showCreateForm)}>
-          <Plus className="w-4 h-4 mr-2" />
-          {showCreateForm ? "Cancel" : "Buat Period"}
-        </Button>
+        <div className="flex gap-2">
+          <SemesterResetDialog />
+          <Button onClick={() => setShowCreateForm(!showCreateForm)}>
+            <Plus className="w-4 h-4 mr-2" />
+            {showCreateForm ? "Cancel" : "Buat Period"}
+          </Button>
+        </div>
       </div>
 
       {/* Create Form */}
