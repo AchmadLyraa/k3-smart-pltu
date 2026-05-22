@@ -85,10 +85,6 @@ export default function SuperAdminHeader({
       </div>
 
       <div className="sa-header__right">
-        {/* Dark Mode Toggle */}
-        <button className="sa-header__icon-btn" title="Toggle Dark Mode">
-          <Moon size={18} />
-        </button>
 
         {/* Notification Bell */}
         <SuperAdminNotificationBell />

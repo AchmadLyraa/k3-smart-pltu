@@ -73,7 +73,7 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
           <Crown className="w-48 h-48 text-red-400" />
         </div>
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
+          <div className="space-y-0">
             <div className="flex items-center gap-2">
               <span className="p-1.5 rounded-lg bg-red-500/20 text-red-300">
                 <Trophy className="w-6 h-6 text-red-400" />

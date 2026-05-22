@@ -50,7 +50,7 @@
   padding: 0 28px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: start;
   border-bottom: 1px solid #e8e8e8;
   box-sizing: border-box;
 }
@@ -85,7 +85,7 @@
 
 .sa-sidebar__item--active {
   background: var(--sa-primary-soft, #FFF0EE);
-  color: var(--sa-primary, #E74C3C);
+  color: var(--sa-primary, #FF383C);
   font-weight: 700;
 }
 
@@ -96,7 +96,7 @@
   transform: translateY(-50%);
   width: 4px;
   height: 0;
-  background: var(--sa-primary, #E74C3C);
+  background: var(--sa-primary, #FF383C);
   border-radius: 0 4px 4px 0;
   transition: height 0.2s ease;
 }

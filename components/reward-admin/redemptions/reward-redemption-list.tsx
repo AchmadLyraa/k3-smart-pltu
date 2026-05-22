@@ -218,7 +218,7 @@ export default function RewardRedemptionList() {
   return (
     <div className="bg-white rounded-[24px] shadow-sm border border-slate-100 p-6">
       <div className="mb-4">
-        <h2 className="text-[15px] font-bold text-[#2B3674]">Status Pengiriman Hadiah</h2>
+        <h2 className="text-[15px] font-bold text-black">Status Pengiriman Hadiah</h2>
       </div>
 
       <div className="mb-6 flex items-center justify-between gap-4 relative">

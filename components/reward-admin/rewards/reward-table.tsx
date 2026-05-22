@@ -67,7 +67,6 @@ export default function RewardTable({ rewards, onRefresh }: RewardTableProps) {
           <thead className="bg-[#FFF0EE] text-[#E74C3C] font-semibold">
             <tr>
               <th className="text-left py-4 px-6 font-semibold rounded-tl-[12px]">Nama Hadiah</th>
-              <th className="text-left py-4 px-6 font-semibold text-center">Foto</th>
               <th className="text-left py-4 px-6 font-semibold">Deskripsi</th>
               <th className="text-center py-4 px-6 font-semibold">Point</th>
               <th className="text-center py-4 px-6 font-semibold">Jumlah</th>

@@ -62,7 +62,7 @@ export default function RewardList({ refreshTrigger = 0 }: RewardListProps) {
   return (
     <div className="bg-white rounded-[24px] shadow-sm border border-slate-100 p-6">
       <div className="mb-4">
-        <h2 className="text-[15px] font-bold text-[#2B3674]">Daftar Hadiah</h2>
+        <h2 className="text-[15px] font-bold text-black">Daftar Hadiah</h2>
       </div>
 
       <div className="mb-6 relative">

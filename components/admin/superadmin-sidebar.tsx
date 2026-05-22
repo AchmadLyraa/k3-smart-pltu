@@ -10,6 +10,7 @@ import {
   Gift,
   FileText,
   Trophy,
+  CalendarClock,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -40,6 +41,11 @@ const SIDEBAR_ITEMS = [
     label: "Leaderboard",
     href: "/admin/leaderboard",
     icon: Trophy,
+  },
+  {
+    label: "Semester",
+    href: "/admin/semester",
+    icon: CalendarClock,
   },
 ];
 
@@ -103,7 +109,7 @@ export default function SuperAdminSidebar() {
         </div>
         <div className="sa-logo-collapsed">
           <Image
-            src="/images/logo-primary-k3.png"
+            src="/images/logo-primary-k3.svg"
             alt="K3"
             width={35}
             height={35}

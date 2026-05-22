@@ -1,11 +1,4 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import SemesterResetDialog from "@/components/admin/semester-reset-dialog";
 import { prisma } from "@/lib/prisma";
 
@@ -51,8 +44,8 @@ async function getAllWorkerPoints() {
         name: w.name,
         nip: w.nip,
         historicalPoints: historical,
-        activePoints: earned, // ← earned semester ini, bukan earned - spent
-        availablePoints: earned - spent, // ← ini yang bisa ditukar
+        activePoints: earned,
+        availablePoints: earned - spent,
         allTimePoints: historical + earned,
       };
     })
@@ -65,7 +58,6 @@ export default async function SemesterPage() {
     getAllWorkerPoints(),
   ]);
 
-  // Group by periodId kalau ada, fallback ke year-semester
   const grouped = summaries.reduce((acc: any, s) => {
     const key = s.periodId ?? `${s.year}-${s.semester}`;
     if (!acc[key]) {
@@ -83,83 +75,78 @@ export default async function SemesterPage() {
   const groups = Object.values(grouped) as any[];
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Semester Management</h1>
-        <p className="text-muted-foreground">
+    <div className="space-y-6">
+      {/* 🚀 MENYAMAKAN HEADER DENGAN KELOLA PENGGUNA */}
+      <div className="sa-welcome mb-8">
+        <div>
+          <h1 className="sa-welcome__title">Semester Management</h1>
+          <p className="sa-welcome__subtitle">
           Reset poin pekerja setiap semester dan lihat riwayat akumulasi poin
         </p>
       </div>
 
-      {/* Reset Card */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Reset Semester</CardTitle>
-          <CardDescription>
-            Snapshot poin aktif semua pekerja ke riwayat, lalu reset ke 0
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <SemesterResetDialog />
-        </CardContent>
-      </Card>
-
-      <Tabs defaultValue="history">
+        {/* Tombol pemicu reset sejajar di sebelah kanan */}
+        <SemesterResetDialog />
+      </div>
+      
+      {/* 🚀 TABS LANGSUNG DI-RENDER TANPA BUNGKUSAN CARD LUAR */}
+      <Tabs defaultValue="history" className="w-full">
         <TabsList className="mb-4">
           <TabsTrigger value="history">Riwayat Per Semester</TabsTrigger>
           <TabsTrigger value="accumulation">Akumulasi Per Worker</TabsTrigger>
         </TabsList>
 
         {/* Tab 1: Riwayat per semester */}
-        <TabsContent value="history">
+        <TabsContent value="history" className="space-y-4">
           {groups.length === 0 ? (
-            <Card>
-              <CardContent className="py-12 text-center text-muted-foreground">
+            <div className="text-center py-12 text-muted-foreground border border-dashed rounded-[24px] bg-white">
                 Belum ada riwayat semester. Lakukan reset semester pertama.
-              </CardContent>
-            </Card>
+            </div>
           ) : (
             <div className="space-y-4">
               {groups.map((group: any) => (
-                <Card key={group.key}>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base">{group.label}</CardTitle>
-                    <CardDescription>
-                      {group.entries.length} pekerja • Total poin:{" "}
-                      {group.entries.reduce(
-                        (s: number, e: any) => s + e.totalPoints,
-                        0,
-                      )}
+                <div
+                  key={group.key}
+                  className="bg-white border rounded-lg p-5 shadow-sm"
+                >
+                  {/* Bagian Sub-Header Group Semester */}
+                  <div className="flex justify-between items-start border-b pb-3 mb-4">
+                    <div>
+                      <h3 className="font-bold text-base text-slate-900">{group.label}</h3>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {group.entries.length} pekerja
                       {group.lastResetAt && (
-                        <span className="ml-2">
-                          • Reset:{" "}
-                          {new Date(group.lastResetAt).toLocaleDateString(
-                            "id-ID",
-                            {
+                          <span>
+                            {" "}• Reset pada:{" "}
+                            {new Date(group.lastResetAt).toLocaleDateString("id-ID", {
                               day: "numeric",
                               month: "short",
                               year: "numeric",
-                            },
-                          )}
+                            })}
                         </span>
                       )}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
+                      </p>
+                    </div>
+                    <span className="text-xs bg-slate-100 text-slate-700 font-semibold px-2.5 py-1 rounded-full">
+                      Total: {group.entries.reduce((s: number, e: any) => s + e.totalPoints, 0)} pts
+                    </span>
+                  </div>
+
+                  {/* List Worker per Semester */}
                     <div className="space-y-2">
                       {group.entries
                         .sort((a: any, b: any) => b.totalPoints - a.totalPoints)
                         .map((entry: any, idx: number) => (
                           <div
                             key={entry.id}
-                            className="flex items-center justify-between py-2 border-b last:border-0"
+                          className="flex items-center justify-between py-2 border-b last:border-0 last:pb-0"
                           >
                             <div className="flex items-center gap-3">
-                              <span className="text-sm text-muted-foreground w-6">
+                            <span className="text-sm text-muted-foreground w-6 font-medium">
                                 #{idx + 1}
                               </span>
                               <div>
-                                <p className="text-sm font-medium">
+                              <p className="text-sm font-semibold text-slate-800">
                                   {entry.user.name}
                                 </p>
                                 <p className="text-xs text-muted-foreground">
@@ -167,14 +154,13 @@ export default async function SemesterPage() {
                                 </p>
                               </div>
                             </div>
-                            <span className="font-bold text-sm">
+                          <span className="font-bold text-sm text-slate-700">
                               {entry.totalPoints} poin
                             </span>
                           </div>
                         ))}
                     </div>
-                  </CardContent>
-                </Card>
+                </div>
               ))}
             </div>
           )}
@@ -182,50 +168,40 @@ export default async function SemesterPage() {
 
         {/* Tab 2: Akumulasi total per worker */}
         <TabsContent value="accumulation">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Total Akumulasi Poin</CardTitle>
-              <CardDescription>
-                Poin keseluruhan dari semua semester + poin aktif saat ini
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
               {workers.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">
+            <div className="text-center py-12 text-muted-foreground border border-dashed rounded-lg bg-white">
                   Belum ada data worker.
-                </p>
+            </div>
               ) : (
-                <div className="space-y-2">
+            <div className="bg-white border rounded-lg p-5 shadow-sm space-y-0">
                   {workers.map((w, idx) => (
                     <div
                       key={w.id}
-                      className="flex items-center justify-between py-3 border-b last:border-0"
+                  className="flex items-center justify-between py-3 border-b last:border-0 last:pb-0"
                     >
                       <div className="flex items-center gap-3">
-                        <span className="text-sm text-muted-foreground w-6">
+                    <span className="text-sm text-muted-foreground w-6 font-medium">
                           #{idx + 1}
                         </span>
                         <div>
-                          <p className="text-sm font-medium">{w.name}</p>
+                      <p className="text-sm font-semibold text-slate-800">{w.name}</p>
                           <p className="text-xs text-muted-foreground">
                             {w.nip ?? "-"}
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-sm">
+                    <p className="font-bold text-sm text-slate-900">
                           {w.allTimePoints} poin
                         </p>
-                        <p className="text-xs text-muted-foreground">
-                          {w.historicalPoints} hist + {w.activePoints} poin sekarang
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {w.historicalPoints} hist + {w.activePoints} aktif semester ini
                         </p>
                       </div>
                     </div>
                   ))}
                 </div>
               )}
-            </CardContent>
-          </Card>
         </TabsContent>
       </Tabs>
     </div>

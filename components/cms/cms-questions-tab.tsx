@@ -262,7 +262,7 @@ export default function CMSQuestionsTab({ questions: initialQuestions }: CMSQues
         <CardHeader>
           <div className="flex justify-between items-start">
             <div>
-              <CardTitle>Question Bank</CardTitle>
+              <CardTitle>Bank Soal</CardTitle>
               <CardDescription>
                 Total: {pagination.total} question
                 {pagination.total !== 1 ? "s" : ""}
@@ -270,7 +270,7 @@ export default function CMSQuestionsTab({ questions: initialQuestions }: CMSQues
             </div>
                           
       <Button className="bg-[#FF4B4B] hover:bg-[#FF3333] text-white rounded-[24px] px-6 h-10 shadow-sm transition-all font-semibold" onClick={() => setShowForm(!showForm)}>
-      {showForm ? "Cancel" : "+ Create Question"}
+      {showForm ? "Cancel" : "+ Buat Soal"}
       </Button>
           </div>
         </CardHeader>
@@ -279,7 +279,7 @@ export default function CMSQuestionsTab({ questions: initialQuestions }: CMSQues
           
   <DialogContent className="max-w-5xl w-full max-h-screen overflow-y-auto">
     <DialogHeader>
-      <DialogTitle>Create Question</DialogTitle>
+      <DialogTitle>Buat Soal</DialogTitle>
     </DialogHeader>
     <QuestionForm
       onSuccess={() => {
@@ -301,7 +301,7 @@ export default function CMSQuestionsTab({ questions: initialQuestions }: CMSQues
 
           {questions.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
-              No questions found. Create your first question.
+              Soal tidak ditemukan.. Buat Soal Pertama Anda.
             </div>
           ) : (
             <>

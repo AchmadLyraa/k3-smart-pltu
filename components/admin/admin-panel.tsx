@@ -158,8 +158,8 @@ export default function AdminDashboard({
       : periods.find((p) => p.id === selectedPeriodId)?.name || "Pilih Periode";
 
   const openWorkerDetail = async (worker: any) => {
-    // Use worker.id if available, otherwise fallback to name (legacy)
-    const workerId = worker.id ? String(worker.id) : String(worker.name);
+    // Use worker.id directly if present; fallback to name for legacy data
+    const workerId = worker.id ?? worker.name;
     console.log('[openWorkerDetail] Selected worker ID:', workerId, 'Name:', worker.name);
     setSelectedWorker(worker);
     setWorkerDetail(null);

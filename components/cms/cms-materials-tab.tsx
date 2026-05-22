@@ -548,9 +548,9 @@ export default function CMSMaterialsTab({
 
   return (
     <>
-      <Card className="space-y-4 py-6">
+      <Card>
         <CardHeader>
-          <div className="flex justify-between items-start ">
+          <div className="flex justify-between items-start">
             <div>
               <CardTitle>Materials</CardTitle>
               <CardDescription>
@@ -558,13 +558,29 @@ export default function CMSMaterialsTab({
               </CardDescription>
             </div>
             <Button
-              className="bg-[#FF4B4B] hover:bg-[#FF3333] text-white rounded-[24px] px-6 shadow-sm transition-all font-semibold"
+              className="bg-[#FF4B4B] hover:bg-[#FF3333] text-white rounded-[24px] px-6 h-10 shadow-sm transition-all font-semibold"
               onClick={() => setShowForm(!showForm)}
             >
-              {showForm ? "Cancel" : "+ Create Material"}
+              {showForm ? "Cancel" : "+ Buat Materi"}
             </Button>
           </div>
         </CardHeader>
+
+        <Dialog open={showForm} onOpenChange={setShowForm}>
+          <DialogContent className="max-w-5xl w-full max-h-screen overflow-y-auto" aria-describedby={undefined}>
+            <DialogHeader>
+              <DialogTitle>Buat Materi</DialogTitle>
+            </DialogHeader>
+            <MaterialForm
+              topics={topics}
+              onSuccess={() => {
+                setShowForm(false);
+                loadMaterials(1);
+              }}
+            />
+          </DialogContent>
+        </Dialog>
+
         <CardContent className="space-y-4">
           <Input
             placeholder="Cari Materi..."
@@ -573,9 +589,9 @@ export default function CMSMaterialsTab({
             className="bg-white rounded-[24px] shadow-sm border border-slate-100 p-6"
           />
           <Dialog open={showForm} onOpenChange={setShowForm}>
-            <DialogContent className="max-w-5xl w-full max-h-screen overflow-y-auto">
+            <DialogContent className="max-w-5xl w-full max-h-screen overflow-y-auto" aria-describedby={undefined}>
               <DialogHeader>
-                <DialogTitle>Create Material</DialogTitle>
+                <DialogTitle>Buat Materi</DialogTitle>
               </DialogHeader>
               <MaterialForm
                 topics={topics}
@@ -700,7 +716,7 @@ export default function CMSMaterialsTab({
         open={!!quizMaterial}
         onOpenChange={(open) => !open && setQuizMaterial(null)}
       >
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" aria-describedby={undefined}>
           <DialogHeader>
             <DialogTitle>Manage Quiz — {quizMaterial?.title}</DialogTitle>
           </DialogHeader>
@@ -1014,7 +1030,7 @@ export default function CMSMaterialsTab({
         open={!!editMaterial}
         onOpenChange={(open) => !open && setEditMaterial(null)}
       >
-        <DialogContent className="max-w-5xl w-full max-h-screen overflow-y-auto">
+        <DialogContent className="max-w-5xl w-full max-h-screen overflow-y-auto" aria-describedby={undefined}>
           <DialogHeader>
             <DialogTitle>Edit Material</DialogTitle>
           </DialogHeader>

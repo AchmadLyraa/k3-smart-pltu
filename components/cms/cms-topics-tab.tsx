@@ -201,11 +201,11 @@ export default function CMSTopicsTab({ initialTopics }: CMSTopicsTabProps) {
               className="bg-[#FF4B4B] hover:bg-[#FF3333] text-white rounded-[24px] px-6 h-10 shadow-sm transition-all font-semibold"
               onClick={() => setShowForm(true)}
             >
-              + Create Topic
+              + Buat Topik
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4">
           {/* Search Bar */}
           <Input
             placeholder="Cari Topic..."
@@ -215,9 +215,6 @@ export default function CMSTopicsTab({ initialTopics }: CMSTopicsTabProps) {
           />
 
           <div className="space-y-2">
-            <h3 className="font-semibold text-lg">
-              Existing Topics ({filteredTopics.length})
-            </h3>
             <div className="grid gap-3">
               {filteredTopics.map((topic) => (
                 <div
@@ -267,7 +264,7 @@ export default function CMSTopicsTab({ initialTopics }: CMSTopicsTabProps) {
 
       {/* Create Topic Dialog */}
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="max-w-lg w-full max-h-screen overflow-y-auto rounded-[24px] p-6">
+        <DialogContent className="max-w-lg w-full max-h-screen overflow-y-auto rounded-[24px] p-6" aria-describedby={undefined}>
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-slate-900">Create Topic</DialogTitle>
           </DialogHeader>
@@ -324,7 +321,7 @@ export default function CMSTopicsTab({ initialTopics }: CMSTopicsTabProps) {
 
       {/* Edit Topic Dialog */}
       <Dialog open={!!editingTopic} onOpenChange={(open) => !open && setEditingTopic(null)}>
-        <DialogContent className="max-w-lg w-full max-h-screen overflow-y-auto rounded-[24px] p-6">
+        <DialogContent className="max-w-lg w-full max-h-screen overflow-y-auto rounded-[24px] p-6" aria-describedby={undefined}>
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-slate-900">Edit Topic</DialogTitle>
           </DialogHeader>
