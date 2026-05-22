@@ -141,6 +141,24 @@ export async function getWorkerMaterialsByPeriod() {
   const userId = session.user.id;
 
   try {
+    const includeMaterial = {
+      topic: true,
+      quizConfigs: {
+        include: {
+          quizSessions: {
+              where: { 
+                userId, 
+                status: { in: ["SUBMITTED", "GRADED"] },
+              },
+              select: { id: true, passed: true },
+            },
+        },
+      },
+      progress: {
+        where: { userId },
+      },
+    };
+
     const periods = await prisma.academicPeriod.findMany({
       where: {
         materials: { some: { status: "PUBLISHED" } },
@@ -149,31 +167,45 @@ export async function getWorkerMaterialsByPeriod() {
       include: {
         materials: {
           where: { status: "PUBLISHED" },
-          include: {
-            topic: true,
-            // mediaFiles: true,
-            quizConfigs: true,
-            progress: {
-              where: { userId }, // ← filter by user yang login
-            },
-          },
+          include: includeMaterial,
         },
       },
     });
 
     const unassigned = await prisma.material.findMany({
       where: { status: "PUBLISHED", periodId: null },
-      include: {
-        topic: true,
-        // mediaFiles: true,
-        quizConfigs: true,
-        progress: {
-          where: { userId }, // ← filter by user yang login
-        },
-      },
+      include: includeMaterial,
     });
 
-    return { success: true, data: { periods, unassigned } };
+    // Transform: hitung quiz count dan status per material
+    const transformMaterial = (m: any) => {
+  const quizCount = m.quizConfigs.length;
+  const completedCount = m.quizConfigs.filter((qc: any) =>
+    qc.quizSessions.length > 0  // ← sudah dikerjakan, apapun hasilnya
+  ).length;
+
+  return {
+    ...m,
+    quizMeta: quizCount === 0
+      ? null
+      : {
+          count: quizCount,
+          completedCount,
+          allDone: completedCount === quizCount,
+        },
+  };
+};
+
+    return {
+      success: true,
+      data: {
+        periods: periods.map((p) => ({
+          ...p,
+          materials: p.materials.map(transformMaterial),
+        })),
+        unassigned: unassigned.map(transformMaterial),
+      },
+    };
   } catch (error) {
     return { success: false, error: "Failed to fetch materials" };
   }

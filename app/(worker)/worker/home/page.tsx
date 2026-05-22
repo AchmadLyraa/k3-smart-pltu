@@ -1,14 +1,18 @@
+// app/(worker)/worker/home/page.tsx
+
 import { auth } from "@/auth";
+
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { BookOpen, Trophy, Award, Star, CheckCircle2 } from "lucide-react";
+  Trophy,
+} from "lucide-react";
+
 import { getWorkerStats } from "@/app/actions/worker";
+
 import { checkAndSubmitExpiredSessions } from "@/app/actions/worker";
+
+import { getWorkerMaterialsByPeriod } from "@/app/actions/academic-period";
+
+import WorkerMaterialList from "@/components/worker/worker-material-list";
 
 export const metadata = {
   title: "Home - K3 SMART",
@@ -16,173 +20,159 @@ export const metadata = {
 
 export default async function WorkerHomePage() {
   await checkAndSubmitExpiredSessions();
+
   const session = await auth();
-  const statsResult = await getWorkerStats();
-  const stats = statsResult.success ? statsResult.data : null;
+
+  const statsResult =
+    await getWorkerStats();
+
+  const stats = statsResult.success
+    ? statsResult.data
+    : null;
+
+  const materialsResult =
+    await getWorkerMaterialsByPeriod();
+
+  const periods = materialsResult.success
+    ? materialsResult.data.periods
+    : [];
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-1">
-          Selamat datang, {session?.user?.name}! 👋
-        </h1>
-        <p className="text-muted-foreground">
-          Terus belajar dan kumpulkan poin untuk ditukar hadiah menarik.
-        </p>
-      </div>
+    <div className="mx-auto max-w-7xl space-y-6">
+      {/* HERO */}
+<section className="overflow-hidden rounded-[32px] bg-gradient-to-br from-red-600 via-red-700 to-black px-5 py-6 text-white shadow-xl">
+  <div className="flex flex-col gap-1">
+    {/* TOP */}
+    <div>
 
-      {/* Stats */}
-      <div className="grid gap-4 grid-cols-5 mb-8">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-muted-foreground">Total Poin</p>
-              <Trophy className="w-5 h-5 text-yellow-500" />
-            </div>
-            <p className="text-3xl font-bold">{stats?.allTimePoints ?? 0}</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              akumulasi keseluruhan
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-muted-foreground">Poin Semester ini</p>
-              <Trophy className="w-5 h-5 text-yellow-500" />
-            </div>
-            <p className="text-3xl font-bold">{stats?.totalPoints ?? 0}</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              akumulasi semester ini
-            </p>
-          </CardContent>
-        </Card>
+      <h1 className="mt-4 text-2xl font-black leading-tight md:text-3xl">
+        Selamat Datang,
+        <br/>
+        Electricity Warrior! 👋
+      </h1>
 
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-muted-foreground">Poin Tersedia</p>
-              <Star className="w-5 h-5 text-yellow-500" />
-            </div>
-            <p className="text-3xl font-bold">{stats?.availablePoints ?? 0}</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              bisa ditukar sekarang
-            </p>
-          </CardContent>
-        </Card>
+      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-red-100">
+        Tingkatkan pemahaman K3,
+        selesaikan quiz,
+        dan kumpulkan reward
+        dari setiap pembelajaran.
+      </p>
+    </div>
 
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-muted-foreground">Materi Selesai</p>
-              <BookOpen className="w-5 h-5 text-blue-500" />
-            </div>
-            <p className="text-3xl font-bold">
-              {stats?.materialsCompleted ?? 0}
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              materi dipelajari
-            </p>
-          </CardContent>
-        </Card>
+    {/* INLINE STATS */}
+<div className="grid grid-cols-2 gap-4 border-t border-white/10 pt-5 md:max-w-md">
+  <div className="rounded-2xl bg-white/10 px-4 py-3 backdrop-blur">
+    <p className="text-[10px] font-semibold uppercase tracking-wide text-red-100/70">
+      Poin Semester
+    </p>
 
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-muted-foreground">Quiz Lulus</p>
-              <Trophy className="w-5 h-5 text-green-500" />
-            </div>
-            <p className="text-3xl font-bold">{stats?.quizPassed ?? 0}</p>
-            <p className="text-xs text-muted-foreground mt-1">quiz berhasil</p>
-          </CardContent>
-        </Card>
-      </div>
+    <h2 className="mt-2 text-3xl font-black leading-none text-white">
+      {stats?.totalPoints ?? 0}
+    </h2>
 
-      {/* Recent point transactions */}
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Riwayat Poin</CardTitle>
-            <CardDescription>5 transaksi terakhir</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {!stats?.recentTransactions?.length ? (
-              <p className="text-sm text-muted-foreground text-center py-4">
-                Belum ada riwayat poin. Selesaikan quiz untuk mendapat poin!
+    <p className="mt-1 text-[11px] text-red-100/70">
+      semester aktif
+    </p>
+  </div>
+
+  <div className="rounded-2xl bg-white/10 px-4 py-3 backdrop-blur">
+    <p className="text-[10px] font-semibold uppercase tracking-wide text-red-100/70">
+      Poin Tersedia
+    </p>
+
+    <h2 className="mt-2 text-3xl font-black leading-none text-white">
+      {stats?.availablePoints ?? 0}
+    </h2>
+
+    <p className="mt-1 text-[11px] text-red-100/70">
+      siap ditukar
+    </p>
+  </div>
+</div>
+  </div>
+</section>
+
+      {/* CONTENT */}
+      <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+        {/* MATERIALS */}
+        <section className="rounded-[28px] border border-zinc-200 bg-white p-5 shadow-sm">
+          <div className="mb-5 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-zinc-900">
+                Materi Pembelajaran
+              </h2>
+
+              <p className="text-sm text-zinc-500">
+                lanjutkan pembelajaran
+                K3 terbaru
               </p>
+            </div>
+          </div>
+
+          <WorkerMaterialList
+            periods={periods}
+            unassigned={[]}
+          />
+        </section>
+
+        {/* RIGHT */}
+        <section className="space-y-5">
+       
+
+          {/* TRANSAKSI */}
+          <div className="rounded-[28px] border border-zinc-200 bg-white p-5 shadow-sm">
+            <div className="mb-4">
+              <h2 className="text-lg font-bold text-zinc-900">
+                Riwayat Poin
+              </h2>
+
+              <p className="text-sm text-zinc-500">
+                5 transaksi terakhir
+              </p>
+            </div>
+
+            {!stats?.recentTransactions
+              ?.length ? (
+              <div className="rounded-2xl border border-dashed border-zinc-300 py-8 text-center text-sm text-zinc-500">
+                Belum ada riwayat poin
+              </div>
             ) : (
               <div className="space-y-3">
-                {stats.recentTransactions.map((t: any) => (
-                  <div key={t.id} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
-                      <div>
-                        <p className="text-sm font-medium">{t.description}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(t.createdAt).toLocaleDateString("id-ID", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })}
+                {stats.recentTransactions.map(
+                  (t: any) => (
+                    <div
+                      key={t.id}
+                      className="flex items-center justify-between rounded-2xl border border-zinc-100 bg-zinc-50 p-3"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-zinc-900">
+                          {t.description}
+                        </p>
+
+                        <p className="mt-1 text-xs text-zinc-500">
+                          {new Date(
+                            t.createdAt
+                          ).toLocaleDateString(
+                            "id-ID",
+                            {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            }
+                          )}
                         </p>
                       </div>
+
+                      <div className="ml-3 rounded-full bg-green-100 px-3 py-1 text-sm font-bold text-green-700">
+                        +{t.points}
+                      </div>
                     </div>
-                    <span className="text-sm font-bold text-green-600">
-                      +{t.points}
-                    </span>
-                  </div>
-                ))}
+                  )
+                )}
               </div>
             )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Cara Mendapat Poin</CardTitle>
-            <CardDescription>Langkah-langkah kumpulkan poin</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex gap-3 items-start">
-                <div className="flex items-center justify-center h-7 w-7 rounded-full bg-blue-600 text-white text-xs font-bold shrink-0">
-                  1
-                </div>
-                <div>
-                  <p className="text-sm font-semibold">Pelajari Materi</p>
-                  <p className="text-xs text-muted-foreground">
-                    Tonton video, baca artikel, dan lihat infografis K3
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-3 items-start">
-                <div className="flex items-center justify-center h-7 w-7 rounded-full bg-yellow-500 text-white text-xs font-bold shrink-0">
-                  2
-                </div>
-                <div>
-                  <p className="text-sm font-semibold">Kerjakan Quiz</p>
-                  <p className="text-xs text-muted-foreground">
-                    Jawab soal dengan benar untuk mendapat poin
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-3 items-start">
-                <div className="flex items-center justify-center h-7 w-7 rounded-full bg-green-600 text-white text-xs font-bold shrink-0">
-                  3
-                </div>
-                <div>
-                  <p className="text-sm font-semibold">Tukar Hadiah</p>
-                  <p className="text-xs text-muted-foreground">
-                    Gunakan poin untuk redeem reward menarik
-                  </p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        </section>
       </div>
     </div>
   );
