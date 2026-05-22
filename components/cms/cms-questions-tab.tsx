@@ -27,6 +27,8 @@ import {
 import { CheckCircle2, Circle, Pencil, X, Plus, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import QuestionForm from "./question-form";
 import { updateQuestion, deleteQuestion, getQuestions as fetchQuestions } from "@/app/actions/quiz";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 type QuestionItem = {
   id: string;
@@ -58,8 +60,16 @@ const typeLabel: Record<string, string> = {
 };
 
 export default function CMSQuestionsTab({ questions: initialQuestions }: CMSQuestionsTabProps) {
+  const router = useRouter();
+  const { toast } = useToast();
+
   // State untuk questions
   const [questions, setQuestions] = useState<QuestionItem[]>(initialQuestions || []);
+
+  // Sinkronisasi prop-to-state pasca router.refresh()
+  useEffect(() => {
+    setQuestions(initialQuestions || []);
+  }, [initialQuestions]);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 20,
@@ -134,12 +144,23 @@ export default function CMSQuestionsTab({ questions: initialQuestions }: CMSQues
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Yakin mau hapus soal ini?")) return;
+    const questionToDelete = questions.find((q) => q.id === id);
+    if (!confirm(`Yakin mau hapus soal "${questionToDelete?.text.substring(0, 40) || ""}..."?`)) return;
     const result = await deleteQuestion(id);
     if (result.success) {
+      toast({
+        title: "Soal Berhasil Dihapus",
+        description: "Soal berhasil dihapus secara permanen.",
+        variant: "success",
+      });
       loadQuestions(pagination.page);
+      router.refresh();
     } else {
-      alert("Gagal hapus soal");
+      toast({
+        title: "Gagal Menghapus Soal",
+        description: result.error || "Gagal hapus soal",
+        variant: "destructive",
+      });
     }
   };
 
@@ -186,20 +207,49 @@ export default function CMSQuestionsTab({ questions: initialQuestions }: CMSQues
   };
 
   const handleSave = async () => {
-    if (!editData.text.trim()) return alert("Question text wajib diisi");
-    if (!editData.answers.some((a: any) => a.isCorrect))
-      return alert("Mesti ada satu jawapan betul");
-    if (!editData.answers.every((a: any) => a.text.trim()))
-      return alert("Semua option mesti diisi");
+    if (!editData.text.trim()) {
+      toast({
+        title: "Validasi Gagal",
+        description: "Question text wajib diisi",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!editData.answers.some((a: any) => a.isCorrect)) {
+      toast({
+        title: "Validasi Gagal",
+        description: "Mesti ada minimal satu jawaban benar",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!editData.answers.every((a: any) => a.text.trim())) {
+      toast({
+        title: "Validasi Gagal",
+        description: "Semua option mesti diisi",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setSaving(true);
     try {
       const result = await updateQuestion(editQuestion.id, editData);
       if (result.success) {
         setEditQuestion(null);
+        toast({
+          title: "Soal Berhasil Diperbarui!",
+          description: "Soal berhasil diperbarui di bank soal.",
+          variant: "success",
+        });
         loadQuestions(pagination.page);
+        router.refresh();
       } else {
-        alert(result.error);
+        toast({
+          title: "Gagal Memperbarui Soal",
+          description: result.error || "Terjadi kesalahan pada server",
+          variant: "destructive",
+        });
       }
     } finally {
       setSaving(false);
@@ -218,30 +268,35 @@ export default function CMSQuestionsTab({ questions: initialQuestions }: CMSQues
                 {pagination.total !== 1 ? "s" : ""}
               </CardDescription>
             </div>
-            <Button onClick={() => setShowForm(!showForm)}>
-              {showForm ? "Cancel" : "+ Create Question"}
-            </Button>
+                          
+      <Button className="bg-[#FF4B4B] hover:bg-[#FF3333] text-white rounded-[24px] px-6 h-10 shadow-sm transition-all font-semibold" onClick={() => setShowForm(!showForm)}>
+      {showForm ? "Cancel" : "+ Create Question"}
+      </Button>
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-4">
-          {showForm && (
-            <div className="mb-6">
-              <QuestionForm
-                onSuccess={() => {
-                  setShowForm(false);
-                  loadQuestions(1);
-                }}
-              />
-            </div>
-          )}
+        <Dialog open={showForm} onOpenChange={setShowForm}>
+          
+  <DialogContent className="max-w-5xl w-full max-h-screen overflow-y-auto">
+    <DialogHeader>
+      <DialogTitle>Create Question</DialogTitle>
+    </DialogHeader>
+    <QuestionForm
+      onSuccess={() => {
+        setShowForm(false);
+        loadQuestions(1);
+      }}
+    />
+  </DialogContent>
+</Dialog>
 
+<CardContent className="space-y-4">
           {/* Search Bar */}
           <Input
-            placeholder="Search questions..."
+            placeholder="Cari Soal..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1"
+            className="bg-white rounded-[24px] shadow-sm border border-slate-100 p-6"
           />
 
           {questions.length === 0 ? (
@@ -297,9 +352,7 @@ export default function CMSQuestionsTab({ questions: initialQuestions }: CMSQues
                         <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
                           {typeLabel[q.type] ?? q.type}
                         </span>
-                        <span
-                          className={`text-xs px-2 py-0.5 rounded-full ${difficultyColor[q.difficulty] ?? "bg-muted text-muted-foreground"}`}
-                        >
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${difficultyColor[q.difficulty] ?? "bg-muted text-muted-foreground"} ml-2`}>
                           {q.difficulty}
                         </span>
                         <span className="text-xs text-muted-foreground">
@@ -381,7 +434,7 @@ export default function CMSQuestionsTab({ questions: initialQuestions }: CMSQues
                 />
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">Type</label>
                   <Select
@@ -412,7 +465,7 @@ export default function CMSQuestionsTab({ questions: initialQuestions }: CMSQues
                       });
                     }}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -436,7 +489,7 @@ export default function CMSQuestionsTab({ questions: initialQuestions }: CMSQues
                       setEditData({ ...editData, difficulty: val })
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -460,6 +513,7 @@ export default function CMSQuestionsTab({ questions: initialQuestions }: CMSQues
                       })
                     }
                     min="1"
+                    className="w-full"
                   />
                 </div>
               </div>
@@ -482,12 +536,15 @@ export default function CMSQuestionsTab({ questions: initialQuestions }: CMSQues
                         />
                         <Button
                           type="button"
-                          size="sm"
                           variant={answer.isCorrect ? "default" : "outline"}
                           onClick={() => handleSetCorrect(idx)}
-                          className="shrink-0 text-xs px-2"
+                          className={`whitespace-nowrap rounded-[24px] transition-all font-semibold h-10 px-5 ${
+                            answer.isCorrect
+                              ? "bg-[#FF4B4B] hover:bg-[#FF3333] text-white border-none"
+                              : "border-[#E2E8F0] hover:border-[#FF4B4B] hover:text-[#FF4B4B]"
+                          }`}
                         >
-                          {answer.isCorrect ? "✓" : "Set"}
+                          {answer.isCorrect ? "✓ Correct" : "Set Correct"}
                         </Button>
                         {editData.answers.length > 2 && (
                           <Button
@@ -507,7 +564,7 @@ export default function CMSQuestionsTab({ questions: initialQuestions }: CMSQues
                       type="button"
                       variant="outline"
                       onClick={addAnswer}
-                      className="w-full mt-2"
+                      className="w-full mt-2 rounded-[24px] border-[#FF4B4B] text-[#FF4B4B] hover:bg-[#FF4B4B]/10 transition-all font-semibold h-10"
                     >
                       <Plus className="w-4 h-4 mr-2" /> Add Option
                     </Button>
@@ -531,12 +588,15 @@ export default function CMSQuestionsTab({ questions: initialQuestions }: CMSQues
                         />
                         <Button
                           type="button"
-                          size="sm"
                           variant={answer.isCorrect ? "default" : "outline"}
                           onClick={() => handleSetCorrect(idx)}
-                          className="shrink-0 text-xs px-2"
+                          className={`whitespace-nowrap rounded-[24px] transition-all font-semibold h-10 px-5 ${
+                            answer.isCorrect
+                              ? "bg-[#FF4B4B] hover:bg-[#FF3333] text-white border-none"
+                              : "border-[#E2E8F0] hover:border-[#FF4B4B] hover:text-[#FF4B4B]"
+                          }`}
                         >
-                          {answer.isCorrect ? "✓" : "Set"}
+                          {answer.isCorrect ? "✓ Correct" : "Set Correct"}
                         </Button>
                       </div>
                     ))}
@@ -565,12 +625,15 @@ export default function CMSQuestionsTab({ questions: initialQuestions }: CMSQues
                         />
                         <Button
                           type="button"
-                          size="sm"
                           variant={answer.isCorrect ? "default" : "outline"}
                           onClick={() => handleSetCorrect(idx)}
-                          className="shrink-0 text-xs px-2"
+                          className={`whitespace-nowrap rounded-[24px] transition-all font-semibold h-10 px-5 ${
+                            answer.isCorrect
+                              ? "bg-[#FF4B4B] hover:bg-[#FF3333] text-white border-none"
+                              : "border-[#E2E8F0] hover:border-[#FF4B4B] hover:text-[#FF4B4B]"
+                          }`}
                         >
-                          {answer.isCorrect ? "✓" : "Set"}
+                          {answer.isCorrect ? "✓ Benar" : "Set Benar"}
                         </Button>
                         {editData.answers.length > 2 && (
                           <Button
@@ -590,7 +653,7 @@ export default function CMSQuestionsTab({ questions: initialQuestions }: CMSQues
                       type="button"
                       variant="outline"
                       onClick={addAnswer}
-                      className="w-full mt-2"
+                      className="w-full mt-2 rounded-[24px] border-[#FF4B4B] text-[#FF4B4B] hover:bg-[#FF4B4B]/10 transition-all font-semibold h-10"
                     >
                       <Plus className="w-4 h-4 mr-2" /> Add Option
                     </Button>
@@ -601,13 +664,13 @@ export default function CMSQuestionsTab({ questions: initialQuestions }: CMSQues
               <div className="flex gap-2 pt-2">
                 <Button
                   variant="outline"
-                  className="flex-1"
+                  className="flex-1 rounded-[24px] h-10 border-[#E2E8F0] hover:border-gray-300 transition-all font-semibold"
                   onClick={() => setEditQuestion(null)}
                 >
                   Cancel
                 </Button>
                 <Button
-                  className="flex-1"
+                  className="flex-1 bg-[#FF4B4B] hover:bg-[#FF3333] text-white rounded-[24px] h-10 shadow-sm transition-all font-semibold"
                   onClick={handleSave}
                   disabled={saving}
                 >

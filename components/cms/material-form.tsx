@@ -1,16 +1,11 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useToast } from "@/hooks/use-toast";
 import { createMaterial, addMediaFile } from "@/app/actions/content";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+
 import {
   Select,
   SelectContent,
@@ -30,6 +25,7 @@ export default function MaterialForm({
   topics: any[];
   onSuccess: () => void;
 }) {
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -99,7 +95,11 @@ export default function MaterialForm({
       clearInterval(progressInterval);
 
       if (!res.ok || !data.success) {
-        alert(data.error ?? "Upload gagal");
+        toast({
+          title: "Upload Gagal",
+          description: data.error ?? "Upload gagal",
+          variant: "destructive",
+        });
         setUploadProgress(0);
         return;
       }
@@ -117,7 +117,11 @@ export default function MaterialForm({
       if (targetField === "imageUrl") setImageInputMode("url");
     } catch {
       clearInterval(progressInterval);
-      alert("Upload gagal, cek koneksi");
+      toast({
+        title: "Upload Gagal",
+        description: "Upload gagal, cek koneksi",
+        variant: "destructive",
+      });
       setUploadProgress(0);
     } finally {
       setUploading(false);
@@ -132,14 +136,46 @@ export default function MaterialForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.topicId) return alert("Topic wajib diisi");
-    if (!formData.title.trim()) return alert("Title wajib diisi");
-    if (formData.type === "VIDEO" && !formData.videoUrl.trim())
-      return alert("URL video wajib diisi");
-    if (formData.type === "INFOGRAPHIC" && !formData.imageUrl.trim())
-      return alert("URL gambar wajib diisi");
-    if (formData.type === "ARTICLE" && !formData.articleContent.trim())
-      return alert("Konten artikel wajib diisi");
+    if (!formData.topicId) {
+      toast({
+        title: "Validasi Gagal",
+        description: "Topic wajib diisi",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!formData.title.trim()) {
+      toast({
+        title: "Validasi Gagal",
+        description: "Title wajib diisi",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (formData.type === "VIDEO" && !formData.videoUrl.trim()) {
+      toast({
+        title: "Validasi Gagal",
+        description: "URL video wajib diisi",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (formData.type === "INFOGRAPHIC" && !formData.imageUrl.trim()) {
+      toast({
+        title: "Validasi Gagal",
+        description: "URL gambar wajib diisi",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (formData.type === "ARTICLE" && !formData.articleContent.trim()) {
+      toast({
+        title: "Validasi Gagal",
+        description: "Konten artikel wajib diisi",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setLoading(true);
     try {
@@ -154,7 +190,12 @@ export default function MaterialForm({
       });
 
       if (!result.success || !result.data) {
-        return alert(result.error ?? "Gagal create material");
+        toast({
+          title: "Gagal Membuat Materi",
+          description: result.error ?? "Gagal create material",
+          variant: "destructive",
+        });
+        return;
       }
 
       const materialId = result.data.id;
@@ -187,6 +228,11 @@ export default function MaterialForm({
         });
       }
 
+      toast({
+        title: "Materi Berhasil Dibuat",
+        description: `Materi "${formData.title}" berhasil ditambahkan.`,
+        variant: "success",
+      });
       onSuccess();
     } finally {
       setLoading(false);
@@ -200,7 +246,7 @@ export default function MaterialForm({
     targetField,
     label,
   }: {
-    fileRef: React.RefObject<HTMLInputElement>;
+    fileRef: React.RefObject<HTMLInputElement | null>;
     accept: string;
     targetField: "videoUrl" | "imageUrl";
     label: string;
@@ -250,12 +296,8 @@ export default function MaterialForm({
   );
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Create Material</CardTitle>
-        <CardDescription>Upload new learning material</CardDescription>
-      </CardHeader>
-      <CardContent>
+
+
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Topic & Type */}
           <div className="grid grid-cols-2 gap-4">
@@ -323,7 +365,7 @@ export default function MaterialForm({
 
           {/* VIDEO */}
           {formData.type === "VIDEO" && (
-            <div className="space-y-3 border rounded-lg p-4 bg-muted/30">
+            <div className="space-y-3">
               <p className="text-sm font-medium">Video Settings</p>
               <Tabs
                 value={videoInputMode}
@@ -402,7 +444,7 @@ export default function MaterialForm({
 
           {/* INFOGRAPHIC */}
           {formData.type === "INFOGRAPHIC" && (
-            <div className="space-y-3 border rounded-lg p-4 bg-muted/30">
+            <div className="space-y-3">
               <p className="text-sm font-medium">Infographic Settings</p>
               <Tabs
                 value={imageInputMode}
@@ -457,7 +499,7 @@ export default function MaterialForm({
 
           {/* ARTICLE */}
           {formData.type === "ARTICLE" && (
-            <div className="space-y-3 border rounded-lg p-4 bg-muted/30">
+            <div className="space-y-3">
               <p className="text-sm font-medium">Article Settings</p>
               <Textarea
                 value={formData.articleContent}
@@ -490,12 +532,12 @@ export default function MaterialForm({
           <Button
             type="submit"
             disabled={loading || uploading}
-            className="w-full"
+            className="bg-[#FF4B4B] hover:bg-[#FF3333] text-white rounded-[24px] px-6 h-10 shadow-sm transition-all font-semibold"
           >
             {loading ? "Creating..." : "Create Material"}
           </Button>
         </form>
-      </CardContent>
-    </Card>
+
+
   );
 }

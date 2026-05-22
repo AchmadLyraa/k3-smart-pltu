@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createQuestion } from "@/app/actions/quiz";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 import {
   Card,
   CardContent,
@@ -21,7 +22,17 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { X, Plus } from "lucide-react";
 
-const defaultAnswers = {
+// Answer option type
+type AnswerOption = {
+  text: string;
+  isCorrect: boolean;
+};
+
+// Question type keys
+type QuestionType = "MULTIPLE_CHOICE" | "MULTIPLE_SELECT" | "TRUE_FALSE";
+
+// Default answers per question type
+const defaultAnswers: Record<QuestionType, AnswerOption[]> = {
   MULTIPLE_CHOICE: [
     { text: "", isCorrect: true },
     { text: "", isCorrect: false },
@@ -42,15 +53,16 @@ const defaultAnswers = {
 
 export default function QuestionForm({ onSuccess }: { onSuccess: () => void }) {
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     text: "",
-    type: "MULTIPLE_CHOICE",
+    type: "MULTIPLE_CHOICE" as QuestionType,
     difficulty: "medium",
     points: 10,
     answers: defaultAnswers.MULTIPLE_CHOICE,
   });
 
-  const handleTypeChange = (val: string) => {
+  const handleTypeChange = (val: QuestionType) => {
     setFormData({
       ...formData,
       type: val,
@@ -87,13 +99,32 @@ export default function QuestionForm({ onSuccess }: { onSuccess: () => void }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+if (!formData.text.trim()) {
+  toast({
+    title: "Error",
+    description: "Question text wajib diisi",
+    variant: "destructive",
+  });
+  return;
+}
 
-    if (!formData.text.trim()) return alert("Question text wajib diisi");
-
-    if (!formData.answers.some((a) => a.isCorrect))
-      return alert("Mesti ada satu jawapan betul");
-    if (!formData.answers.every((a) => a.text.trim()))
-      return alert("Semua option mesti diisi");
+    if (!formData.answers.some((a) => a.isCorrect)) {
+        toast({
+          title: "Error",
+          description: "Mesti ada satu jawapan betul",
+          variant: "destructive",
+        });
+        return;
+    }
+    
+    if (!formData.answers.every((a) => a.text.trim())) {
+      toast({
+        title: "Error",
+        description: "Semua option mesti diisi",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setLoading(true);
     try {
@@ -108,14 +139,18 @@ export default function QuestionForm({ onSuccess }: { onSuccess: () => void }) {
       if (result.success) {
         setFormData({
           text: "",
-          type: "MULTIPLE_CHOICE",
+          type: "MULTIPLE_CHOICE" as QuestionType,
           difficulty: "medium",
           points: 10,
           answers: defaultAnswers.MULTIPLE_CHOICE,
         });
         onSuccess();
       } else {
-        alert(result.error ?? "Gagal create question");
+        toast({
+          title: "Error",
+          description: result.error ?? "Gagal create question",
+          variant: "destructive",
+        });
       }
     } finally {
       setLoading(false);
@@ -123,211 +158,221 @@ export default function QuestionForm({ onSuccess }: { onSuccess: () => void }) {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Create Question</CardTitle>
-        <CardDescription>Add question to question bank</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="space-y-4 py-2">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Question Text
+          </label>
+          <Textarea
+            value={formData.text}
+            onChange={(e) =>
+              setFormData({ ...formData, text: e.target.value })
+            }
+            placeholder="Enter question"
+            rows={3}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-2">Type</label>
+            <Select value={formData.type} onValueChange={handleTypeChange}>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="MULTIPLE_CHOICE">
+                  Multiple Choice
+                </SelectItem>
+                <SelectItem value="MULTIPLE_SELECT">
+                  Multiple Select
+                </SelectItem>
+                <SelectItem value="TRUE_FALSE">True / False</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <div>
             <label className="block text-sm font-medium mb-2">
-              Question Text
+              Difficulty
             </label>
-            <Textarea
-              value={formData.text}
-              onChange={(e) =>
-                setFormData({ ...formData, text: e.target.value })
+            <Select
+              value={formData.difficulty}
+              onValueChange={(val) =>
+                setFormData({ ...formData, difficulty: val })
               }
-              placeholder="Enter question"
-              rows={3}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="easy">Easy</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="hard">Hard</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Points</label>
+            <Input
+              type="number"
+              value={formData.points}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  points: parseInt(e.target.value) || 10,
+                })
+              }
+              min="1"
+              className="w-full"
             />
           </div>
+        </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Type</label>
-              <Select value={formData.type} onValueChange={handleTypeChange}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="MULTIPLE_CHOICE">
-                    Multiple Choice
-                  </SelectItem>
-                  <SelectItem value="MULTIPLE_SELECT">
-                    Multiple Select
-                  </SelectItem>
-                  <SelectItem value="TRUE_FALSE">True / False</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Difficulty
-              </label>
-              <Select
-                value={formData.difficulty}
-                onValueChange={(val) =>
-                  setFormData({ ...formData, difficulty: val })
-                }
+        {/* MULTIPLE CHOICE */}
+        {formData.type === "MULTIPLE_CHOICE" && (
+          <div className="space-y-3">
+            <label className="block text-sm font-medium">
+              Answer Options
+            </label>
+            {formData.answers.map((answer, idx) => (
+              <div key={idx} className="flex gap-2 items-center">
+                <Input
+                  value={answer.text}
+                  onChange={(e) => handleAnswerChange(idx, e.target.value)}
+                  placeholder={`Option ${idx + 1}`}
+                />
+                <Button
+                  type="button"
+                  variant={answer.isCorrect ? "default" : "outline"}
+                  onClick={() => handleSetCorrect(idx)}
+                  className={`whitespace-nowrap rounded-[24px] transition-all font-semibold h-10 px-5 ${
+                    answer.isCorrect
+                      ? "bg-[#FF4B4B] hover:bg-[#FF3333] text-white border-none"
+                      : "border-[#E2E8F0] hover:border-[#FF4B4B] hover:text-[#FF4B4B]"
+                  }`}
+                >
+                  {answer.isCorrect ? "✓ Correct" : "Set Correct"}
+                </Button>
+                {formData.answers.length > 2 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeAnswer(idx)}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                )}
+              </div>
+            ))}
+            {formData.answers.length < 6 && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={addAnswer}
+                className="w-full rounded-[24px] border-[#FF4B4B] text-[#FF4B4B] hover:bg-[#FF4B4B]/10 transition-all font-semibold h-10"
               >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="easy">Easy</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="hard">Hard</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Points</label>
-              <Input
-                type="number"
-                value={formData.points}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    points: parseInt(e.target.value) || 10,
-                  })
-                }
-                min="1"
-              />
-            </div>
+                <Plus className="w-4 h-4 mr-2" /> Add Option
+              </Button>
+            )}
           </div>
+        )}
 
-          {/* MULTIPLE CHOICE */}
-          {formData.type === "MULTIPLE_CHOICE" && (
-            <div className="space-y-3">
-              <label className="block text-sm font-medium">
-                Answer Options
-              </label>
-              {formData.answers.map((answer, idx) => (
-                <div key={idx} className="flex gap-2 items-center">
-                  <Input
-                    value={answer.text}
-                    onChange={(e) => handleAnswerChange(idx, e.target.value)}
-                    placeholder={`Option ${idx + 1}`}
-                  />
-                  <Button
-                    type="button"
-                    variant={answer.isCorrect ? "default" : "outline"}
-                    onClick={() => handleSetCorrect(idx)}
-                    className="whitespace-nowrap"
-                  >
-                    {answer.isCorrect ? "✓ Correct" : "Set Correct"}
-                  </Button>
-                  {formData.answers.length > 2 && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeAnswer(idx)}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  )}
-                </div>
-              ))}
-              {formData.answers.length < 6 && (
+        {/* TRUE/FALSE */}
+        {formData.type === "TRUE_FALSE" && (
+          <div className="space-y-2">
+            <label className="block text-sm font-medium">
+              Correct Answer
+            </label>
+            {formData.answers.map((answer, idx) => (
+              <div key={idx} className="flex gap-2 items-center">
+                <Input value={answer.text} disabled className="bg-muted" />
                 <Button
                   type="button"
-                  variant="outline"
-                  onClick={addAnswer}
-                  className="w-full"
+                  variant={answer.isCorrect ? "default" : "outline"}
+                  onClick={() => handleSetCorrect(idx)}
+                  className={`whitespace-nowrap rounded-[24px] transition-all font-semibold h-10 px-5 ${
+                    answer.isCorrect
+                      ? "bg-[#FF4B4B] hover:bg-[#FF3333] text-white border-none"
+                      : "border-[#E2E8F0] hover:border-[#FF4B4B] hover:text-[#FF4B4B]"
+                  }`}
                 >
-                  <Plus className="w-4 h-4 mr-2" /> Add Option
+                  {answer.isCorrect ? "✓ Correct" : "Set Correct"}
                 </Button>
-              )}
-            </div>
-          )}
+              </div>
+            ))}
+          </div>
+        )}
 
-          {/* TRUE/FALSE */}
-          {formData.type === "TRUE_FALSE" && (
-            <div className="space-y-2">
-              <label className="block text-sm font-medium">
-                Correct Answer
-              </label>
-              {formData.answers.map((answer, idx) => (
-                <div key={idx} className="flex gap-2 items-center">
-                  <Input value={answer.text} disabled className="bg-muted" />
-                  <Button
-                    type="button"
-                    variant={answer.isCorrect ? "default" : "outline"}
-                    onClick={() => handleSetCorrect(idx)}
-                    className="whitespace-nowrap"
-                  >
-                    {answer.isCorrect ? "✓ Correct" : "Set Correct"}
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* MULTIPLE SELECT */}
-          {formData.type === "MULTIPLE_SELECT" && (
-            <div className="space-y-3">
-              <label className="block text-sm font-medium">
-                Answer Options{" "}
-                <span className="text-xs text-muted-foreground font-normal">
-                  (bisa pilih lebih dari 1 benar)
-                </span>
-              </label>
-              {formData.answers.map((answer, idx) => (
-                <div key={idx} className="flex gap-2 items-center">
-                  <Input
-                    value={answer.text}
-                    onChange={(e) => handleAnswerChange(idx, e.target.value)}
-                    placeholder={`Option ${idx + 1}`}
-                  />
-                  {/* Toggle — tidak reset yang lain */}
-                  <Button
-                    type="button"
-                    variant={answer.isCorrect ? "default" : "outline"}
-                    onClick={() =>
-                      setFormData({
-                        ...formData,
-                        answers: formData.answers.map((a, i) =>
-                          i === idx ? { ...a, isCorrect: !a.isCorrect } : a,
-                        ),
-                      })
-                    }
-                    className="whitespace-nowrap"
-                  >
-                    {answer.isCorrect ? "✓ Benar" : "Set Benar"}
-                  </Button>
-                  {formData.answers.length > 2 && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeAnswer(idx)}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  )}
-                </div>
-              ))}
-              {formData.answers.length < 6 && (
+        {/* MULTIPLE SELECT */}
+        {formData.type === "MULTIPLE_SELECT" && (
+          <div className="space-y-3">
+            <label className="block text-sm font-medium">
+              Answer Options{" "}
+              <span className="text-xs text-muted-foreground font-normal">
+                (bisa pilih lebih dari 1 benar)
+              </span>
+            </label>
+            {formData.answers.map((answer, idx) => (
+              <div key={idx} className="flex gap-2 items-center">
+                <Input
+                  value={answer.text}
+                  onChange={(e) => handleAnswerChange(idx, e.target.value)}
+                  placeholder={`Option ${idx + 1}`}
+                />
                 <Button
                   type="button"
-                  variant="outline"
-                  onClick={addAnswer}
-                  className="w-full"
+                  variant={answer.isCorrect ? "default" : "outline"}
+                  onClick={() =>
+                    setFormData({
+                      ...formData,
+                      answers: formData.answers.map((a, i) =>
+                        i === idx ? { ...a, isCorrect: !a.isCorrect } : a,
+                      ),
+                    })
+                  }
+                  className={`whitespace-nowrap rounded-[24px] transition-all font-semibold h-10 px-5 ${
+                    answer.isCorrect
+                      ? "bg-[#FF4B4B] hover:bg-[#FF3333] text-white border-none"
+                      : "border-[#E2E8F0] hover:border-[#FF4B4B] hover:text-[#FF4B4B]"
+                  }`}
                 >
-                  <Plus className="w-4 h-4 mr-2" /> Add Option
+                  {answer.isCorrect ? "✓ Benar" : "Set Benar"}
                 </Button>
-              )}
-            </div>
-          )}
+                {formData.answers.length > 2 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeAnswer(idx)}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                )}
+              </div>
+            ))}
+            {formData.answers.length < 6 && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={addAnswer}
+                className="w-full rounded-[24px] border-[#FF4B4B] text-[#FF4B4B] hover:bg-[#FF4B4B]/10 transition-all font-semibold h-10"
+              >
+                <Plus className="w-4 h-4 mr-2" /> Add Option
+              </Button>
+            )}
+          </div>
+        )}
 
-          <Button type="submit" disabled={loading} className="w-full">
-            {loading ? "Creating..." : "Create Question"}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+        <Button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-[#FF4B4B] hover:bg-[#FF3333] text-white rounded-[24px] px-6 h-12 shadow-sm transition-all font-semibold"
+        >
+          {loading ? "Creating..." : "Create Question"}
+        </Button>
+      </form>
+    </div>
   );
 }

@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 
 interface UserEditDialogProps {
   user: any;
@@ -30,12 +31,11 @@ export default function UserEditDialog({
   const [email, setEmail] = useState(user?.email || "");
   const [nip, setNip] = useState(user?.nip || "");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
 
     try {
       const result = await updateUserProfile(user.id, {
@@ -45,12 +45,24 @@ export default function UserEditDialog({
       });
 
       if (result.success) {
+        toast({
+          title: "Berhasil",
+          description: "Data pengguna berhasil diperbarui",
+        });
         onSuccess();
       } else {
-        setError(result.error || "Failed to update user");
+        toast({
+          title: "Gagal",
+          description: result.error || "Gagal memperbarui data pengguna",
+          variant: "destructive",
+        });
       }
     } catch (err) {
-      setError("An error occurred");
+      toast({
+        title: "Error",
+        description: "Terjadi kesalahan saat memperbarui pengguna",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -98,9 +110,7 @@ export default function UserEditDialog({
             />
           </div>
 
-          {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded">{error}</div>
-          )}
+
 
           <div className="flex gap-2 justify-end">
             <Button

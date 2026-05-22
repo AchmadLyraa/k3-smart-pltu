@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,6 +42,7 @@ import {
   deleteMaterial,
 } from "@/app/actions/content";
 import SemesterResetDialog from "@/components/admin/semester-reset-dialog";
+import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 
 const typeIcon = {
@@ -75,6 +76,16 @@ export default function CmsAcademicPeriodTab({
   });
   const [saving, setSaving] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
+
+  // Sinkronisasi prop-to-state agar UI terupdate otomatis pasca router.refresh()
+  useEffect(() => {
+    setPeriods(initialPeriods);
+  }, [initialPeriods]);
+
+  useEffect(() => {
+    setUnassigned(unassignedMaterials);
+  }, [unassignedMaterials]);
 
   const toggleExpand = (id: string) => {
     setExpandedPeriods((prev) =>
@@ -83,9 +94,22 @@ export default function CmsAcademicPeriodTab({
   };
 
   const handleCreate = async () => {
-    if (!formData.name.trim()) return alert("Nama wajib diisi");
-    if (!formData.startDate || !formData.endDate)
-      return alert("Tanggal wajib diisi");
+    if (!formData.name.trim()) {
+      toast({
+        title: "Validasi Gagal",
+        description: "Nama period wajib diisi",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!formData.startDate || !formData.endDate) {
+      toast({
+        title: "Validasi Gagal",
+        description: "Tanggal wajib diisi",
+        variant: "destructive",
+      });
+      return;
+    }
     setSaving(true);
     const result = await createAcademicPeriod({
       name: formData.name,
@@ -94,12 +118,33 @@ export default function CmsAcademicPeriodTab({
     });
     setSaving(false);
     if (result.success) {
+      toast({
+        title: "Berhasil!",
+        description: `Academic Period "${formData.name}" berhasil dibuat.`,
+        variant: "success",
+      });
+      setShowCreateForm(false);
+      setFormData({ name: "", startDate: "", endDate: "" });
       router.refresh();
-    } else alert(result.error);
+    } else {
+      toast({
+        title: "Gagal Membuat Period",
+        description: result.error || "Terjadi kesalahan pada server",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleUpdate = async () => {
     if (!editPeriod) return;
+    if (!editPeriod.name.trim()) {
+      toast({
+        title: "Validasi Gagal",
+        description: "Nama period wajib diisi",
+        variant: "destructive",
+      });
+      return;
+    }
     setSaving(true);
     const result = await updateAcademicPeriod(editPeriod.id, {
       name: editPeriod.name,
@@ -107,64 +152,161 @@ export default function CmsAcademicPeriodTab({
       endDate: new Date(editPeriod.endDate),
     });
     setSaving(false);
-    if (result.success) router.refresh();
-    else alert(result.error);
+    if (result.success) {
+      toast({
+        title: "Berhasil Diperbarui!",
+        description: `Academic Period "${editPeriod.name}" berhasil diperbarui.`,
+        variant: "success",
+      });
+      setEditPeriod(null);
+      router.refresh();
+    } else {
+      toast({
+        title: "Gagal Memperbarui",
+        description: result.error || "Terjadi kesalahan pada server",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleDelete = async (id: string) => {
+    const periodToDelete = periods.find((p: any) => p.id === id);
     if (
-      !confirm("Hapus period ini? Materi yang terassign akan jadi unassigned.")
+      !confirm(`Hapus period "${periodToDelete?.name || ""}"? Materi yang terassign akan jadi unassigned.`)
     )
       return;
     const result = await deleteAcademicPeriod(id);
-    if (result.success) router.refresh();
-    else alert(result.error);
+    if (result.success) {
+      toast({
+        title: "Berhasil Dihapus",
+        description: `Academic Period "${periodToDelete?.name || ""}" berhasil dihapus.`,
+        variant: "success",
+      });
+      router.refresh();
+    } else {
+      toast({
+        title: "Gagal Menghapus",
+        description: result.error || "Terjadi kesalahan pada server",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSetActive = async (id: string) => {
+    const period = periods.find((p: any) => p.id === id);
+    const originalActive = period?.isActive;
     const result = await setActivePeriod(id);
 
     if (result.success) {
-      setPeriods((prev: any[]) =>
-        prev.map((p) => (p.id === id ? { ...p, isActive: !p.isActive } : p)),
-      );
+      toast({
+        title: "Status Diubah!",
+        description: `Academic Period "${period?.name || ""}" sekarang ${!originalActive ? "aktif" : "nonaktif"}.`,
+        variant: "success",
+      });
+      router.refresh();
     } else {
-      alert(result.error);
+      toast({
+        title: "Gagal Mengubah Status",
+        description: result.error || "Terjadi kesalahan pada server",
+        variant: "destructive",
+      });
     }
   };
 
   const handleAssign = async (materialId: string, periodId: string) => {
+    const material = unassigned.find((m: any) => m.id === materialId);
+    const period = periods.find((p: any) => p.id === periodId);
     const result = await assignMaterialToPeriod(materialId, periodId);
-    if (result.success) router.refresh();
-    else alert(result.error);
+    if (result.success) {
+      toast({
+        title: "Materi Terassign!",
+        description: `"${material?.title || ""}" berhasil ditambahkan ke "${period?.name || ""}".`,
+        variant: "success",
+      });
+      router.refresh();
+    } else {
+      toast({
+        title: "Gagal Assign Materi",
+        description: result.error || "Terjadi kesalahan pada server",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleUnassign = async (materialId: string) => {
     if (!confirm("Lepas materi dari period ini?")) return;
     const result = await assignMaterialToPeriod(materialId, null);
-    if (result.success) router.refresh();
-    else alert(result.error);
+    if (result.success) {
+      toast({
+        title: "Materi Dilepas!",
+        description: "Materi berhasil dikeluarkan dari period.",
+        variant: "success",
+      });
+      router.refresh();
+    } else {
+      toast({
+        title: "Gagal Melepas Materi",
+        description: result.error || "Terjadi kesalahan pada server",
+        variant: "destructive",
+      });
+    }
   };
 
   const handlePublish = async (id: string) => {
     if (!confirm("Publish material ini?")) return;
     const result = await publishMaterial(id);
-    if (result.success) router.refresh();
-    else alert(result.error);
+    if (result.success) {
+      toast({
+        title: "Materi Dipublikasikan!",
+        description: "Status materi berhasil diubah menjadi PUBLISHED.",
+        variant: "success",
+      });
+      router.refresh();
+    } else {
+      toast({
+        title: "Gagal Publikasi",
+        description: result.error || "Terjadi kesalahan pada server",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleArchive = async (id: string) => {
     if (!confirm("Archive material ini?")) return;
     const result = await archiveMaterial(id);
-    if (result.success) router.refresh();
-    else alert(result.error);
+    if (result.success) {
+      toast({
+        title: "Materi Diarsipkan!",
+        description: "Status materi berhasil diubah menjadi ARCHIVED.",
+        variant: "success",
+      });
+      router.refresh();
+    } else {
+      toast({
+        title: "Gagal Mengarsipkan",
+        description: result.error || "Terjadi kesalahan pada server",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleDeleteMaterial = async (id: string) => {
     if (!confirm("Hapus material ini?")) return;
     const result = await deleteMaterial(id);
-    if (result.success) router.refresh();
-    else alert(result.error);
+    if (result.success) {
+      toast({
+        title: "Materi Dihapus",
+        description: "Materi berhasil dihapus secara permanen.",
+        variant: "success",
+      });
+      router.refresh();
+    } else {
+      toast({
+        title: "Gagal Menghapus Materi",
+        description: result.error || "Terjadi kesalahan pada server",
+        variant: "destructive",
+      });
+    }
   };
 
   const MaterialRow = ({ m, periodId }: { m: any; periodId?: string }) => {
@@ -234,7 +376,10 @@ export default function CmsAcademicPeriodTab({
         <h2 className="text-lg font-semibold">Academic Periods</h2>
         <div className="flex gap-2">
           <SemesterResetDialog />
-          <Button onClick={() => setShowCreateForm(!showCreateForm)}>
+          <Button
+            className="bg-[#FF4B4B] hover:bg-[#FF3333] text-white rounded-[24px] px-6 h-10 shadow-sm transition-all font-semibold"
+            onClick={() => setShowCreateForm(!showCreateForm)}
+          >
             <Plus className="w-4 h-4 mr-2" />
             {showCreateForm ? "Cancel" : "Buat Period"}
           </Button>
@@ -248,7 +393,7 @@ export default function CmsAcademicPeriodTab({
             <div>
               <label className="text-sm font-medium">Nama Period</label>
               <Input
-                className="mt-1"
+                className="mt-1 bg-white rounded-[24px] shadow-sm border border-slate-100 p-2"
                 placeholder="cth: 2025/2026 Semester 1"
                 value={formData.name}
                 onChange={(e) =>
@@ -259,28 +404,14 @@ export default function CmsAcademicPeriodTab({
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-sm font-medium">Tanggal Mulai</label>
-                <Input
-                  className="mt-1"
-                  type="date"
-                  value={formData.startDate}
-                  onChange={(e) =>
-                    setFormData({ ...formData, startDate: e.target.value })
-                  }
-                />
+                <Input className="mt-1 bg-white rounded-[24px] shadow-sm border border-slate-100 p-2" type="date" value={formData.startDate} onChange={(e) => setFormData({ ...formData, startDate: e.target.value })} />
               </div>
               <div>
                 <label className="text-sm font-medium">Tanggal Selesai</label>
-                <Input
-                  className="mt-1"
-                  type="date"
-                  value={formData.endDate}
-                  onChange={(e) =>
-                    setFormData({ ...formData, endDate: e.target.value })
-                  }
-                />
+                <Input className="mt-1 bg-white rounded-[24px] shadow-sm border border-slate-100 p-2" type="date" value={formData.endDate} onChange={(e) => setFormData({ ...formData, endDate: e.target.value })} />
               </div>
             </div>
-            <Button onClick={handleCreate} disabled={saving} className="w-full">
+            <Button onClick={handleCreate} disabled={saving} className="bg-[#FF4B4B] hover:bg-[#FF3333] text-white rounded-[24px] px-6 h-10 shadow-sm transition-all font-semibold w-full">
               {saving ? "Menyimpan..." : "Simpan Period"}
             </Button>
           </CardContent>
@@ -426,19 +557,13 @@ export default function CmsAcademicPeriodTab({
             <div className="space-y-3">
               <div>
                 <label className="text-sm font-medium">Nama</label>
-                <Input
-                  className="mt-1"
-                  value={editPeriod.name}
-                  onChange={(e) =>
-                    setEditPeriod({ ...editPeriod, name: e.target.value })
-                  }
-                />
+                <Input className="mt-1 bg-white rounded-[24px] shadow-sm border border-slate-100 p-2" value={editPeriod.name} onChange={(e) => setEditPeriod({ ...editPeriod, name: e.target.value })} />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-sm font-medium">Mulai</label>
                   <Input
-                    className="mt-1"
+                    className="mt-1 bg-white rounded-[24px] shadow-sm border border-slate-100 p-2"
                     type="date"
                     value={editPeriod.startDate}
                     onChange={(e) =>
@@ -451,31 +576,18 @@ export default function CmsAcademicPeriodTab({
                 </div>
                 <div>
                   <label className="text-sm font-medium">Selesai</label>
-                  <Input
-                    className="mt-1"
-                    type="date"
-                    value={editPeriod.endDate}
-                    onChange={(e) =>
-                      setEditPeriod({ ...editPeriod, endDate: e.target.value })
-                    }
-                  />
+                  <Input className="mt-1 bg-white rounded-[24px] shadow-sm border border-slate-100 p-2" type="date" value={editPeriod.endDate} onChange={(e) => setEditPeriod({ ...editPeriod, endDate: e.target.value })} />
                 </div>
               </div>
               <div className="flex gap-2">
                 <Button
                   variant="outline"
-                  className="flex-1"
+                  className="flex-1 rounded-[24px]"
                   onClick={() => setEditPeriod(null)}
                 >
                   Cancel
                 </Button>
-                <Button
-                  className="flex-1"
-                  onClick={handleUpdate}
-                  disabled={saving}
-                >
-                  {saving ? "Menyimpan..." : "Simpan"}
-                </Button>
+                <Button className="bg-[#FF4B4B] hover:bg-[#FF3333] text-white rounded-[24px] px-6 h-10 shadow-sm transition-all font-semibold" onClick={handleUpdate} disabled={saving}>{saving ? "Menyimpan..." : "Simpan"}</Button>
               </div>
             </div>
           )}

@@ -23,21 +23,22 @@ export default async function CMSDashboard() {
   const unassignedMaterials = periodsData.unassigned;
 
   return (
-    <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Content Management System</h1>
-        <p className="text-muted-foreground">
-          Manage learning materials, questions, and quiz configurations
-        </p>
-      </div>
+        <div>
+          <h1 className="sa-welcome__title">Content Management System</h1>
+          <p className="sa-welcome__subtitle">Manajemen Konten K3 Smart</p>
+        </div>
 
-      <CMSTabsClient
-        topics={topics}
-        materials={materials}
-        questions={questions}
-        periods={periods}
-        unassignedMaterials={unassignedMaterials}
-      />
+        <div className="mt-6">
+          <CMSTabsClient
+            topics={topics}
+            materials={materials}
+            questions={questions}
+            periods={periods}
+            unassignedMaterials={unassignedMaterials}
+            tabTriggerClass="rounded-[24px]"
+          />
+        </div>
     </div>
   );
 }

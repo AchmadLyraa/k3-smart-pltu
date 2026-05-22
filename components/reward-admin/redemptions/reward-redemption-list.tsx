@@ -11,24 +11,9 @@ import {
 import { useDebounce } from "@/hooks/use-debounce";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { RefreshCw, Save, Check, X, CheckCircle2 } from "lucide-react";
+import { RefreshCw, Save, Check, X, CheckCircle2, Search } from "lucide-react";
 
 type RedemptionItem = {
   id: string;
@@ -167,7 +152,11 @@ export default function RewardRedemptionList() {
     const reason = prompt("Alasan penolakan (poin akan dikembalikan ke user):");
     if (reason === null) return;
     if (!reason.trim()) {
-      alert("Alasan penolakan wajib diisi");
+      toast({
+        title: "Error",
+        description: "Alasan penolakan wajib diisi",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -220,40 +209,34 @@ export default function RewardRedemptionList() {
 
   if (error) {
     return (
-      <Card className="border-destructive">
-        <CardContent className="pt-6">
-          <p className="text-destructive text-sm">{error}</p>
-        </CardContent>
-      </Card>
+      <div className="bg-white rounded-[24px] shadow-sm border border-red-200 p-6">
+        <p className="text-red-500 text-sm">{error}</p>
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <CardTitle>Status Pengiriman Reward</CardTitle>
-            <CardDescription>
-              Update status manual seperti sedang diproses, sedang dikirimkan, atau sudah diserahkan.
-            </CardDescription>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="relative w-full md:w-64">
-              <Input
-                placeholder="Cari user atau reward..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="h-9"
-              />
-            </div>
-            <Button variant="outline" size="sm" onClick={() => loadRedemptions(page, debouncedSearch)} disabled={loading}>
-              <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-            </Button>
+    <div className="bg-white rounded-[24px] shadow-sm border border-slate-100 p-6">
+      <div className="mb-4">
+        <h2 className="text-[15px] font-bold text-[#2B3674]">Status Pengiriman Hadiah</h2>
+      </div>
+
+      <div className="mb-6 flex items-center justify-between gap-4 relative">
+        <div className="relative flex-1">
+          <Input
+            placeholder="Cari Nama"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full h-12 pl-4 pr-12 rounded-[24px] border-[#E2E8F0] focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-gray-300 text-sm"
+          />
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+            <Search className="w-5 h-5" strokeWidth={1.5} />
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
+        <Button variant="outline" size="icon" onClick={() => loadRedemptions(page, debouncedSearch)} disabled={loading} className="rounded-full w-12 h-12 flex-shrink-0">
+          <RefreshCw className={`h-5 w-5 ${loading ? "animate-spin" : ""}`} />
+        </Button>
+      </div>
         {loading ? (
           <div className="py-8 text-center text-sm text-muted-foreground">
             Memuat data pengiriman reward...
@@ -264,22 +247,22 @@ export default function RewardRedemptionList() {
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto rounded-lg border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>PIC</TableHead>
-                    <TableHead>Reward</TableHead>
-                    <TableHead>Status Transaksi</TableHead>
-                    <TableHead>Status Pengiriman</TableHead>
-                    <TableHead>Terakhir Update</TableHead>
-                    <TableHead className="w-24">Aksi</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+            <div className="overflow-x-auto rounded-[12px] border border-slate-100 pb-2">
+              <table className="w-full text-sm">
+                <thead className="bg-[#FFF0EE] text-[#E74C3C] font-semibold">
+                  <tr>
+                    <th className="text-left py-4 px-6 font-semibold rounded-tl-[12px]">PIC</th>
+                    <th className="text-left py-4 px-6 font-semibold">Hadiah</th>
+                    <th className="text-center py-4 px-6 font-semibold">Status transaksi</th>
+                    <th className="text-center py-4 px-6 font-semibold">Status Pengiriman</th>
+                    <th className="text-center py-4 px-6 font-semibold">Terakhir Update</th>
+                    <th className="text-center py-4 px-6 font-semibold rounded-tr-[12px]">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
                   {redemptions.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell>
+                    <tr key={item.id} className="border-b border-gray-100 hover:bg-slate-50/50 transition-colors">
+                      <td className="py-4 px-6">
                         <div className="space-y-1">
                           <p className="font-medium leading-none">
                             {item.user.name || item.user.email}
@@ -289,16 +272,16 @@ export default function RewardRedemptionList() {
                             <p className="text-xs text-muted-foreground">NIP: {item.user.nip}</p>
                           )}
                         </div>
-                      </TableCell>
-                      <TableCell>
+                      </td>
+                      <td className="py-4 px-6">
                         <div className="space-y-1">
-                          <p className="font-medium leading-none">{item.reward.name}</p>
+                          <p className="font-medium leading-none text-gray-700">{item.reward.name}</p>
                           <p className="text-xs text-muted-foreground">
                             {item.pointsUsed.toLocaleString("id-ID")} poin
                           </p>
                         </div>
-                      </TableCell>
-                      <TableCell>
+                      </td>
+                      <td className="py-4 px-6 text-center">
                         <Badge 
                           className={
                             item.status === "COMPLETED" 
@@ -313,8 +296,8 @@ export default function RewardRedemptionList() {
                         >
                           {item.status}
                         </Badge>
-                      </TableCell>
-                      <TableCell>
+                      </td>
+                      <td className="py-4 px-6 text-center">
                         <Input
                           value={drafts[item.id] ?? ""}
                           onChange={(e) =>
@@ -326,12 +309,12 @@ export default function RewardRedemptionList() {
                           placeholder="Contoh: sedang dikirimkan"
                           className="min-w-[220px]"
                         />
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
+                      </td>
+                      <td className="py-4 px-6 text-center text-sm text-muted-foreground">
                         {new Date(item.updatedAt).toLocaleString("id-ID")}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
+                      </td>
+                      <td className="py-4 px-6 text-center">
+                        <div className="flex items-center justify-center gap-2">
                           {item.status === "PENDING" && (
                             <>
                               <Button
@@ -378,11 +361,11 @@ export default function RewardRedemptionList() {
                             <Save className="h-4 w-4" />
                           </Button>
                         </div>
-                      </TableCell>
-                    </TableRow>
+                      </td>
+                    </tr>
                   ))}
-                </TableBody>
-              </Table>
+                </tbody>
+              </table>
             </div>
 
             {pagination.pages > 1 && (
@@ -412,7 +395,6 @@ export default function RewardRedemptionList() {
             )}
           </>
         )}
-      </CardContent>
-    </Card>
+    </div>
   );
 }

@@ -3,6 +3,9 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+// Consistent tab styling classes
+const tabTriggerClass = "data-[state=active]:bg-[#FF4B4B] data-[state=active]:text-white data-[state=active]:rounded-[20px] py-2 rounded-[20px]";
+
 import CMSMaterialsTab from "@/components/cms/cms-materials-tab";
 import CMSQuestionsTab from "@/components/cms/cms-questions-tab";
 import CMSTopicsTab from "@/components/cms/cms-topics-tab";
@@ -26,14 +29,14 @@ export default function CMSTabsClient({
       onValueChange={(v) => router.push(`?tab=${v}`)}
       className="space-y-4"
     >
-      <TabsList className="grid w-full grid-cols-4">
-        <TabsTrigger value="materials">Materials</TabsTrigger>
-        <TabsTrigger value="questions">Questions</TabsTrigger>
-        <TabsTrigger value="topics">Topics</TabsTrigger>
-        <TabsTrigger value="periods">Academic Periods</TabsTrigger>
+      <TabsList className="grid w-full grid-cols-4 gap-2">
+        <TabsTrigger value="materials" className={tabTriggerClass}>Materials</TabsTrigger>
+        <TabsTrigger value="questions" className={tabTriggerClass}>Questions</TabsTrigger>
+        <TabsTrigger value="topics" className={tabTriggerClass}>Topics</TabsTrigger>
+        <TabsTrigger value="periods" className={tabTriggerClass}>Academic Periods</TabsTrigger>
       </TabsList>
 
-      <TabsContent value="materials">
+      <TabsContent value="materials" className="mt-2">
         <CMSMaterialsTab
           topics={topics}
           materials={materials}
@@ -41,15 +44,15 @@ export default function CMSTabsClient({
         />
       </TabsContent>
 
-      <TabsContent value="questions">
+      <TabsContent value="questions" className="mt-2">
         <CMSQuestionsTab questions={questions} />
       </TabsContent>
 
-      <TabsContent value="topics">
+      <TabsContent value="topics" className="mt-2">
         <CMSTopicsTab initialTopics={topics} />
       </TabsContent>
 
-      <TabsContent value="periods">
+      <TabsContent value="periods" className="mt-2">
         <CMSPeriodicTab
           periods={periods}
           unassignedMaterials={unassignedMaterials}

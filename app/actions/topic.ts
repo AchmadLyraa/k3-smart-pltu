@@ -60,3 +60,43 @@ export async function deleteTopic(id: string) {
     return { success: false, error: "Failed to delete topic" };
   }
 }
+
+export async function updateTopic(
+  id: string,
+  data: {
+    name: string;
+    slug: string;
+    description?: string | null;
+  }
+) {
+  await requireAuth(["SUPER_ADMIN"]);
+
+  try {
+    // Check if slug already exists for another topic
+    const existing = await prisma.topic.findFirst({
+      where: {
+        slug: data.slug,
+        id: { not: id },
+      },
+    });
+
+    if (existing) {
+      return { success: false, error: "Slug already exists" };
+    }
+
+    const topic = await prisma.topic.update({
+      where: { id },
+      data: {
+        name: data.name,
+        slug: data.slug,
+        description: data.description,
+      },
+    });
+
+    return { success: true, data: topic };
+  } catch (error) {
+    console.error("[updateTopic error]", error);
+    return { success: false, error: "Failed to update topic" };
+  }
+}
+

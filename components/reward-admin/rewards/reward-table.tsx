@@ -1,19 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
 import RewardEditDialog from "./reward-edit-dialog";
 import RewardDeleteDialog from "./reward-delete-dialog";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 
 interface RewardTableProps {
   rewards: any[];
@@ -72,65 +62,64 @@ export default function RewardTable({ rewards, onRefresh }: RewardTableProps) {
 
   return (
     <>
-      <div className="border rounded-lg overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nama Reward</TableHead>
-              <TableHead>Deskripsi</TableHead>
-              <TableHead className="text-right">Point Cost</TableHead>
-              <TableHead className="text-right">Quantity</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="w-20">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+      <div className="overflow-x-auto rounded-[12px] border border-slate-100 pb-2">
+        <table className="w-full text-sm">
+          <thead className="bg-[#FFF0EE] text-[#E74C3C] font-semibold">
+            <tr>
+              <th className="text-left py-4 px-6 font-semibold rounded-tl-[12px]">Nama Hadiah</th>
+              <th className="text-left py-4 px-6 font-semibold text-center">Foto</th>
+              <th className="text-left py-4 px-6 font-semibold">Deskripsi</th>
+              <th className="text-center py-4 px-6 font-semibold">Point</th>
+              <th className="text-center py-4 px-6 font-semibold">Jumlah</th>
+              <th className="text-center py-4 px-6 font-semibold">Status</th>
+              <th className="text-left py-4 px-6 font-semibold rounded-tr-[12px]">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
             {rewards.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center py-8">
-                  <p className="text-muted-foreground">Tidak ada reward</p>
-                </TableCell>
-              </TableRow>
+              <tr className="border-b border-gray-100">
+                <td colSpan={7} className="text-center py-8">
+                  <p className="text-muted-foreground">Tidak ada hadiah</p>
+                </td>
+              </tr>
             ) : (
               rewards.map((reward) => (
-                <TableRow key={reward.id}>
-                  <TableCell className="font-medium">{reward.name}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground max-w-xs truncate">
+                <tr key={reward.id} className="border-b border-gray-100 hover:bg-slate-50/50 transition-colors">
+                  <td className="py-4 px-6 font-medium text-gray-700">{reward.name}</td>
+                  <td className="py-4 px-6 text-center text-gray-500">-</td>
+                  <td className="py-4 px-6 text-gray-500 max-w-[200px] truncate">
                     {reward.description || "-"}
-                  </TableCell>
-                  <TableCell className="text-right font-semibold">
-                    {reward.pointCost} pts
-                  </TableCell>
-                  <TableCell className="text-right">{reward.quantity}</TableCell>
-                  <TableCell>
-                    <Badge variant={getStatusVariant(reward.status)}>
-                      {getStatusLabel(reward.status)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
+                  </td>
+                  <td className="py-4 px-6 text-center font-medium text-gray-700">
+                    {reward.pointCost}
+                  </td>
+                  <td className="py-4 px-6 text-center text-gray-700">{reward.quantity}</td>
+                  <td className="py-4 px-6 text-center text-gray-500">
+                    {getStatusLabel(reward.status)}
+                  </td>
+                  <td className="py-4 px-6">
                     <div className="flex items-center gap-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
+                      <button
                         onClick={() => handleEdit(reward)}
+                        className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                        title="Edit Reward"
                       >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="text-destructive hover:text-destructive"
+                        <Edit className="w-[18px] h-[18px]" strokeWidth={2} />
+                      </button>
+                      <button
                         onClick={() => handleDelete(reward)}
+                        className="p-1.5 text-[#E74C3C] hover:bg-red-50 rounded transition-colors"
+                        title="Delete Reward"
                       >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                        <Trash2 className="w-[18px] h-[18px]" strokeWidth={2} />
+                      </button>
                     </div>
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               ))
             )}
-          </TableBody>
-        </Table>
+          </tbody>
+        </table>
       </div>
 
       {selectedReward && (

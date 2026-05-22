@@ -2,19 +2,15 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { getAllUsers } from "@/app/actions/users";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import UserTable from "./user-table";
-import { ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 
-export default function UserList() {
+interface UserListProps {
+  refreshTrigger?: number;
+}
+
+export default function UserList({ refreshTrigger = 0 }: UserListProps) {
   const [users, setUsers] = useState<any[]>([]);
   const [pagination, setPagination] = useState({
     page: 1,
@@ -29,7 +25,7 @@ export default function UserList() {
     setLoading(true);
     try {
       const result = await getAllUsers(page, 10);
-      if (result.success) {
+      if (result.success && result.data && result.pagination) {
         setUsers(result.data);
         setPagination(result.pagination);
       }
@@ -42,7 +38,7 @@ export default function UserList() {
 
   useEffect(() => {
     loadUsers(1);
-  }, [loadUsers]);
+  }, [loadUsers, refreshTrigger]);
 
   const filteredUsers = users.filter(
     (user) =>
@@ -52,63 +48,45 @@ export default function UserList() {
   );
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex justify-between items-start">
-          <div>
-            <CardTitle>Users Management</CardTitle>
-            <CardDescription>Total Users: {pagination.total}</CardDescription>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => loadUsers(pagination.page)}
-            disabled={loading}
-          >
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Refresh
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex gap-2">
-          <Input
-            placeholder="Search by name or email..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1"
-          />
-        </div>
-
-        <UserTable
-          users={filteredUsers}
-          onRefresh={() => loadUsers(pagination.page)}
+    <div className="bg-white rounded-[24px] shadow-sm border border-slate-100 p-6">
+      <div className="mb-6 relative">
+        <Input
+          placeholder="Cari Nama atau Email"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full h-12 pl-4 pr-12 rounded-[24px] border-[#E2E8F0] focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-gray-300 text-sm"
         />
-
-        <div className="flex justify-between items-center mt-4">
-          <p className="text-sm text-muted-foreground">
-            Page {pagination.page} of {pagination.pages}
-          </p>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => loadUsers(pagination.page - 1)}
-              disabled={pagination.page === 1 || loading}
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => loadUsers(pagination.page + 1)}
-              disabled={pagination.page >= pagination.pages || loading}
-            >
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+          <Search className="w-5 h-5" strokeWidth={1.5} />
         </div>
-      </CardContent>
-    </Card>
+      </div>
+
+      <UserTable
+        users={filteredUsers}
+        onRefresh={() => loadUsers(pagination.page)}
+      />
+
+      <div className="flex justify-between items-center mt-6">
+        <p className="text-sm text-muted-foreground">
+          Page {pagination.page} of {pagination.pages || 1}
+        </p>
+        <div className="flex gap-2">
+          <button
+            onClick={() => loadUsers(pagination.page - 1)}
+            disabled={pagination.page === 1 || loading}
+            className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 disabled:opacity-50 hover:bg-gray-50 transition-colors"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => loadUsers(pagination.page + 1)}
+            disabled={pagination.page >= pagination.pages || loading}
+            className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 disabled:opacity-50 hover:bg-gray-50 transition-colors"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -20,6 +20,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { resetPassword } from "@/app/actions/users";
+import { useToast } from "@/hooks/use-toast";
 
 interface ResetPasswordDialogProps {
   open: boolean;
@@ -43,6 +44,7 @@ export function ResetPasswordDialog({
   const [result, setResult] = useState<any>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [copied, setCopied] = useState(false);
+  const { toast } = useToast();
 
   const handleReset = async () => {
     if (!user?.id) return;
@@ -55,8 +57,17 @@ export function ResetPasswordDialog({
 
       if (response.success) {
         setResult(response.data);
+        toast({
+          title: "Berhasil",
+          description: "Password berhasil direset",
+        });
       } else {
         setError(response.error || "Failed to reset password");
+        toast({
+          title: "Gagal",
+          description: response.error || "Gagal mereset password",
+          variant: "destructive",
+        });
       }
     } finally {
       setLoading(false);

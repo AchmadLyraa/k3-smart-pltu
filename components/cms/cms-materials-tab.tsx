@@ -16,6 +16,25 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
+
+// Helper to extract YouTube video ID from URL
+const extractYouTubeId = (url: string): string | null => {
+  try {
+    const ytRegex = /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/;
+    const match = url.match(ytRegex);
+    return match ? match[1] : null;
+  } catch {
+    return null;
+  }
+};
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -67,9 +86,9 @@ const typeLabel = {
   ARTICLE: "Article",
 };
 const statusColor = {
-  DRAFT: "bg-yellow-100 text-yellow-700",
-  PUBLISHED: "bg-green-100 text-green-700",
-  ARCHIVED: "bg-gray-100 text-gray-500",
+  DRAFT: "bg-[#FFB3B3] text-[#FF4B4B]",
+  PUBLISHED: "bg-[#FF4B4B] text-white",
+  ARCHIVED: "bg-[#FF6666] text-white",
 };
 const difficultyColor = {
   easy: "bg-green-100 text-green-700",
@@ -141,10 +160,18 @@ export default function CMSMaterialsTab({
   materials: initialMaterials,
   questions,
 }: CMSMaterialsTabProps) {
+  const router = useRouter();
+  const { toast } = useToast();
+
   // Material state
   const [materials, setMaterials] = useState<MaterialItem[]>(
     initialMaterials || [],
   );
+
+  // Sinkronisasi prop-to-state pasca router.refresh()
+  useEffect(() => {
+    setMaterials(initialMaterials || []);
+  }, [initialMaterials]);
   const [materialPagination, setMaterialPagination] = useState({
     page: 1,
     limit: 10,
@@ -301,8 +328,22 @@ export default function CMSMaterialsTab({
 
   const handleCreateQuiz = async () => {
     if (!quizMaterial) return;
-    if (!quizFormData.name.trim()) return alert("Nama quiz wajib diisi");
-    if (selectedQuestions.length === 0) return alert("Pilih minimal 1 soal");
+    if (!quizFormData.name.trim()) {
+      toast({
+        title: "Validasi Gagal",
+        description: "Nama quiz wajib diisi",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (selectedQuestions.length === 0) {
+      toast({
+        title: "Validasi Gagal",
+        description: "Pilih minimal 1 soal",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setSavingQuiz(true);
     try {
@@ -334,8 +375,17 @@ export default function CMSMaterialsTab({
           shuffleQuestions: true,
           deadline: "",
         });
+        toast({
+          title: "Quiz Berhasil Dibuat",
+          description: `Quiz "${quizFormData.name}" berhasil dibuat.`,
+          variant: "success",
+        });
       } else {
-        alert(result.error ?? "Gagal buat quiz");
+        toast({
+          title: "Gagal Membuat Quiz",
+          description: result.error ?? "Gagal buat quiz",
+          variant: "destructive",
+        });
       }
     } finally {
       setSavingQuiz(false);
@@ -359,8 +409,22 @@ export default function CMSMaterialsTab({
 
   const handleSave = async () => {
     if (!editMaterial) return;
-    if (!editData.title.trim()) return alert("Title wajib diisi");
-    if (!editData.topicId) return alert("Topic wajib diisi");
+    if (!editData.title.trim()) {
+      toast({
+        title: "Validasi Gagal",
+        description: "Title wajib diisi",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!editData.topicId) {
+      toast({
+        title: "Validasi Gagal",
+        description: "Topic wajib diisi",
+        variant: "destructive",
+      });
+      return;
+    }
     setSaving(true);
     try {
       const result = await updateMaterial(editMaterial.id, {
@@ -404,9 +468,18 @@ export default function CMSMaterialsTab({
         }
 
         setEditMaterial(null);
-        window.location.reload();
+        toast({
+          title: "Materi Berhasil Diperbarui!",
+          description: `Materi "${editData.title}" berhasil diperbarui.`,
+          variant: "success",
+        });
+        router.refresh();
       } else {
-        alert(result.error);
+        toast({
+          title: "Gagal Memperbarui Materi",
+          description: result.error || "Terjadi kesalahan pada server",
+          variant: "destructive",
+        });
       }
     } finally {
       setSaving(false);
@@ -414,47 +487,96 @@ export default function CMSMaterialsTab({
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Yakin mau hapus material ini?")) return;
+    const materialToDelete = materials.find((m) => m.id === id);
+    if (!confirm(`Yakin mau hapus material "${materialToDelete?.title || ""}"?`)) return;
     const result = await deleteMaterial(id);
-    if (result.success) window.location.reload();
-    else alert("Gagal hapus material");
+    if (result.success) {
+      toast({
+        title: "Materi Berhasil Dihapus",
+        description: `Materi "${materialToDelete?.title || ""}" berhasil dihapus secara permanen.`,
+        variant: "success",
+      });
+      router.refresh();
+    } else {
+      toast({
+        title: "Gagal Menghapus Materi",
+        description: result.error || "Gagal hapus material",
+        variant: "destructive",
+      });
+    }
   };
 
   const handlePublish = async (id: string) => {
-    if (!confirm("Publish material ini?")) return;
+    const materialToPublish = materials.find((m) => m.id === id);
+    if (!confirm(`Publish material "${materialToPublish?.title || ""}"?`)) return;
     const result = await publishMaterial(id);
-    if (result.success) window.location.reload();
-    else alert("Gagal publish material");
+    if (result.success) {
+      toast({
+        title: "Materi Dipublikasikan",
+        description: `Materi "${materialToPublish?.title || ""}" sekarang berstatus PUBLISHED.`,
+        variant: "success",
+      });
+      router.refresh();
+    } else {
+      toast({
+        title: "Gagal Memublikasikan Materi",
+        description: result.error || "Gagal publish material",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleArchive = async (id: string) => {
-    if (!confirm("Archive material ini?")) return;
+    const materialToArchive = materials.find((m) => m.id === id);
+    if (!confirm(`Archive material "${materialToArchive?.title || ""}"?`)) return;
     const result = await archiveMaterial(id);
-    if (result.success) window.location.reload();
-    else alert("Gagal archive material");
+    if (result.success) {
+      toast({
+        title: "Materi Diarsipkan",
+        description: `Materi "${materialToArchive?.title || ""}" sekarang berstatus ARCHIVED.`,
+        variant: "success",
+      });
+      router.refresh();
+    } else {
+      toast({
+        title: "Gagal Mengarsipkan Materi",
+        description: result.error || "Gagal archive material",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
     <>
-      <Card>
+      <Card className="space-y-4 py-6">
         <CardHeader>
-          <div className="flex justify-between items-start">
+          <div className="flex justify-between items-start ">
             <div>
               <CardTitle>Materials</CardTitle>
               <CardDescription>
-                Total: {materialPagination.total} material
-                {materialPagination.total !== 1 ? "s" : ""}
+                Total: {materialPagination.total} material{materialPagination.total !== 1 ? "s" : ""}
               </CardDescription>
             </div>
-            <Button onClick={() => setShowForm(!showForm)}>
+            <Button
+              className="bg-[#FF4B4B] hover:bg-[#FF3333] text-white rounded-[24px] px-6 shadow-sm transition-all font-semibold"
+              onClick={() => setShowForm(!showForm)}
+            >
               {showForm ? "Cancel" : "+ Create Material"}
             </Button>
           </div>
         </CardHeader>
-
         <CardContent className="space-y-4">
-          {showForm && (
-            <div className="mb-6">
+          <Input
+            placeholder="Cari Materi..."
+            value={materialSearch}
+            onChange={(e) => setMaterialSearch(e.target.value)}
+            className="bg-white rounded-[24px] shadow-sm border border-slate-100 p-6"
+          />
+          <Dialog open={showForm} onOpenChange={setShowForm}>
+            <DialogContent className="max-w-5xl w-full max-h-screen overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Create Material</DialogTitle>
+              </DialogHeader>
               <MaterialForm
                 topics={topics}
                 onSuccess={() => {
@@ -462,16 +584,8 @@ export default function CMSMaterialsTab({
                   loadMaterials(1);
                 }}
               />
-            </div>
-          )}
-
-          {/* Search Bar */}
-          <Input
-            placeholder="Search materials..."
-            value={materialSearch}
-            onChange={(e) => setMaterialSearch(e.target.value)}
-            className="flex-1"
-          />
+            </DialogContent>
+          </Dialog>
 
           {materials.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
@@ -482,6 +596,17 @@ export default function CMSMaterialsTab({
               <div className="space-y-3">
                 {materials.map((m: MaterialItem, idx: number) => {
                   const Icon = typeIcon[m.type] ?? FileText;
+                  // Determine thumbnail URL
+                  const thumbnailUrl =
+                    m.thumbnail ||
+                    (m.type === "VIDEO" &&
+                      m.mediaFiles?.find((f) => f.type === "video")?.url &&
+                      (() => {
+                        const id = extractYouTubeId(
+                          m.mediaFiles?.find((f) => f.type === "video")!.url
+                        );
+                        return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : null;
+                      })());
                   return (
                     <div
                       key={m.id}
@@ -489,33 +614,21 @@ export default function CMSMaterialsTab({
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex gap-3 items-start flex-1 min-w-0">
-                          <span className="text-sm text-muted-foreground mt-0.5 shrink-0">
-                            #
-                            {(materialPagination.page - 1) *
-                              materialPagination.limit +
-                              idx +
-                              1}
+                          <span className="text-sm text-muted-foreground mt-0.5 shrink-0">#
+                            {(materialPagination.page - 1) * materialPagination.limit + idx + 1}
                           </span>
-                          <Icon className="w-4 h-4 mt-0.5 shrink-0 text-muted-foreground" />
+                          {thumbnailUrl && (
+                            <img src={thumbnailUrl} alt="thumbnail" className="w-24 h-14 object-cover rounded mr-2" />
+                          )}
                           <div className="flex-1 min-w-0">
-                            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-                              {" "}
-                              {process.env.NEXT_PUBLIC_APP_URL}
-                              /worker/materials/{m.id}
-                            </p>
                             <p className="font-medium text-sm">{m.title}</p>
                             {m.description && (
-                              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-                                {m.description}
-                              </p>
+                              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{m.description}</p>
                             )}
                             <div className="flex gap-2 mt-1.5 text-xs text-muted-foreground">
                               <span>{m.topic?.name ?? "-"}</span>
                               <span>•</span>
-                              <span>
-                                {Math.floor(m.duration / 60)}m {m.duration % 60}
-                                s
-                              </span>
+                              <span>{Math.floor(m.duration / 60)}m {m.duration % 60}s</span>
                               <span>•</span>
                               <span>{m.mediaFiles?.length ?? 0} files</span>
                               <span>•</span>
@@ -523,59 +636,23 @@ export default function CMSMaterialsTab({
                             </div>
                           </div>
                         </div>
-
                         <div className="flex flex-col gap-1 items-end shrink-0">
-                          <span
-                            className={`text-xs px-2 py-0.5 rounded-full ${statusColor[m.status]}`}
-                          >
-                            {m.status}
-                          </span>
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-                            {typeLabel[m.type] ?? m.type}
-                          </span>
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${statusColor[m.status]}`}>{m.status}</span>
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">{typeLabel[m.type] ?? m.type}</span>
                           <div className="flex gap-1 mt-1 flex-wrap justify-end">
                             {m.status !== "PUBLISHED" && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="h-7 px-2 text-xs text-green-600 hover:text-green-700 hover:bg-green-50"
-                                onClick={() => handlePublish(m.id)}
-                              >
-                                Publish
-                              </Button>
+                              <Button size="sm" variant="outline" className="h-7 px-2 text-xs text-green-600 hover:text-green-700 hover:bg-green-50" onClick={() => handlePublish(m.id)}>Publish</Button>
                             )}
                             {m.status === "PUBLISHED" && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="h-7 px-2 text-xs text-gray-600 hover:bg-gray-50"
-                                onClick={() => handleArchive(m.id)}
-                              >
-                                Archive
-                              </Button>
+                              <Button size="sm" variant="outline" className="h-7 px-2 text-xs text-gray-600 hover:bg-gray-50" onClick={() => handleArchive(m.id)}>Archive</Button>
                             )}
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="h-7 px-2 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                              onClick={() => openQuizDialog(m)}
-                            >
+                            <Button size="sm" variant="outline" className="h-7 px-2 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50" onClick={() => openQuizDialog(m)}>
                               <ClipboardList className="w-3 h-3 mr-1" /> Quiz
                             </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="h-7 px-2 text-xs"
-                              onClick={() => openEdit(m)}
-                            >
+                            <Button size="sm" variant="outline" className="h-7 px-2 text-xs" onClick={() => openEdit(m)}>
                               <Pencil className="w-3 h-3 mr-1" /> Edit
                             </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="h-7 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
-                              onClick={() => handleDelete(m.id)}
-                            >
+                            <Button size="sm" variant="outline" className="h-7 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => handleDelete(m.id)}>
                               <Trash2 className="w-3 h-3" />
                             </Button>
                           </div>
@@ -937,7 +1014,7 @@ export default function CMSMaterialsTab({
         open={!!editMaterial}
         onOpenChange={(open) => !open && setEditMaterial(null)}
       >
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-5xl w-full max-h-screen overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Material</DialogTitle>
           </DialogHeader>
@@ -1120,9 +1197,10 @@ export default function CMSMaterialsTab({
                   Cancel
                 </Button>
                 <Button
-                  className="flex-1"
-                  onClick={handleSave}
+                  type="submit"
                   disabled={saving}
+                  className="bg-[#FF4B4B] hover:bg-[#FF3333] text-white rounded-[20px] px-6 h-10 shadow-sm transition-all font-semibold flex-1"
+                  onClick={handleSave}
                 >
                   {saving ? "Saving..." : "Save Changes"}
                 </Button>

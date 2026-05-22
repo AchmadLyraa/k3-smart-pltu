@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { RefreshCcw } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -39,7 +40,11 @@ export default function SemesterResetDialog() {
   const loadPeriods = async () => {
     setLoadingPeriods(true);
     const result = await getAcademicPeriodsForReset();
-    if (result.success) setPeriods(result.data);
+    if (result.success && result.data) {
+      setPeriods(result.data);
+    } else {
+      setPeriods([]);
+    }
     setLoadingPeriods(false);
   };
 
@@ -70,7 +75,7 @@ export default function SemesterResetDialog() {
     setLoading(false);
 
     if (result.success) {
-      setMessage({ type: "success", text: result.message });
+      setMessage({ type: "success", text: result.message ?? "Berhasil" });
       setTimeout(() => {
         setOpen(false);
         window.location.reload();
@@ -85,12 +90,14 @@ export default function SemesterResetDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="destructive">Reset Semester</Button>
+        <Button variant="destructive" size="icon">
+          <RefreshCcw className="w-4 h-4" />
+        </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent aria-describedby="semester-reset-dialog-description" aria-labelledby="semester-reset-dialog-title">
         <DialogHeader>
-          <DialogTitle>Reset Semester</DialogTitle>
-          <DialogDescription>
+          <DialogTitle id="semester-reset-dialog-title">Reset Semester</DialogTitle>
+          <DialogDescription id="semester-reset-dialog-description">
             Pilih academic period yang akan direset. Period yang sudah direset
             tidak akan muncul di daftar ini.
           </DialogDescription>

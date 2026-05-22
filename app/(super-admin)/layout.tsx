@@ -37,6 +37,7 @@ export default async function AdminLayout({
           flexDirection: "column",
           height: "100vh",
           padding: "16px 16px 16px 0",
+          minWidth: 0,
         }}
       >
         <div className="sa-content-container">

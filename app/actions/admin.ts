@@ -184,7 +184,7 @@ export async function getWorkerPerformanceList(periodId?: string) {
       );
 
       return {
-        id: w.name ?? w.id,
+        id: w.id,
         name: w.name,
         email: w.email,
         nip: w.nip,

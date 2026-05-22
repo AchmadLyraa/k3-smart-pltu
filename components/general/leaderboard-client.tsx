@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { LeaderboardUser } from "@/app/actions/leaderboard";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -25,7 +26,7 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
   };
 
   // Sort and filter workers
-  const sortedAndFiltered = [...initialData]
+  const sortedAndFiltered = initialData
     .sort((a, b) => {
       const valA = getSortValue(a);
       const valB = getSortValue(b);
@@ -37,6 +38,11 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
         user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         user.nip.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+  const pageSize = 15;
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil(sortedAndFiltered.length / pageSize);
+  const paginatedData = sortedAndFiltered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   // Separate top 3 for podium
   const top3 = sortedAndFiltered.slice(0, 3);
@@ -61,22 +67,22 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* Header Banner */}
-      <div className="relative rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-6 md:p-8 text-white overflow-hidden shadow-xl border border-indigo-900/30">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(99,102,241,0.15),transparent)] pointer-events-none" />
+      <div className="relative rounded-2xl bg-gradient-to-r from-red-900 via-red-950 to-red-900 p-6 md:p-8 text-white overflow-hidden shadow-xl border border-red-900/30">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(239,71,111,0.15),transparent)] pointer-events-none" />
         <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
-          <Trophy className="w-48 h-48 text-indigo-400" />
+          <Crown className="w-48 h-48 text-red-400" />
         </div>
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="p-1.5 rounded-lg bg-indigo-500/20 text-indigo-300">
-                <Trophy className="w-6 h-6 animate-bounce" />
+              <span className="p-1.5 rounded-lg bg-red-500/20 text-red-300">
+                <Trophy className="w-6 h-6 text-red-400" />
               </span>
-              <span className="text-xs font-semibold tracking-wider uppercase text-indigo-300 flex items-center gap-1">
+              <span className="text-xs font-semibold tracking-wider uppercase text-red-300 flex items-center gap-1">
                 Leaderboard <Sparkles className="w-3.5 h-3.5" />
               </span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-indigo-200 bg-clip-text text-transparent">
+            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-red-200 bg-clip-text text-transparent">
               Papan Peringkat K3 Smart PLTU
             </h1>
             <p className="text-sm text-slate-300 max-w-xl">
@@ -85,17 +91,6 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
-            {/* Search */}
-            <div className="relative min-w-[200px] sm:min-w-[260px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <Input
-                type="text"
-                placeholder="Cari nama atau NIP..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 bg-slate-950/40 border-slate-800 text-white placeholder-slate-400 focus-visible:ring-indigo-500"
-              />
-            </div>
 
             {/* Tab Selector */}
             <Tabs
@@ -103,16 +98,16 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
               onValueChange={(val) => setActiveTab(val as "semester" | "alltime")}
               className="w-full sm:w-auto"
             >
-              <TabsList className="grid grid-cols-2 bg-slate-950/60 border border-slate-800 p-1 text-slate-400">
+              <TabsList className="grid grid-cols-2 bg-white border border-slate-800 p-1 text-slate-400">
                 <TabsTrigger
                   value="semester"
-                  className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-xs py-1.5 px-3"
+                  className="data-[state=active]:bg-red-600 data-[state=active]:text-white text-xs whitespace-nowrap py-1.5 px-3"
                 >
                   Semester Ini
                 </TabsTrigger>
                 <TabsTrigger
                   value="alltime"
-                  className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-xs py-1.5 px-3"
+                  className="data-[state=active]:bg-red-600 data-[state=active]:text-white text-xs whitespace-nowrap py-1.5 px-3"
                 >
                   All-Time
                 </TabsTrigger>
@@ -127,7 +122,7 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold tracking-tight flex items-center gap-2">
-              <Award className="w-5 h-5 text-indigo-500" />
+              <Award className="w-5 h-5 text-red-500" />
               Top 3 Pekerja Terbaik
             </h2>
           </div>
@@ -151,21 +146,31 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
               if (user.rank === 1) {
                 rankStyle = {
                   podiumHeight: "h-44 md:h-56",
-                  podiumBg: "bg-amber-100/80 dark:bg-amber-950/30 border-amber-300/50 shadow-[0_4px_20px_rgba(245,158,11,0.15)]",
-                  badgeBg: "bg-amber-400 text-amber-950 font-bold",
-                  avatarRing: "ring-amber-400 ring-offset-4 ring-offset-background bg-amber-50",
-                  icon: <Crown className="w-10 h-10 text-amber-500 drop-shadow-md animate-pulse" />,
-                  titleColor: "text-amber-800 dark:text-amber-400 font-extrabold",
+                  podiumBg: "bg-red-100/80 dark:bg-red-950/30 border-red-300/50 shadow-[0_4px_20px_rgba(239,71,111,0.15)]",
+                  badgeBg: "bg-red-400 text-red-950 font-bold",
+                  avatarRing: "ring-red-400 ring-offset-4 ring-offset-background bg-red-50",
+                  icon: <Crown className="w-10 h-10 text-red-500 drop-shadow-md" />,
+                  titleColor: "text-red-800 dark:text-red-400 font-extrabold",
                   order: "order-1 md:order-2 z-10 scale-105 md:scale-110",
+                };
+              } else if (user.rank === 2) {
+                rankStyle = {
+                  podiumHeight: "h-36 md:h-48",
+                  podiumBg: "bg-red-200/80 dark:bg-red-950/20 border-red-200/50 shadow-[0_4px_20px_rgba(239,71,111,0.1)]",
+                  badgeBg: "bg-red-300 text-red-900 font-bold",
+                  avatarRing: "ring-red-300 ring-offset-4 ring-offset-background bg-red-100",
+                  icon: <Crown className="w-10 h-10 text-red-300" />, // simplified icon
+                  titleColor: "text-red-600 dark:text-red-500 font-semibold",
+                  order: "order-2 md:order-1",
                 };
               } else if (user.rank === 3) {
                 rankStyle = {
                   podiumHeight: "h-24 md:h-32",
-                  podiumBg: "bg-orange-50 dark:bg-orange-950/10 border-orange-200",
-                  badgeBg: "bg-orange-600 text-white",
-                  avatarRing: "ring-orange-500 bg-orange-50",
-                  icon: <Medal className="w-6 h-6 text-orange-600" />,
-                  titleColor: "text-orange-900 dark:text-orange-400",
+                  podiumBg: "bg-red-50 dark:bg-red-950/10 border-red-200",
+                  badgeBg: "bg-red-600 text-white",
+                  avatarRing: "ring-red-500 bg-red-50",
+                  icon: <Medal className="w-6 h-6 text-red-600" />,
+                  titleColor: "text-red-900 dark:text-red-400",
                   order: "order-3",
                 };
               }
@@ -202,7 +207,7 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
                     <p className={cn("font-bold text-sm md:text-base truncate flex items-center justify-center gap-1", rankStyle.titleColor)}>
                       {user.name}
                       {isCurrentUser && (
-                        <span className="text-xs bg-indigo-600 text-white px-1.5 py-0.5 rounded-full font-medium">
+                        <span className="text-xs bg-red-600 text-white px-1.5 py-0.5 rounded-full font-medium">
                           Anda
                         </span>
                       )}
@@ -258,8 +263,8 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
               </div>
 
               {/* Items */}
-              {sortedAndFiltered.map((user, index) => {
-                const rank = index + 1;
+              {paginatedData.map((user, index) => {
+                const rank = (currentPage - 1) * pageSize + index + 1;
                 const points = getSortValue(user);
                 const isCurrentUser = user.id === currentUserId;
 
@@ -268,7 +273,7 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
                     key={user.id}
                     className={cn(
                       "grid grid-cols-12 gap-4 px-6 py-4 items-center transition-colors hover:bg-muted/30",
-                      isCurrentUser && "bg-indigo-50/40 dark:bg-indigo-950/10 border-y border-indigo-100 dark:border-indigo-950/30"
+                      isCurrentUser && "bg-red-50/40 dark:bg-red-950/10 border-y border-red-100 dark:border-red-950/30"
                     )}
                   >
                     {/* Rank */}
@@ -278,9 +283,9 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
                           variant="secondary"
                           className={cn(
                             "w-7 h-7 rounded-full flex items-center justify-center p-0 font-extrabold border-none",
-                            rank === 1 && "bg-amber-400 text-amber-950",
-                            rank === 2 && "bg-slate-300 text-slate-850",
-                            rank === 3 && "bg-orange-600 text-white"
+                            rank === 1 && "bg-red-400 text-red-950",
+                            rank === 2 && "bg-red-300 text-red-900",
+                            rank === 3 && "bg-red-600 text-white"
                           )}
                         >
                           {rank}
@@ -295,7 +300,7 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
                     {/* Profile & Name */}
                     <div className="col-span-10 md:col-span-5 flex items-center gap-3">
                       <Avatar className="w-9 h-9">
-                        <AvatarFallback className={cn("text-xs font-bold", isCurrentUser ? "bg-indigo-600 text-white" : "bg-slate-100")}>
+                        <AvatarFallback className={cn("text-xs font-bold", isCurrentUser ? "bg-red-600 text-white" : "bg-slate-100")}>
                           {getInitials(user.name)}
                         </AvatarFallback>
                       </Avatar>
@@ -303,7 +308,7 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
                         <p className="text-sm font-bold truncate flex items-center gap-1.5">
                           {user.name}
                           {isCurrentUser && (
-                            <Badge variant="outline" className="text-[10px] bg-indigo-500/10 text-indigo-600 border-indigo-200 dark:border-indigo-900 py-0 px-1.5">
+                            <Badge variant="outline" className="text-[10px] bg-red-500/10 text-red-600 border-red-200 dark:border-red-900 py-0 px-1.5">
                               Anda
                             </Badge>
                           )}
@@ -341,6 +346,28 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
           )}
         </CardContent>
       </Card>
-    </div>
+              {/* Pagination Controls */}
+          <div className="flex justify-center items-center space-x-2 mt-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+            <span className="text-sm">
+              Page {currentPage} of {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+              disabled={currentPage === totalPages || totalPages === 0}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
   );
 }

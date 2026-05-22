@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 
 interface CreateUserFormProps {
   onSuccess?: () => void;
@@ -31,14 +32,11 @@ export default function CreateUserForm({ onSuccess }: CreateUserFormProps) {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("WORKER");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
-    setSuccess("");
 
     try {
       const result = await createUser({
@@ -50,7 +48,10 @@ export default function CreateUserForm({ onSuccess }: CreateUserFormProps) {
       });
 
       if (result.success) {
-        setSuccess("User created successfully");
+        toast({
+          title: "Berhasil",
+          description: "Pengguna berhasil ditambahkan",
+        });
         setName("");
         setEmail("");
         setPassword("");
@@ -58,10 +59,18 @@ export default function CreateUserForm({ onSuccess }: CreateUserFormProps) {
         setRole("WORKER");
         onSuccess?.();
       } else {
-        setError(result.error || "Failed to create user");
+        toast({
+          title: "Gagal",
+          description: result.error || "Gagal menambahkan pengguna",
+          variant: "destructive",
+        });
       }
     } catch (err) {
-      setError("An error occurred");
+      toast({
+        title: "Error",
+        description: "Terjadi kesalahan saat membuat pengguna",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -144,15 +153,7 @@ export default function CreateUserForm({ onSuccess }: CreateUserFormProps) {
             </Select>
           </div>
 
-          {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded">{error}</div>
-          )}
 
-          {success && (
-            <div className="bg-green-50 text-green-600 p-3 rounded">
-              {success}
-            </div>
-          )}
 
           <Button type="submit" disabled={loading} className="w-full">
             {loading ? "Creating..." : "Create User"}

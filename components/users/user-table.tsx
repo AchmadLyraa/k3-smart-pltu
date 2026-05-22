@@ -18,6 +18,7 @@ import { Edit, Trash2, Key } from "lucide-react";
 import UserEditDialog from "./user-edit-dialog";
 import UserDeleteDialog from "./user-delete-dialog";
 import { ResetPasswordDialog } from "./reset-password-dialog";
+import { useToast } from "@/hooks/use-toast";
 
 interface UserTableProps {
   users: any[];
@@ -29,6 +30,7 @@ export default function UserTable({ users, onRefresh }: UserTableProps) {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
+  const { toast } = useToast();
 
   const handleEditUser = (user: any) => {
     setSelectedUser(user);
@@ -48,114 +50,140 @@ export default function UserTable({ users, onRefresh }: UserTableProps) {
   const handleRoleChange = async (userId: string, newRole: string) => {
     const result = await updateUserRole(userId, newRole);
     if (result.success) {
+      toast({
+        title: "Berhasil",
+        description: "Role pengguna berhasil diubah",
+      });
       onRefresh();
+    } else {
+      toast({
+        title: "Gagal",
+        description: "Gagal mengubah role pengguna",
+        variant: "destructive",
+      });
     }
   };
 
   const handleStatusChange = async (userId: string, newStatus: string) => {
     const result = await updateUserStatus(userId, newStatus);
     if (result.success) {
+      toast({
+        title: "Berhasil",
+        description: "Status pengguna berhasil diubah",
+      });
       onRefresh();
+    } else {
+      toast({
+        title: "Gagal",
+        description: "Gagal mengubah status pengguna",
+        variant: "destructive",
+      });
     }
   };
 
   const handleConfirmDelete = async () => {
     const result = await deleteUser(selectedUser.id);
     if (result.success) {
+      toast({
+        title: "Berhasil",
+        description: "Pengguna berhasil dihapus",
+      });
       setDeleteDialogOpen(false);
       onRefresh();
+    } else {
+      toast({
+        title: "Gagal",
+        description: "Gagal menghapus pengguna",
+        variant: "destructive",
+      });
     }
   };
 
   return (
     <>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto rounded-[12px] border border-slate-100 pb-2">
         <table className="w-full text-sm">
-          <thead className="border-b bg-muted/50">
+          <thead className="bg-[#FFF0EE] text-[#E74C3C] font-semibold">
             <tr>
-              <th className="text-left py-3 px-4 font-medium">Name</th>
-              <th className="text-left py-3 px-4 font-medium">Email</th>
-              <th className="text-left py-3 px-4 font-medium">NIP</th>
-              <th className="text-left py-3 px-4 font-medium">Role</th>
-              <th className="text-left py-3 px-4 font-medium">Status</th>
-              <th className="text-left py-3 px-4 font-medium">Last Login</th>
-              <th className="text-left py-3 px-4 font-medium">Actions</th>
+              <th className="text-left py-4 px-6 font-semibold rounded-tl-[12px]">Nama</th>
+              <th className="text-left py-4 px-6 font-semibold">Email</th>
+              <th className="text-left py-4 px-6 font-semibold">NIP</th>
+              <th className="text-left py-4 px-6 font-semibold">Role</th>
+              <th className="text-left py-4 px-6 font-semibold">Status</th>
+              <th className="text-left py-4 px-6 font-semibold">Last Login</th>
+              <th className="text-left py-4 px-6 font-semibold rounded-tr-[12px]">Aksi</th>
             </tr>
           </thead>
           <tbody>
             {users.map((user) => (
               <tr
                 key={user.id}
-                className="border-b hover:bg-muted/50 transition-colors"
+                className="border-b border-gray-100 hover:bg-slate-50/50 transition-colors"
               >
-                <td className="py-3 px-4 font-medium">{user.name || "—"}</td>
-                <td className="py-3 px-4 text-sm">{user.email}</td>
-                <td className="py-3 px-4 text-sm text-muted-foreground">
+                <td className="py-4 px-6 font-medium text-gray-700">{user.name || "—"}</td>
+                <td className="py-4 px-6 text-gray-600">{user.email}</td>
+                <td className="py-4 px-6 text-gray-500">
                   {user.nip || "—"}
                 </td>
-                <td className="py-3 px-4">
+                <td className="py-3 px-6">
                   <Select
                     value={user.role}
                     onValueChange={(val) => handleRoleChange(user.id, val)}
                   >
-                    <SelectTrigger className="w-32 h-8">
+                    <SelectTrigger className="w-32 h-8 border-0 shadow-none bg-transparent hover:bg-gray-100 text-gray-600 font-medium">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="WORKER">Worker</SelectItem>
                       <SelectItem value="HSE_ADMIN">HSE Admin</SelectItem>
                       <SelectItem value="REWARD_ADMIN">Reward Admin</SelectItem>
-                      <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
+                      <SelectItem value="SUPER_ADMIN">Admin</SelectItem>
                     </SelectContent>
                   </Select>
                 </td>
-                <td className="py-3 px-4">
+                <td className="py-3 px-6">
                   <Select
                     value={user.status}
                     onValueChange={(val) => handleStatusChange(user.id, val)}
                   >
-                    <SelectTrigger className="w-28 h-8">
+                    <SelectTrigger className="w-28 h-8 border-0 shadow-none bg-transparent hover:bg-gray-100 text-gray-600 font-medium">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="ACTIVE">Active</SelectItem>
+                      <SelectItem value="ACTIVE">Aktif</SelectItem>
                       <SelectItem value="INACTIVE">Inactive</SelectItem>
                       <SelectItem value="SUSPENDED">Suspended</SelectItem>
                     </SelectContent>
                   </Select>
                 </td>
-                <td className="py-3 px-4 text-xs text-muted-foreground">
+                <td className="py-4 px-6 text-gray-500">
                   {user.lastLogin
                     ? new Date(user.lastLogin).toLocaleDateString("id-ID")
-                    : "Never"}
+                    : "—"}
                 </td>
-                <td className="py-3 px-4">
-                  <div className="flex gap-1">
-                    <Button
-                      size="sm"
-                      variant="outline"
+                <td className="py-4 px-6">
+                  <div className="flex gap-2 items-center">
+                    <button
                       onClick={() => handleResetPassword(user)}
-                      className="h-8 px-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                      className="p-1.5 text-gray-500 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors"
                       title="Reset Password"
                     >
-                      <Key className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
+                      <Key className="w-[18px] h-[18px]" strokeWidth={2} />
+                    </button>
+                    <button
                       onClick={() => handleEditUser(user)}
-                      className="h-8 w-8 p-0"
+                      className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                      title="Edit User"
                     >
-                      <Edit className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
+                      <Edit className="w-[18px] h-[18px]" strokeWidth={2} />
+                    </button>
+                    <button
                       onClick={() => handleDeleteUser(user)}
-                      className="h-8 w-8 p-0"
+                      className="p-1.5 text-[#E74C3C] hover:bg-red-50 rounded transition-colors"
+                      title="Delete User"
                     >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                      <Trash2 className="w-[18px] h-[18px]" strokeWidth={2} />
+                    </button>
                   </div>
                 </td>
               </tr>

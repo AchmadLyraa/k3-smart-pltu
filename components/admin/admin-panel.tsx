@@ -6,8 +6,11 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+
 import {
   CheckCircle2,
   XCircle,
@@ -134,6 +137,7 @@ export default function AdminDashboard({
   const [showValue, setShowValue] = useState(true);
   const [selectedPeriodId, setSelectedPeriodId] = useState(defaultPeriodId);
   const [isNavigating, setIsNavigating] = useState(false);
+  const { toast } = useToast();
 
   const handlePeriodChange = (periodId: string) => {
     setSelectedPeriodId(periodId);
@@ -154,10 +158,13 @@ export default function AdminDashboard({
       : periods.find((p) => p.id === selectedPeriodId)?.name || "Pilih Periode";
 
   const openWorkerDetail = async (worker: any) => {
+    // Use worker.id if available, otherwise fallback to name (legacy)
+    const workerId = worker.id ? String(worker.id) : String(worker.name);
+    console.log('[openWorkerDetail] Selected worker ID:', workerId, 'Name:', worker.name);
     setSelectedWorker(worker);
     setWorkerDetail(null);
     setPage(1);
-    await fetchWorkerDetail(worker.id, 1, false);
+    await fetchWorkerDetail(workerId, 1, false);
   };
 
   const fetchWorkerDetail = async (
@@ -168,6 +175,7 @@ export default function AdminDashboard({
     setLoadingDetail(true);
     try {
       const result = await getWorkerDetail(userId, targetPage, 10);
+      console.log('[fetchWorkerDetail] API result for userId', userId, 'page', targetPage, ':', result);
       if (result.success && result.data) {
         if (append) {
           setWorkerDetail((prev: any) => ({
@@ -180,8 +188,15 @@ export default function AdminDashboard({
         } else {
           setWorkerDetail(result.data);
         }
+        console.log('[fetchWorkerDetail] Updated workerDetail state:', result.data);
         setPage(targetPage);
+      } else {
+        console.error('[fetchWorkerDetail] Failed to fetch worker detail:', result.error);
+        setWorkerDetail({ error: result.error || 'Failed to load' } as any);
       }
+    } catch (e) {
+      console.error('[fetchWorkerDetail] Exception:', e);
+      setWorkerDetail({ error: (e as any).message || 'Exception occurred' } as any);
     } finally {
       setLoadingDetail(false);
     }
@@ -198,7 +213,11 @@ export default function AdminDashboard({
         selectedPeriodId === "all" ? undefined : selectedPeriodId
       );
       if (!result.success || !result.data || result.data.length === 0) {
-        alert("Tidak ada data pengguna aktif untuk periode ini.");
+        toast({
+  title: "Tidak ada data pengguna aktif",
+  description: "Tidak ada data pengguna aktif untuk periode ini.",
+  variant: "destructive",
+});
         return;
       }
 
@@ -248,7 +267,11 @@ export default function AdminDashboard({
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error("[handleSaveReport error]", error);
-      alert("Gagal mengunduh laporan.");
+      toast({
+  title: "Gagal",
+  description: "Gagal mengunduh laporan.",
+  variant: "destructive",
+});
     }
   };
 
@@ -474,6 +497,9 @@ export default function AdminDashboard({
                     key={w.id}
                     onClick={() => openWorkerDetail(w)}
                     className="sa-table__row"
+                    role="button"
+                    tabIndex={0}
+                    onKeyPress={(e) => { if (e.key === 'Enter' || e.key === ' ') openWorkerDetail(w); }}
                   >
                     <td>
                       <div className="sa-table__name">
@@ -498,7 +524,7 @@ export default function AdminDashboard({
         </div>
       </div>
 
-      {/* Detail Dialog (preserved from original) */}
+      {/* Detail Dialog */}
       <Dialog
         open={!!selectedWorker}
         onOpenChange={(open) => {
@@ -508,153 +534,160 @@ export default function AdminDashboard({
           }
         }}
       >
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" aria-describedby="worker-dialog-description" aria-labelledby="worker-dialog-title">
           <DialogHeader>
-            <DialogTitle>{selectedWorker?.name}</DialogTitle>
+            <DialogTitle id="worker-dialog-title">{selectedWorker?.name}</DialogTitle>
             <p className="text-sm text-muted-foreground">
               {selectedWorker?.email}
             </p>
           </DialogHeader>
+          <DialogDescription id="worker-dialog-description" className="sr-only">
+            Detailed performance information for the selected worker, including quiz history and point transactions.
+          </DialogDescription>
 
           {loadingDetail && !workerDetail ? (
             <div className="py-10 flex justify-center">
               <Loader2 className="w-5 h-5 animate-spin" />
             </div>
           ) : workerDetail ? (
-            <div className="space-y-6">
-              {/* Quiz */}
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-semibold">Riwayat Quiz</h3>
-                  <span className="text-xs text-muted-foreground">
-                    {workerDetail.pagination.total} total
-                  </span>
-                </div>
+            workerDetail.error ? (
+              <div className="p-4 text-red-600">Error: {workerDetail.error}</div>
+            ) : (
+              <div className="space-y-6">
+                {/* Quiz */}
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-semibold">Riwayat Quiz</h3>
+                    <span className="text-xs text-muted-foreground">
+                      {workerDetail.pagination.total} total
+                    </span>
+                  </div>
 
-                <div className="space-y-3">
-                  {workerDetail.quizSessions.map((session: any) => {
-                    const duration =
-                      session.submittedAt && session.startedAt
-                        ? Math.round(
-                            (new Date(session.submittedAt).getTime() -
-                              new Date(session.startedAt).getTime()) /
-                              1000
-                          )
-                        : null;
+                  <div className="space-y-3">
+                    {workerDetail.quizSessions.map((session: any) => {
+                      const duration =
+                        session.submittedAt && session.startedAt
+                          ? Math.round(
+                              (new Date(session.submittedAt).getTime() -
+                                new Date(session.startedAt).getTime()) /
+                                1000
+                            )
+                          : null;
 
-                    const correctCount = session.userAnswers.filter(
-                      (a: any) => a.isCorrect
-                    ).length;
+                      const correctCount = session.userAnswers.filter(
+                        (a: any) => a.isCorrect
+                      ).length;
 
-                    return (
-                      <div key={session.id} className="border rounded-lg p-3">
-                        <div className="flex justify-between items-start mb-2">
-                          <div>
-                            <p className="text-sm font-medium">
-                              {session.quizConfig.name}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {new Date(session.submittedAt).toLocaleString(
-                                "id-ID"
-                              )}
-                            </p>
-                          </div>
-
-                          <div className="text-right">
-                            <span
-                              className={`text-xs px-2 py-1 rounded-full ${
-                                session.passed
-                                  ? "bg-green-100 text-green-700"
-                                  : "bg-red-100 text-red-600"
-                              }`}
-                            >
-                              {session.passed ? "Lulus" : "Tidak Lulus"}
-                            </span>
-                            <p className="text-sm font-bold mt-1">
-                              {session.score} pts
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="space-y-1">
-                          {session.userAnswers.map((a: any) => (
-                            <div
-                              key={a.id}
-                              className="flex items-start gap-2 text-xs"
-                            >
-                              {a.isCorrect ? (
-                                <CheckCircle2 className="w-3.5 h-3.5 text-green-600 shrink-0 mt-0.5" />
-                              ) : (
-                                <XCircle className="w-3.5 h-3.5 text-red-500 shrink-0 mt-0.5" />
-                              )}
-                              <span className="text-muted-foreground line-clamp-1">
-                                {a.question?.text ?? "Soal dihapus"}
-                              </span>
-                              {a.isCorrect && (
-                                <span className="text-green-600 shrink-0">
-                                  +{a.pointsEarned}
-                                </span>
-                              )}
+                      return (
+                        <div key={session.id} className="border rounded-lg p-3">
+                          <div className="flex justify-between items-start mb-2">
+                            <div>
+                              <p className="text-sm font-medium">
+                                {session.quizConfig.name}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {new Date(session.submittedAt).toLocaleString(
+                                  "id-ID"
+                                )}
+                              </p>
                             </div>
-                          ))}
+
+                            <div className="text-right">
+                              <span
+                                className={`text-xs px-2 py-1 rounded-full ${
+                                  session.passed
+                                    ? "bg-green-100 text-green-700"
+                                    : "bg-red-100 text-red-600"
+                                }`}
+                              >
+                                {session.passed ? "Lulus" : "Tidak Lulus"}
+                              </span>
+                              <p className="text-sm font-bold mt-1">
+                                {session.score} pts
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            {session.userAnswers.map((a: any) => (
+                              <div
+                                key={a.id}
+                                className="flex items-start gap-2 text-xs"
+                              >
+                                {a.isCorrect ? (
+                                  <CheckCircle2 className="w-3.5 h-3.5 text-green-600 shrink-0 mt-0.5" />
+                                ) : (
+                                  <XCircle className="w-3.5 h-3.5 text-red-500 shrink-0 mt-0.5" />
+                                )}
+                                <span className="text-muted-foreground line-clamp-1">
+                                  {a.question?.text ?? "Soal dihapus"}
+                                </span>
+                                {a.isCorrect && (
+                                  <span className="text-green-600 shrink-0">
+                                    +{a.pointsEarned}
+                                  </span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+
+                          <p className="text-xs text-muted-foreground mt-2">
+                            {correctCount}/{session.userAnswers.length} benar
+                            {duration && ` • ${duration} detik`}
+                          </p>
                         </div>
+                      );
+                    })}
+                  </div>
 
-                        <p className="text-xs text-muted-foreground mt-2">
-                          {correctCount}/{session.userAnswers.length} benar
-                          {duration && ` • ${duration} detik`}
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {workerDetail.pagination.hasMore && (
-                  <Button
-                    variant="outline"
-                    className="w-full mt-4"
-                    onClick={loadMoreQuiz}
-                    disabled={loadingDetail}
-                  >
-                    {loadingDetail ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Loading...
-                      </>
-                    ) : (
-                      "Load More"
-                    )}
-                  </Button>
-                )}
-              </div>
-
-              {/* Point */}
-              <div>
-                <h3 className="font-semibold mb-3">Riwayat Poin</h3>
-                <div className="space-y-2">
-                  {workerDetail.pointTransactions.map((t: any) => (
-                    <div
-                      key={t.id}
-                      className="flex justify-between items-center text-sm"
+                  {workerDetail.pagination.hasMore && (
+                    <Button
+                      variant="outline"
+                      className="w-full mt-4"
+                      onClick={loadMoreQuiz}
+                      disabled={loadingDetail}
                     >
-                      <div>
-                        <p className="font-medium">{t.description}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(t.createdAt).toLocaleDateString("id-ID")}
-                        </p>
-                      </div>
-                      <span
-                        className={`font-bold ${
-                          t.points > 0 ? "text-green-600" : "text-red-500"
-                        }`}
+                      {loadingDetail ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Loading...
+                        </>
+                      ) : (
+                        "Load More"
+                      )}
+                    </Button>
+                  )}
+                </div>
+
+                {/* Point */}
+                <div>
+                  <h3 className="font-semibold mb-3">Riwayat Poin</h3>
+                  <div className="space-y-2">
+                    {workerDetail.pointTransactions.map((t: any) => (
+                      <div
+                        key={t.id}
+                        className="flex justify-between items-center text-sm"
                       >
-                        {t.points > 0 ? "+" : ""}
-                        {t.points}
-                      </span>
-                    </div>
-                  ))}
+                        <div>
+                          <p className="font-medium">{t.description}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(t.createdAt).toLocaleDateString("id-ID")}
+                          </p>
+                        </div>
+                        <span
+                          className={`font-bold ${
+                            t.points > 0 ? "text-green-600" : "text-red-500"
+                          }`}
+                        >
+                          {t.points > 0 ? "+" : ""}
+                          {t.points}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
+            )
           ) : null}
         </DialogContent>
       </Dialog>

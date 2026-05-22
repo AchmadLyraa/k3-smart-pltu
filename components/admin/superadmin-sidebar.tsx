@@ -95,7 +95,7 @@ export default function SuperAdminSidebar() {
           <Image
             src="/images/logonew-k3.svg"
             alt="K3 SMART"
-            width={160}
+            width={140}
             height={50}
             priority
             style={{ objectFit: "contain" }}

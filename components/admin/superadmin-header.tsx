@@ -23,13 +23,13 @@ interface SuperAdminHeaderProps {
 }
 
 const BREADCRUMB_MAP: Record<string, string> = {
-  "/admin/dashboard": "Dashboard / Admin",
-  "/admin/users": "Kelola Pengguna / Admin",
-  "/admin/reward-admin": "Manajemen Hadiah / Admin",
-  "/admin/cms": "CMS / Admin",
-  "/admin/leaderboard": "Leaderboard / Admin",
-  "/admin/semester": "Riwayat Semester / Admin",
-  "/admin/profile": "Profile / Admin",
+  "/admin/dashboard": "Dashboard / Dashboard",
+  "/admin/users": "Dashboard / Kelola Pengguna",
+  "/admin/reward-admin": "Dashboard / Manajemen Hadiah",
+  "/admin/cms": "Dashboard / CMS",
+  "/admin/leaderboard": "Dashboard / Leaderboard",
+  "/admin/semester": "Dashboard / Riwayat Semester",
+  "/admin/profile": "Dashboard / Profile",
 };
 
 export default function SuperAdminHeader({
