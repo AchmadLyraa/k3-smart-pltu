@@ -231,22 +231,12 @@ export default function CMSTopicsTab({ initialTopics }: CMSTopicsTabProps) {
                     )}
                   </div>
                   <div className="flex items-center gap-1">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-slate-500 hover:text-slate-600 hover:bg-slate-50 rounded-full w-8 h-8 p-0 flex items-center justify-center"
-                      onClick={() => handleEditClick(topic)}
-                    >
-                      <SquarePen className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full w-8 h-8 p-0 flex items-center justify-center"
-                      onClick={() => handleDeleteTopic(topic.id)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                    <button className="p-1.5 text-muted-foreground hover:bg-blue-50 rounded transition-colors" title="Edit" onClick={() => handleEditClick(topic)}>
+                      <SquarePen className="w-4.5 h-4.5" strokeWidth={2} />
+                    </button>
+                    <button className="p-1.5 text-red-500 hover:bg-red-50 rounded transition-colors" title="Delete" onClick={() => handleDeleteTopic(topic.id)}>
+                      <Trash2 className="w-4.5 h-4.5" strokeWidth={2} />
+                    </button>
                   </div>
                 </div>
               ))}
@@ -270,9 +260,9 @@ export default function CMSTopicsTab({ initialTopics }: CMSTopicsTabProps) {
           </DialogHeader>
           <form onSubmit={handleCreateTopic} className="space-y-4 pt-2">
             <div>
-              <label className="block text-sm font-medium mb-1.5 text-slate-700">Topic Name</label>
+              <label className="block text-sm font-medium mb-1.5 text-slate-700">Nama Topik</label>
               <Input
-                placeholder="Topic name (e.g., Fire Safety)"
+                placeholder="Nama Topik (e.g., Keselamatan Kebakaran)"
                 value={name}
                 onChange={(e) => handleNameChange(e.target.value)}
                 required
@@ -292,7 +282,7 @@ export default function CMSTopicsTab({ initialTopics }: CMSTopicsTabProps) {
             <div>
               <label className="block text-sm font-medium mb-1.5 text-slate-700">Description</label>
               <Input
-                placeholder="Description (optional)"
+                placeholder="Deskripsi (optional)"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 className={inputStyleClass}
@@ -327,9 +317,9 @@ export default function CMSTopicsTab({ initialTopics }: CMSTopicsTabProps) {
           </DialogHeader>
           <form onSubmit={handleUpdateTopic} className="space-y-4 pt-2">
             <div>
-              <label className="block text-sm font-medium mb-1.5 text-slate-700">Topic Name</label>
+              <label className="block text-sm font-medium mb-1.5 text-slate-700">Nama Topik</label>
               <Input
-                placeholder="Topic name (e.g., Fire Safety)"
+                placeholder="Nama Topik (e.g., Keselamatan Kebakaran)"
                 value={editName}
                 onChange={(e) => handleEditNameChange(e.target.value)}
                 required
@@ -347,9 +337,9 @@ export default function CMSTopicsTab({ initialTopics }: CMSTopicsTabProps) {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1.5 text-slate-700">Description</label>
+              <label className="block text-sm font-medium mb-1.5 text-slate-700">Deskripsi</label>
               <Input
-                placeholder="Description (optional)"
+                placeholder="Deskripsi (optional)"
                 value={editDescription}
                 onChange={(e) => setEditDescription(e.target.value)}
                 className={inputStyleClass}
@@ -362,14 +352,14 @@ export default function CMSTopicsTab({ initialTopics }: CMSTopicsTabProps) {
                 className="flex-1 rounded-[24px] h-10 border-[#E2E8F0] hover:border-gray-300 transition-all font-semibold"
                 onClick={() => setEditingTopic(null)}
               >
-                Cancel
+                Batal
               </Button>
               <Button
                 type="submit"
                 disabled={editLoading}
                 className="flex-1 bg-[#FF4B4B] hover:bg-[#FF3333] text-white rounded-[24px] h-10 shadow-sm transition-all font-semibold"
               >
-                {editLoading ? "Saving..." : "Save Changes"}
+                {editLoading ? "Menyimpan..." : "Simpan Perubahan"}
               </Button>
             </div>
           </form>

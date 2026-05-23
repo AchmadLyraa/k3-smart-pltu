@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Edit, Trash2, Key } from "lucide-react";
+import { UserRoundPen, Trash2, Key } from "lucide-react";
 import UserEditDialog from "./user-edit-dialog";
 import UserDeleteDialog from "./user-delete-dialog";
 import { ResetPasswordDialog } from "./reset-password-dialog";
@@ -175,7 +175,7 @@ export default function UserTable({ users, onRefresh }: UserTableProps) {
                       className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
                       title="Edit User"
                     >
-                      <Edit className="w-[18px] h-[18px]" strokeWidth={2} />
+                      <UserRoundPen className="w-[18px] h-[18px]" strokeWidth={2} />
                     </button>
                     <button
                       onClick={() => handleDeleteUser(user)}

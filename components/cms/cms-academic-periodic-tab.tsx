@@ -29,6 +29,7 @@ import {
   FileText,
   CheckCircle,
   X,
+  Archive,
 } from "lucide-react";
 import {
   createAcademicPeriod,
@@ -42,7 +43,6 @@ import {
   archiveMaterial,
   deleteMaterial,
 } from "@/app/actions/content";
-import SemesterResetDialog from "@/components/admin/semester-reset-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 
@@ -67,8 +67,9 @@ export default function CmsAcademicPeriodTab({
   const [periods, setPeriods] = useState(initialPeriods);
   const [unassigned, setUnassigned] = useState(unassignedMaterials);
   const [expandedPeriods, setExpandedPeriods] = useState<string[]>([]);
-  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [editPeriod, setEditPeriod] = useState<any>(null);
+  const [editPeriodLoading, setEditPeriodLoading] = useState(false);
   const [showAssignDialog, setShowAssignDialog] = useState<string | null>(null); // periodId
   const [formData, setFormData] = useState({
     name: "",
@@ -124,7 +125,7 @@ export default function CmsAcademicPeriodTab({
         description: `Academic Period "${formData.name}" berhasil dibuat.`,
         variant: "success",
       });
-      setShowCreateForm(false);
+      setShowCreateDialog(false);
       setFormData({ name: "", startDate: "", endDate: "" });
       router.refresh();
     } else {
@@ -146,13 +147,13 @@ export default function CmsAcademicPeriodTab({
       });
       return;
     }
-    setSaving(true);
+    setEditPeriodLoading(true);
     const result = await updateAcademicPeriod(editPeriod.id, {
       name: editPeriod.name,
       startDate: new Date(editPeriod.startDate),
       endDate: new Date(editPeriod.endDate),
     });
-    setSaving(false);
+    setEditPeriodLoading(false);
     if (result.success) {
       toast({
         title: "Berhasil Diperbarui!",
@@ -342,7 +343,7 @@ export default function CmsAcademicPeriodTab({
               title="Archive"
               onClick={() => handleArchive(m.id)}
             >
-              <X className="w-[18px] h-[18px]" strokeWidth={2} />
+              <Archive className="w-[18px] h-[18px]" strokeWidth={2} />
             </button>
           )}
           {periodId && (
@@ -372,25 +373,27 @@ export default function CmsAcademicPeriodTab({
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-semibold">Academic Periods</h2>
         <div className="flex gap-2">
-          <SemesterResetDialog />
           <Button
             className="bg-[#FF4B4B] hover:bg-[#FF3333] text-white rounded-[24px] px-6 h-10 shadow-sm transition-all font-semibold"
-            onClick={() => setShowCreateForm(!showCreateForm)}
+            onClick={() => setShowCreateDialog(true)}
           >
             <Plus className="w-4 h-4 mr-2" />
-            {showCreateForm ? "Cancel" : "Buat Period"}
+            Buat Period
           </Button>
         </div>
       </div>
 
-      {/* Create Form */}
-      {showCreateForm && (
-        <Card>
-          <CardContent className="pt-4 space-y-3">
+      {/* Create Period Dialog */}
+      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+        <DialogContent className="max-w-lg w-full max-h-screen overflow-y-auto rounded-[24px] p-6">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-slate-900">Buat Period Baru</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
             <div>
-              <label className="text-sm font-medium">Nama Period</label>
+              <label className="block text-sm font-medium mb-1.5 text-slate-700">Nama Period</label>
               <Input
-                className="mt-1 bg-white rounded-[24px] shadow-sm border border-slate-100 p-2"
+                className="w-full rounded-[24px] h-11 px-5 border-[#E2E8F0] focus-visible:border-[#FF4B4B] focus-visible:ring-[#FF4B4B]/20 focus-visible:ring-[3px] focus-visible:outline-none transition-all shadow-sm"
                 placeholder="cth: 2025/2026 Semester 1"
                 value={formData.name}
                 onChange={(e) =>
@@ -400,20 +403,30 @@ export default function CmsAcademicPeriodTab({
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-sm font-medium">Tanggal Mulai</label>
-                <Input className="mt-1 bg-white rounded-[24px] shadow-sm border border-slate-100 p-2" type="date" value={formData.startDate} onChange={(e) => setFormData({ ...formData, startDate: e.target.value })} />
+                <label className="block text-sm font-medium mb-1.5 text-slate-700">Tanggal Mulai</label>
+                <Input className="w-full rounded-[24px] h-11 px-5 border-[#E2E8F0] focus-visible:border-[#FF4B4B] focus-visible:ring-[#FF4B4B]/20 focus-visible:ring-[3px] focus-visible:outline-none transition-all shadow-sm" type="date" value={formData.startDate} onChange={(e) => setFormData({ ...formData, startDate: e.target.value })} />
               </div>
               <div>
-                <label className="text-sm font-medium">Tanggal Selesai</label>
-                <Input className="mt-1 bg-white rounded-[24px] shadow-sm border border-slate-100 p-2" type="date" value={formData.endDate} onChange={(e) => setFormData({ ...formData, endDate: e.target.value })} />
+                <label className="block text-sm font-medium mb-1.5 text-slate-700">Tanggal Selesai</label>
+                <Input className="w-full rounded-[24px] h-11 px-5 border-[#E2E8F0] focus-visible:border-[#FF4B4B] focus-visible:ring-[#FF4B4B]/20 focus-visible:ring-[3px] focus-visible:outline-none transition-all shadow-sm" type="date" value={formData.endDate} onChange={(e) => setFormData({ ...formData, endDate: e.target.value })} />
               </div>
             </div>
-            <Button onClick={handleCreate} disabled={saving} className="bg-[#FF4B4B] hover:bg-[#FF3333] text-white rounded-[24px] px-6 h-10 shadow-sm transition-all font-semibold w-full">
-              {saving ? "Menyimpan..." : "Simpan Period"}
-            </Button>
-          </CardContent>
-        </Card>
-      )}
+            <div className="flex gap-2 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1 rounded-[24px] h-10 border-[#E2E8F0] hover:border-gray-300 transition-all font-semibold"
+                onClick={() => setShowCreateDialog(false)}
+              >
+                Cancel
+              </Button>
+              <Button onClick={handleCreate} disabled={saving} className="flex-1 bg-[#FF4B4B] hover:bg-[#FF3333] text-white rounded-[24px] h-10 shadow-sm transition-all font-semibold">
+                {saving ? "Menyimpan..." : "Simpan Period"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Period List */}
       {periods.length === 0 ? (
@@ -542,21 +555,21 @@ export default function CmsAcademicPeriodTab({
         open={!!editPeriod}
         onOpenChange={(open) => !open && setEditPeriod(null)}
       >
-        <DialogContent>
+        <DialogContent className="max-w-lg w-full max-h-screen overflow-y-auto rounded-[24px] p-6">
           <DialogHeader>
-            <DialogTitle>Edit Period</DialogTitle>
+            <DialogTitle className="text-xl font-bold text-slate-900">Edit Period</DialogTitle>
           </DialogHeader>
           {editPeriod && (
-            <div className="space-y-3">
+            <div className="space-y-4 pt-2">
               <div>
-                <label className="text-sm font-medium">Nama</label>
-                <Input className="mt-1 bg-white rounded-[24px] shadow-sm border border-slate-100 p-2" value={editPeriod.name} onChange={(e) => setEditPeriod({ ...editPeriod, name: e.target.value })} />
+                <label className="block text-sm font-medium mb-1.5 text-slate-700">Nama</label>
+                <Input className="w-full rounded-[24px] h-11 px-5 border-[#E2E8F0] focus-visible:border-[#FF4B4B] focus-visible:ring-[#FF4B4B]/20 focus-visible:ring-[3px] focus-visible:outline-none transition-all shadow-sm" value={editPeriod.name} onChange={(e) => setEditPeriod({ ...editPeriod, name: e.target.value })} />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-sm font-medium">Mulai</label>
+                  <label className="block text-sm font-medium mb-1.5 text-slate-700">Mulai</label>
                   <Input
-                    className="mt-1 bg-white rounded-[24px] shadow-sm border border-slate-100 p-2"
+                    className="w-full rounded-[24px] h-11 px-5 border-[#E2E8F0] focus-visible:border-[#FF4B4B] focus-visible:ring-[#FF4B4B]/20 focus-visible:ring-[3px] focus-visible:outline-none transition-all shadow-sm"
                     type="date"
                     value={editPeriod.startDate}
                     onChange={(e) =>
@@ -568,19 +581,19 @@ export default function CmsAcademicPeriodTab({
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">Selesai</label>
-                  <Input className="mt-1 bg-white rounded-[24px] shadow-sm border border-slate-100 p-2" type="date" value={editPeriod.endDate} onChange={(e) => setEditPeriod({ ...editPeriod, endDate: e.target.value })} />
+                  <label className="block text-sm font-medium mb-1.5 text-slate-700">Selesai</label>
+                  <Input className="w-full rounded-[24px] h-11 px-5 border-[#E2E8F0] focus-visible:border-[#FF4B4B] focus-visible:ring-[#FF4B4B]/20 focus-visible:ring-[3px] focus-visible:outline-none transition-all shadow-sm" type="date" value={editPeriod.endDate} onChange={(e) => setEditPeriod({ ...editPeriod, endDate: e.target.value })} />
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 pt-2">
                 <Button
                   variant="outline"
-                  className="flex-1 rounded-[24px]"
+                  className="flex-1 rounded-[24px] h-10 border-[#E2E8F0] hover:border-gray-300 transition-all font-semibold"
                   onClick={() => setEditPeriod(null)}
                 >
                   Cancel
                 </Button>
-                <Button className="bg-[#FF4B4B] hover:bg-[#FF3333] text-white rounded-[24px] px-6 h-10 shadow-sm transition-all font-semibold" onClick={handleUpdate} disabled={saving}>{saving ? "Menyimpan..." : "Simpan"}</Button>
+                <Button className="flex-1 bg-[#FF4B4B] hover:bg-[#FF3333] text-white rounded-[24px] h-10 shadow-sm transition-all font-semibold" onClick={handleUpdate} disabled={editPeriodLoading}>{editPeriodLoading ? "Menyimpan..." : "Simpan"}</Button>
               </div>
             </div>
           )}

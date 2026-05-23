@@ -273,7 +273,7 @@ if (!formData.text.trim()) {
                 onClick={addAnswer}
                 className="w-full rounded-[24px] border-[#FF4B4B] text-[#FF4B4B] hover:bg-[#FF4B4B]/10 transition-all font-semibold h-10"
               >
-                <Plus className="w-4 h-4 mr-2" /> Add Option
+                <Plus className="w-4 h-4 mr-2" /> Tambah Pilihan
               </Button>
             )}
           </div>

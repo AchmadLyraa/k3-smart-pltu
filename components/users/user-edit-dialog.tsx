@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { updateUserProfile } from "@/app/actions/users";
 import {
   Dialog,
@@ -28,11 +28,20 @@ export default function UserEditDialog({
   onOpenChange,
   onSuccess,
 }: UserEditDialogProps) {
-  const [name, setName] = useState(user?.name || "");
-  const [email, setEmail] = useState(user?.email || "");
-  const [nip, setNip] = useState(user?.nip || "");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [nip, setNip] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+
+  // Sync state when user prop changes
+  useEffect(() => {
+    if (user && open) {
+      setName(user.name || "");
+      setEmail(user.email || "");
+      setNip(user.nip || "");
+    }
+  }, [user, open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,14 +127,14 @@ export default function UserEditDialog({
               onClick={() => onOpenChange(false)}
               disabled={loading}
             >
-              Cancel
+              Batal
             </Button>
             <Button
               type="submit"
               disabled={loading}
               className="flex-1 bg-[#FF4B4B] hover:bg-[#FF3333] text-white rounded-[24px] h-10 shadow-sm transition-all font-semibold"
             >
-              {loading ? "Saving..." : "Save Changes"}
+              {loading ? "Menyimpan..." : "Simpan Perubahan"}
             </Button>
           </div>
         </form>

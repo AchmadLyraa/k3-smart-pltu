@@ -28,7 +28,7 @@ const SIDEBAR_ITEMS = [
     icon: Users,
   },
   {
-    label: "Manajemen Hadiah",
+    label: "Kelola Hadiah",
     href: "/admin/reward-admin",
     icon: Gift,
   },

@@ -52,7 +52,7 @@ import {
   FileText,
   ClipboardList,
   Plus,
-  X,
+  Archive,
   CheckCircle2,
   Circle,
   ChevronLeft,
@@ -663,11 +663,11 @@ export default function CMSMaterialsTab({
                               </button>
                             )}
                             {m.status === "PUBLISHED" && (
-                              <button className="p-1.5 text-gray-500 hover:bg-gray-100 rounded transition-colors" title="Archive" onClick={() => handleArchive(m.id)}>
-                                <X className="w-[18px] h-[18px]" strokeWidth={2} />
+                              <button className="p-1.5 text-yellow-500 hover:bg-yellow-100 rounded transition-colors" title="Archive" onClick={() => handleArchive(m.id)}>
+                                <Archive className="w-[18px] h-[18px]" strokeWidth={2} />
                               </button>
                             )}
-                            <button className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors" title="Quiz" onClick={() => openQuizDialog(m)}>
+                            <button className="p-1.5 text-green-600 hover:bg-green-50 rounded transition-colors" title="Quiz" onClick={() => openQuizDialog(m)}>
                               <ClipboardList className="w-[18px] h-[18px]" strokeWidth={2} />
                             </button>
                             <button className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" title="Edit" onClick={() => openEdit(m)}>
@@ -717,29 +717,30 @@ export default function CMSMaterialsTab({
       </Card>
 
       {/* Quiz Dialog */}
+      {/* Quiz Dialog */}
       <Dialog
         open={!!quizMaterial}
         onOpenChange={(open) => !open && setQuizMaterial(null)}
       >
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" aria-describedby={undefined}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-[24px] p-6" aria-describedby={undefined}>
           <DialogHeader>
-            <DialogTitle>Manage Quiz — {quizMaterial?.title}</DialogTitle>
+            <DialogTitle className="text-xl font-bold text-slate-900">Manage Quiz — {quizMaterial?.title}</DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4">
+          <div className="space-y-4 pt-2">
             {/* =================================== Existing quizzes ======================================= */}
             {quizConfigs.length > 0 && (
               <div>
-                <p className="text-sm font-medium mb-2">Quiz yang sudah ada:</p>
+                <p className="text-sm font-semibold text-slate-700 mb-2">Quiz yang sudah ada:</p>
                 <div className="space-y-2">
                   {quizConfigs.map((quiz: any) => (
                     <div
                       key={quiz.id}
-                      className="border rounded-lg p-3 flex justify-between items-center"
+                      className="border border-slate-100 rounded-[16px] p-4 flex justify-between items-center bg-white shadow-sm"
                     >
                       <div>
-                        <p className="text-sm font-medium">{quiz.name}</p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-sm font-medium text-slate-800">{quiz.name}</p>
+                        <p className="text-xs text-slate-500 mt-1">
                           {quiz.questionCount} soal •{" "}
                           {Math.floor(quiz.timeLimit / 60)} menit • Lulus{" "}
                           {quiz.passingScore}%
@@ -768,13 +769,14 @@ export default function CMSMaterialsTab({
 
                 {/* Quiz Pagination */}
                 <div className="flex justify-between items-center mt-3">
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-slate-500">
                     Page {quizPagination.page} of {quizPagination.pages}
                   </p>
                   <div className="flex gap-2">
                     <Button
                       variant="outline"
                       size="sm"
+                      className="rounded-full border-[#E2E8F0]"
                       onClick={() =>
                         quizMaterial &&
                         loadQuizConfigs(
@@ -789,6 +791,7 @@ export default function CMSMaterialsTab({
                     <Button
                       variant="outline"
                       size="sm"
+                      className="rounded-full border-[#E2E8F0]"
                       onClick={() =>
                         quizMaterial &&
                         loadQuizConfigs(
@@ -809,47 +812,43 @@ export default function CMSMaterialsTab({
             )}
 
             {quizConfigs.length === 0 && !quizLoading && (
-              <p className="text-sm text-muted-foreground">
+              <div className="text-center py-6 text-sm text-slate-500 border-2 border-dashed rounded-[16px]">
                 Belum ada quiz config.
-              </p>
+              </div>
             )}
 
             {/* Toggle form */}
             {!showQuizForm ? (
-              <Button onClick={() => setShowQuizForm(true)} className="w-full">
+              <Button onClick={() => setShowQuizForm(true)} className="w-full bg-[#FF4B4B] hover:bg-[#FF3333] text-white rounded-[24px] h-10 shadow-sm transition-all font-semibold">
                 <Plus className="w-4 h-4 mr-2" /> Tambah Quiz Config
               </Button>
             ) : (
-              <div className="border rounded-lg p-4 space-y-4">
+              <div className="border border-slate-100 rounded-[16px] p-5 space-y-4 bg-white shadow-sm">
                 <div className="flex justify-between items-center">
-                  <p className="font-medium text-sm">Quiz Baru</p>
-                  <Button
-                    variant="ghost"
-                    size="sm"
+                  <p className="font-semibold text-slate-800">Quiz Baru</p>
+                  <button
+                    className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-full transition-colors"
                     onClick={() => setShowQuizForm(false)}
                   >
-                    <X className="w-4 h-4" />
-                  </Button>
+                    <Archive className="w-4 h-4" />
+                  </button>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Nama Quiz
-                  </label>
+                  <label className="block text-sm font-medium mb-1.5 text-slate-700">Nama Quiz</label>
                   <Input
                     value={quizFormData.name}
                     onChange={(e) =>
                       setQuizFormData({ ...quizFormData, name: e.target.value })
                     }
                     placeholder="Nama quiz"
+                    className="w-full rounded-[24px] h-11 px-5 border-[#E2E8F0] focus-visible:border-[#FF4B4B] focus-visible:ring-[#FF4B4B]/20 focus-visible:ring-[3px] focus-visible:outline-none transition-all shadow-sm"
                   />
                 </div>
 
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Jumlah Soal
-                    </label>
+                    <label className="block text-sm font-medium mb-1.5 text-slate-700">Jumlah Soal</label>
                     <Input
                       type="number"
                       value={quizFormData.totalQuestions}
@@ -860,12 +859,11 @@ export default function CMSMaterialsTab({
                         })
                       }
                       min="1"
+                      className="w-full rounded-[24px] h-11 px-5 border-[#E2E8F0] focus-visible:border-[#FF4B4B] focus-visible:ring-[#FF4B4B]/20 focus-visible:ring-[3px] focus-visible:outline-none transition-all shadow-sm"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Nilai Lulus (%)
-                    </label>
+                    <label className="block text-sm font-medium mb-1.5 text-slate-700">Nilai Lulus (%)</label>
                     <Input
                       type="number"
                       value={quizFormData.passingScore}
@@ -877,12 +875,11 @@ export default function CMSMaterialsTab({
                       }
                       min="0"
                       max="100"
+                      className="w-full rounded-[24px] h-11 px-5 border-[#E2E8F0] focus-visible:border-[#FF4B4B] focus-visible:ring-[#FF4B4B]/20 focus-visible:ring-[3px] focus-visible:outline-none transition-all shadow-sm"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Waktu (menit)
-                    </label>
+                    <label className="block text-sm font-medium mb-1.5 text-slate-700">Waktu (menit)</label>
                     <Input
                       type="number"
                       value={Math.floor(quizFormData.timeLimit / 60)}
@@ -893,12 +890,11 @@ export default function CMSMaterialsTab({
                         })
                       }
                       min="1"
+                      className="w-full rounded-[24px] h-11 px-5 border-[#E2E8F0] focus-visible:border-[#FF4B4B] focus-visible:ring-[#FF4B4B]/20 focus-visible:ring-[3px] focus-visible:outline-none transition-all shadow-sm"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Deadline (opsional)
-                    </label>
+                    <label className="block text-sm font-medium mb-1.5 text-slate-700">Deadline (opsional)</label>
                     <Input
                       type="datetime-local"
                       value={quizFormData.deadline}
@@ -908,15 +904,16 @@ export default function CMSMaterialsTab({
                           deadline: e.target.value,
                         })
                       }
+                      className="w-full rounded-[24px] h-11 px-5 border-[#E2E8F0] focus-visible:border-[#FF4B4B] focus-visible:ring-[#FF4B4B]/20 focus-visible:ring-[3px] focus-visible:outline-none transition-all shadow-sm"
                     />
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className="text-xs text-muted-foreground mt-1 ml-1">
                       Lewat deadline: -5% per hari, maks -40%
                     </p>
                   </div>
                 </div>
 
                 <div className="flex gap-4 text-sm">
-                  <label className="flex items-center gap-2 cursor-pointer">
+                  <label className="flex items-center gap-2 cursor-pointer text-slate-700">
                     <Checkbox
                       checked={quizFormData.allowRetake}
                       onCheckedChange={(c) =>
@@ -928,7 +925,7 @@ export default function CMSMaterialsTab({
                     />
                     Allow Retake
                   </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
+                  <label className="flex items-center gap-2 cursor-pointer text-slate-700">
                     <Checkbox
                       checked={quizFormData.showCorrectAns}
                       onCheckedChange={(c) =>
@@ -940,7 +937,7 @@ export default function CMSMaterialsTab({
                     />
                     Show Answers
                   </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
+                  <label className="flex items-center gap-2 cursor-pointer text-slate-700">
                     <Checkbox
                       checked={quizFormData.shuffleQuestions}
                       onCheckedChange={(c) =>
@@ -956,7 +953,7 @@ export default function CMSMaterialsTab({
 
                 {/* Select questions */}
                 <div>
-                  <p className="text-sm font-medium mb-2">
+                  <p className="text-sm font-semibold text-slate-700 mb-2">
                     Pilih Soal ({selectedQuestions.length} dipilih)
                   </p>
 
@@ -965,15 +962,15 @@ export default function CMSMaterialsTab({
                     placeholder="Search soal..."
                     value={questionSearch}
                     onChange={(e) => setQuestionSearch(e.target.value)}
-                    className="mb-2"
+                    className="w-full rounded-[24px] h-11 px-5 border-[#E2E8F0] focus-visible:border-[#FF4B4B] focus-visible:ring-[#FF4B4B]/20 focus-visible:ring-[3px] focus-visible:outline-none transition-all shadow-sm mb-2"
                   />
 
                   {questions.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-slate-500 text-center py-4">
                       Belum ada soal di bank soal.
                     </p>
                   ) : (
-                    <div className="space-y-2 max-h-64 overflow-y-auto border rounded-lg p-2">
+                    <div className="space-y-2 max-h-64 overflow-y-auto border border-slate-100 rounded-[16px] p-3">
                       {questions
                         .filter((q: any) =>
                           q.text
@@ -983,7 +980,7 @@ export default function CMSMaterialsTab({
                         .map((q: QuestionItem) => (
                           <label
                             key={q.id}
-                            className="flex items-start gap-2 p-2 hover:bg-muted rounded cursor-pointer"
+                            className="flex items-start gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer"
                           >
                             <Checkbox
                               checked={selectedQuestions.includes(q.id)}
@@ -996,19 +993,15 @@ export default function CMSMaterialsTab({
                               }}
                             />
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm">{q.text}</p>
+                              <p className="text-sm text-slate-800">{q.text}</p>
                               <div className="flex gap-2 mt-0.5">
-                                <span className="text-xs text-muted-foreground">
-                                  {q.type}
-                                </span>
+                                <span className="text-xs text-slate-500">{q.type}</span>
                                 <span
                                   className={`text-xs px-1.5 rounded-full ${difficultyColor[q.difficulty] ?? ""}`}
                                 >
                                   {q.difficulty}
                                 </span>
-                                <span className="text-xs text-muted-foreground">
-                                  {q.points} pts
-                                </span>
+                                <span className="text-xs text-slate-500">{q.points} pts</span>
                               </div>
                             </div>
                           </label>
@@ -1017,13 +1010,23 @@ export default function CMSMaterialsTab({
                   )}
                 </div>
 
-                <Button
-                  className="w-full"
-                  onClick={handleCreateQuiz}
-                  disabled={savingQuiz}
-                >
-                  {savingQuiz ? "Menyimpan..." : "Simpan Quiz Config"}
-                </Button>
+                <div className="flex gap-2 pt-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex-1 rounded-[24px] h-10 border-[#E2E8F0] hover:border-gray-300 transition-all font-semibold"
+                    onClick={() => setShowQuizForm(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleCreateQuiz}
+                    disabled={savingQuiz}
+                    className="flex-1 bg-[#FF4B4B] hover:bg-[#FF3333] text-white rounded-[24px] h-10 shadow-sm transition-all font-semibold"
+                  >
+                    {savingQuiz ? "Menyimpan..." : "Simpan Quiz Config"}
+                  </Button>
+                </div>
               </div>
             )}
           </div>

@@ -1,27 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Lock, Mail, User, MapPin, Building2, Clock, CheckCircle2, AlertCircle } from "lucide-react";
 import { getUserProfile, changePassword } from "@/app/actions/users";
 import { useSession } from "next-auth/react";
+
+const inputStyleClass =
+  "w-full rounded-[24px] h-11 px-5 border-[#E2E8F0] focus-visible:border-[#FF4B4B] focus-visible:ring-[#FF4B4B]/20 focus-visible:ring-[3px] focus-visible:outline-none transition-all shadow-sm";
 
 export default function UserProfile() {
   const { data: session } = useSession();
@@ -61,7 +54,6 @@ export default function UserProfile() {
     setPasswordError("");
     setPasswordSuccess("");
 
-    // Validation
     if (!passwordForm.oldPassword.trim()) {
       setPasswordError("Current password is required");
       return;
@@ -100,7 +92,7 @@ export default function UserProfile() {
     setPasswordLoading(true);
     try {
       const result = await changePassword(
-        session!.user.id,
+        session?.user?.id ?? "",
         passwordForm.oldPassword,
         passwordForm.newPassword,
       );
@@ -126,217 +118,183 @@ export default function UserProfile() {
 
   if (loading) {
     return (
-      <Card>
-        <CardContent className="flex items-center justify-center py-12">
-          <p className="text-muted-foreground">Loading profile...</p>
-        </CardContent>
-      </Card>
+      <div className="bg-white rounded-[24px] shadow-sm border border-slate-100 p-8 flex items-center justify-center py-16">
+        <p className="text-muted-foreground">Loading profile...</p>
+      </div>
     );
   }
 
   if (error || !profile) {
     return (
-      <Card>
-        <CardContent className="py-12">
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error || "Profile not found"}</AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
+      <div className="bg-white rounded-[24px] shadow-sm border border-slate-100 p-8 py-12">
+        <div className="rounded-[24px] bg-red-50 border border-red-200 p-4 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+          <p className="text-sm text-red-700">{error || "Profile not found"}</p>
+        </div>
+      </div>
     );
   }
 
   return (
     <>
-      <div className="grid gap-6">
-        {/* Profile Header */}
-        <Card>
-          <CardHeader>
-            <CardTitle>My Profile</CardTitle>
-            <CardDescription>Manage your personal information</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Profile Picture and Basic Info */}
-            <div className="flex gap-6 items-start">
-              <div className="flex-shrink-0">
-                {profile.image ? (
-                  <img
-                    src={profile.image}
-                    alt={profile.name}
-                    className="h-24 w-24 rounded-lg object-cover border border-border"
-                  />
-                ) : (
-                  <div className="h-24 w-24 rounded-lg bg-muted flex items-center justify-center border border-border">
-                    <User className="h-12 w-12 text-muted-foreground" />
-                  </div>
-                )}
-              </div>
-
-              <div className="flex-1">
-                <div className="space-y-1">
-                  <h2 className="text-2xl font-bold">{profile.name}</h2>
-                  <p className="text-sm text-muted-foreground flex items-center gap-2">
-                    <Mail className="h-4 w-4" />
-                    {profile.email}
-                  </p>
+      <div className="space-y-6">
+        {/* Profile Header Card */}
+        <div className="bg-white rounded-[24px] shadow-sm border border-slate-100 p-8">
+          <div className="flex gap-8 items-start">
+            {/* Profile Picture - Circle */}
+            <div className="flex-shrink-0">
+              {profile.image ? (
+                <img
+                  src={profile.image}
+                  alt={profile.name}
+                  className="h-24 w-24 rounded-full object-cover border-4 border-[#FFF0EE]"
+                />
+              ) : (
+                <div className="h-24 w-24 rounded-full bg-[#FFF0EE] flex items-center justify-center border-4 border-[#FFF0EE]">
+                  <User className="h-10 w-10 text-[#FF4B4B]" />
                 </div>
+              )}
+            </div>
 
-                <div className="flex gap-2 mt-4">
-                  <span className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700">
-                    {profile.role}
+            <div className="flex-1 pt-1">
+              <h2 className="text-2xl font-bold text-slate-900">{profile.name}</h2>
+              <p className="text-sm text-slate-500 flex items-center gap-2 mt-1">
+                <Mail className="h-4 w-4 text-slate-400" />
+                {profile.email}
+              </p>
+
+              <div className="flex gap-2 mt-4">
+                <span className="inline-flex items-center rounded-full bg-[#FFF0EE] px-4 py-1.5 text-sm font-semibold text-[#FF4B4B]">
+                  {profile.role}
+                </span>
+                {profile.status === "ACTIVE" ? (
+                  <span className="inline-flex items-center rounded-full bg-green-50 px-4 py-1.5 text-sm font-semibold text-green-700">
+                    <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" />
+                    Active
                   </span>
-                  {profile.status === "ACTIVE" ? (
-                    <span className="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700">
-                      <CheckCircle2 className="h-3 w-3 mr-1" />
-                      Active
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700">
-                      {profile.status}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Divider */}
-            <div className="border-t" />
-
-            {/* Personal Information */}
-            <div className="space-y-4">
-              <h3 className="font-semibold">Personal Information</h3>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Full Name
-                  </label>
-                  <p className="text-sm mt-1">{profile.name || "-"}</p>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    <Mail className="h-4 w-4 inline mr-1" />
-                    Email
-                  </label>
-                  <p className="text-sm mt-1">{profile.email}</p>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    NIP
-                  </label>
-                  <p className="text-sm mt-1">{profile.nip || "-"}</p>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Role
-                  </label>
-                  <p className="text-sm mt-1">{profile.role}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Organizational Information */}
-            {(profile.unit || profile.division || profile.shift) && (
-              <>
-                <div className="border-t" />
-
-                <div className="space-y-4">
-                  <h3 className="font-semibold">Organization</h3>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    {profile.unit && (
-                      <div>
-                        <label className="text-sm font-medium text-muted-foreground flex items-center gap-1">
-                          <Building2 className="h-4 w-4" />
-                          Unit
-                        </label>
-                        <p className="text-sm mt-1">{profile.unit.name}</p>
-                      </div>
-                    )}
-
-                    {profile.division && (
-                      <div>
-                        <label className="text-sm font-medium text-muted-foreground flex items-center gap-1">
-                          <MapPin className="h-4 w-4" />
-                          Division
-                        </label>
-                        <p className="text-sm mt-1">{profile.division.name}</p>
-                      </div>
-                    )}
-
-                    {profile.shift && (
-                      <div>
-                        <label className="text-sm font-medium text-muted-foreground flex items-center gap-1">
-                          <Clock className="h-4 w-4" />
-                          Shift
-                        </label>
-                        <p className="text-sm mt-1">{profile.shift.name}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </>
-            )}
-
-            {/* Account Information */}
-            <div className="border-t" />
-
-            <div className="space-y-4">
-              <h3 className="font-semibold">Account Information</h3>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Account Created
-                  </label>
-                  <p className="text-sm mt-1">
-                    {new Date(profile.createdAt).toLocaleDateString("id-ID", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </p>
-                </div>
-
-                {profile.lastLogin && (
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">
-                      Last Login
-                    </label>
-                    <p className="text-sm mt-1">
-                      {new Date(profile.lastLogin).toLocaleDateString(
-                        "id-ID",
-                        {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        },
-                      )}
-                    </p>
-                  </div>
+                ) : (
+                  <span className="inline-flex items-center rounded-full bg-gray-100 px-4 py-1.5 text-sm font-semibold text-gray-700">
+                    {profile.status}
+                  </span>
                 )}
               </div>
             </div>
+          </div>
+        </div>
 
-            {/* Action Buttons */}
-            <div className="border-t pt-4 flex gap-2">
-              <Button
-                onClick={() => setShowPasswordDialog(true)}
-                variant="outline"
-                className="gap-2"
-              >
-                <Lock className="h-4 w-4" />
-                Change Password
-              </Button>
+        {/* Personal Information Card */}
+        <div className="bg-white rounded-[24px] shadow-sm border border-slate-100 p-8">
+          <h3 className="font-bold text-[15px] text-slate-900 mb-6">Personal Information</h3>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-slate-50 rounded-[16px] p-4">
+              <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">Full Name</p>
+              <p className="text-sm font-semibold text-slate-800 mt-1.5">{profile.name || "-"}</p>
             </div>
-          </CardContent>
-        </Card>
+
+            <div className="bg-slate-50 rounded-[16px] p-4">
+              <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">
+                <Mail className="h-3.5 w-3.5 inline mr-1 text-slate-400" />
+                Email
+              </p>
+              <p className="text-sm font-semibold text-slate-800 mt-1.5">{profile.email}</p>
+            </div>
+
+            <div className="bg-slate-50 rounded-[16px] p-4">
+              <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">NIP</p>
+              <p className="text-sm font-semibold text-slate-800 mt-1.5">{profile.nip || "-"}</p>
+            </div>
+
+            <div className="bg-slate-50 rounded-[16px] p-4">
+              <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">Role</p>
+              <p className="text-sm font-semibold text-slate-800 mt-1.5">{profile.role}</p>
+            </div>
+          </div>
+
+          {/* Organizational Information */}
+          {(profile.unit || profile.division || profile.shift) && (
+            <>
+              <hr className="my-6 border-slate-100" />
+              <h3 className="font-bold text-[15px] text-slate-900 mb-6">Organization</h3>
+
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {profile.unit && (
+                  <div className="bg-slate-50 rounded-[16px] p-4">
+                    <p className="text-xs text-slate-500 font-medium uppercase tracking-wide flex items-center gap-1">
+                      <Building2 className="h-3.5 w-3.5 text-slate-400" />
+                      Unit
+                    </p>
+                    <p className="text-sm font-semibold text-slate-800 mt-1.5">{profile.unit.name}</p>
+                  </div>
+                )}
+
+                {profile.division && (
+                  <div className="bg-slate-50 rounded-[16px] p-4">
+                    <p className="text-xs text-slate-500 font-medium uppercase tracking-wide flex items-center gap-1">
+                      <MapPin className="h-3.5 w-3.5 text-slate-400" />
+                      Division
+                    </p>
+                    <p className="text-sm font-semibold text-slate-800 mt-1.5">{profile.division.name}</p>
+                  </div>
+                )}
+
+                {profile.shift && (
+                  <div className="bg-slate-50 rounded-[16px] p-4">
+                    <p className="text-xs text-slate-500 font-medium uppercase tracking-wide flex items-center gap-1">
+                      <Clock className="h-3.5 w-3.5 text-slate-400" />
+                      Shift
+                    </p>
+                    <p className="text-sm font-semibold text-slate-800 mt-1.5">{profile.shift.name}</p>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Account Information */}
+          <hr className="my-6 border-slate-100" />
+          <h3 className="font-bold text-[15px] text-slate-900 mb-6">Account Information</h3>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-slate-50 rounded-[16px] p-4">
+              <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">Account Created</p>
+              <p className="text-sm font-semibold text-slate-800 mt-1.5">
+                {new Date(profile.createdAt).toLocaleDateString("id-ID", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </p>
+            </div>
+
+            {profile.lastLogin && (
+              <div className="bg-slate-50 rounded-[16px] p-4">
+                <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">Last Login</p>
+                <p className="text-sm font-semibold text-slate-800 mt-1.5">
+                  {new Date(profile.lastLogin).toLocaleDateString("id-ID", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="mt-8 pt-6 border-t border-slate-100">
+            <Button
+              onClick={() => setShowPasswordDialog(true)}
+              variant="outline"
+              className="rounded-[24px] h-10 px-6 border-[#E2E8F0] hover:border-gray-300 transition-all font-semibold gap-2"
+            >
+              <Lock className="h-4 w-4" />
+              Change Password
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Change Password Dialog */}
@@ -344,33 +302,28 @@ export default function UserProfile() {
         open={showPasswordDialog}
         onOpenChange={setShowPasswordDialog}
       >
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="max-w-lg w-full max-h-screen overflow-y-auto rounded-[24px] p-6">
           <DialogHeader>
-            <DialogTitle>Change Password</DialogTitle>
-            <DialogDescription>
-              Enter your current password and choose a new one
-            </DialogDescription>
+            <DialogTitle className="text-xl font-bold text-slate-900">Change Password</DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4 py-4">
+          <div className="space-y-4 pt-2">
             {passwordError && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{passwordError}</AlertDescription>
-              </Alert>
+              <div className="rounded-[24px] bg-red-50 border border-red-200 p-4 flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+                <p className="text-sm text-red-700">{passwordError}</p>
+              </div>
             )}
 
             {passwordSuccess && (
-              <Alert className="bg-green-50 border-green-200">
-                <CheckCircle2 className="h-4 w-4 text-green-600" />
-                <AlertDescription className="text-green-700">
-                  {passwordSuccess}
-                </AlertDescription>
-              </Alert>
+              <div className="rounded-[24px] bg-green-50 border border-green-200 p-4 flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
+                <p className="text-sm text-green-700">{passwordSuccess}</p>
+              </div>
             )}
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Current Password</label>
+            <div>
+              <label className="block text-sm font-medium mb-1.5 text-slate-700">Current Password</label>
               <Input
                 type="password"
                 placeholder="Enter your current password"
@@ -382,11 +335,12 @@ export default function UserProfile() {
                   })
                 }
                 disabled={passwordLoading}
+                className={inputStyleClass}
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">New Password</label>
+            <div>
+              <label className="block text-sm font-medium mb-1.5 text-slate-700">New Password</label>
               <Input
                 type="password"
                 placeholder="Enter new password"
@@ -398,14 +352,15 @@ export default function UserProfile() {
                   })
                 }
                 disabled={passwordLoading}
+                className={inputStyleClass}
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground mt-1 ml-1">
                 Minimum 8 characters, must include uppercase, lowercase, and number
               </p>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Confirm Password</label>
+            <div>
+              <label className="block text-sm font-medium mb-1.5 text-slate-700">Confirm Password</label>
               <Input
                 type="password"
                 placeholder="Confirm new password"
@@ -417,12 +372,14 @@ export default function UserProfile() {
                   })
                 }
                 disabled={passwordLoading}
+                className={inputStyleClass}
               />
             </div>
 
-            <div className="flex gap-2 justify-end pt-4 border-t">
+            <div className="flex gap-2 pt-2">
               <Button
                 variant="outline"
+                className="flex-1 rounded-[24px] h-10 border-[#E2E8F0] hover:border-gray-300 transition-all font-semibold"
                 onClick={() => setShowPasswordDialog(false)}
                 disabled={passwordLoading}
               >
@@ -431,6 +388,7 @@ export default function UserProfile() {
               <Button
                 onClick={handleChangePassword}
                 disabled={passwordLoading}
+                className="flex-1 bg-[#FF4B4B] hover:bg-[#FF3333] text-white rounded-[24px] h-10 shadow-sm transition-all font-semibold"
               >
                 {passwordLoading ? "Changing..." : "Change Password"}
               </Button>

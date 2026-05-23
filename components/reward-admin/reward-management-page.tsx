@@ -28,7 +28,7 @@ export default function RewardManagementPage() {
     <div className="space-y-6">
       <div className="sa-welcome mb-8">
         <div>
-          <h1 className="sa-welcome__title">Manajemen Hadiah</h1>
+          <h1 className="sa-welcome__title">Kelola Hadiah</h1>
           <p className="sa-welcome__subtitle">
             Buat reward baru dan kelola daftar reward yang tersedia
           </p>

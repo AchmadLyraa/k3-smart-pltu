@@ -21,7 +21,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
-import { Upload, Link, Loader2, CheckCircle } from "lucide-react";
+import { Upload, Link, Loader2, CheckCircle, ExternalLink } from "lucide-react";
 
 export default function MaterialForm({
   topics,
@@ -193,6 +193,17 @@ export default function MaterialForm({
     }
   };
 
+  // Helper to extract YouTube video ID from URL
+  const extractYouTubeId = (url: string): string | null => {
+    try {
+      const ytRegex = /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/;
+      const match = url.match(ytRegex);
+      return match ? match[1] : null;
+    } catch {
+      return null;
+    }
+  };
+
   // ── Reusable upload zone ──────────────────────────────────────────────────
   const UploadZone = ({
     fileRef,
@@ -250,8 +261,6 @@ export default function MaterialForm({
   );
 
   return (
-    <Card>
-      <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Topic & Type */}
           <div className="grid grid-cols-2 gap-4">
@@ -376,21 +385,48 @@ export default function MaterialForm({
               {formData.videoUrl && (
                 <div className="mt-2">
                   <p className="text-xs text-muted-foreground mb-1">Preview:</p>
-                  <div className="aspect-video rounded overflow-hidden bg-black">
-                    {isStorageUrl(formData.videoUrl) ? (
-                      <video
-                        src={formData.videoUrl}
-                        controls
-                        className="w-full h-full"
-                      />
-                    ) : (
-                      <iframe
-                        src={formData.videoUrl.replace("watch?v=", "embed/")}
-                        className="w-full h-full"
-                        allowFullScreen
-                      />
-                    )}
+                  <div className="aspect-video rounded overflow-hidden bg-black relative flex items-center justify-center">
+                    {(() => {
+                      const ytId = extractYouTubeId(formData.videoUrl);
+                      if (ytId) {
+                        // YouTube: show thumbnail instead of iframe
+                        return (
+                          <img
+                            src={`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`}
+                            alt="YouTube thumbnail"
+                            className="w-full h-full object-cover absolute inset-0"
+                          />
+                        );
+                      }
+                      if (isStorageUrl(formData.videoUrl)) {
+                        return (
+                          <video
+                            src={formData.videoUrl}
+                            controls
+                            className="w-full h-full absolute inset-0"
+                          />
+                        );
+                      }
+                      // Google Drive or other: show placeholder
+                      return (
+                        <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                          <ExternalLink className="w-8 h-8" />
+                          <p className="text-xs text-center px-4">
+                            Preview tidak tersedia. Buka link di tab baru.
+                          </p>
+                        </div>
+                      );
+                    })()}
                   </div>
+                  <a
+                    href={formData.videoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-blue-600 hover:underline mt-1 inline-flex items-center gap-1"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    Buka video di tab baru
+                  </a>
                 </div>
               )}
             </div>
@@ -491,7 +527,5 @@ export default function MaterialForm({
             {loading ? "Membuat..." : "Buat Materi"}
           </Button>
         </form>
-      </CardContent>
-    </Card>
   );
 }

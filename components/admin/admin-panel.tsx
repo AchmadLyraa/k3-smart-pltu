@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -17,6 +17,8 @@ import {
   Loader2,
   Search,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Download,
   MoreVertical,
   Users,
@@ -136,6 +138,8 @@ export default function AdminDashboard({
   const [searchQuery, setSearchQuery] = useState("");
   const [showValue, setShowValue] = useState(true);
   const [selectedPeriodId, setSelectedPeriodId] = useState(defaultPeriodId);
+  const [workerPage, setWorkerPage] = useState(1);
+  const WORKER_PAGE_SIZE = 10;
   const [isNavigating, setIsNavigating] = useState(false);
   const { toast } = useToast();
 
@@ -285,6 +289,18 @@ export default function AdminDashboard({
         w.email?.toLowerCase().includes(q)
     );
   }, [workers, searchQuery]);
+
+  // Pagination for workers table
+  const totalWorkerPages = Math.max(1, Math.ceil(filteredWorkers.length / WORKER_PAGE_SIZE));
+  const paginatedWorkers = useMemo(() => {
+    const start = (workerPage - 1) * WORKER_PAGE_SIZE;
+    return filteredWorkers.slice(start, start + WORKER_PAGE_SIZE);
+  }, [filteredWorkers, workerPage]);
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setWorkerPage(1);
+  }, [searchQuery]);
 
   // Calculate progress percentages
   const progressData = useMemo(() => {
@@ -492,7 +508,7 @@ export default function AdminDashboard({
                   </td>
                 </tr>
               ) : (
-                filteredWorkers.map((w) => (
+                paginatedWorkers.map((w) => (
                   <tr
                     key={w.id}
                     onClick={() => openWorkerDetail(w)}
@@ -522,6 +538,31 @@ export default function AdminDashboard({
             </tbody>
           </table>
         </div>
+
+        {/* Pagination */}
+        {filteredWorkers.length > 0 && (
+          <div className="flex justify-between items-center mt-6">
+            <p className="text-sm text-muted-foreground">
+              Page {workerPage} of {totalWorkerPages}
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setWorkerPage(p => Math.max(p - 1, 1))}
+                disabled={workerPage === 1}
+                className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 disabled:opacity-50 hover:bg-gray-50 transition-colors"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setWorkerPage(p => Math.min(p + 1, totalWorkerPages))}
+                disabled={workerPage >= totalWorkerPages}
+                className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 disabled:opacity-50 hover:bg-gray-50 transition-colors"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Detail Dialog */}

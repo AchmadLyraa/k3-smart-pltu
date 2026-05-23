@@ -142,7 +142,7 @@ export default function CreateUserForm({ onSuccess }: CreateUserFormProps) {
           variant="outline"
           className="flex-1 rounded-[24px] h-10 border-[#E2E8F0] hover:border-gray-300 transition-all font-semibold"
         >
-          Cancel
+          Batal
         </Button>
         <Button
           type="submit"

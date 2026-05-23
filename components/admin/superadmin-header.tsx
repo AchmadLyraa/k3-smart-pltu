@@ -25,7 +25,7 @@ interface SuperAdminHeaderProps {
 const BREADCRUMB_MAP: Record<string, string> = {
   "/admin/dashboard": "Dashboard / Dashboard",
   "/admin/users": "Dashboard / Kelola Pengguna",
-  "/admin/reward-admin": "Dashboard / Manajemen Hadiah",
+  "/admin/reward-admin": "Dashboard / Kelola Hadiah",
   "/admin/cms": "Dashboard / CMS",
   "/admin/leaderboard": "Dashboard / Leaderboard",
   "/admin/semester": "Dashboard / Riwayat Semester",

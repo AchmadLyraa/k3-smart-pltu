@@ -17,7 +17,7 @@ export default function RewardAdminPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Manajemen Reward</h1>
+        <h1 className="text-3xl font-bold">Kelola Hadiah</h1>
         <p className="text-muted-foreground mt-2">
           Buat reward baru dan kelola daftar reward yang tersedia
         </p>

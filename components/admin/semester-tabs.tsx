@@ -4,13 +4,12 @@
 
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   Pagination,
   PaginationContent,
   PaginationItem,
   PaginationLink,
-  PaginationPrevious,
-  PaginationNext,
 } from "@/components/ui/pagination";
 
 export default function SemesterTabs({ groups, workers }: { groups: any[]; workers: any[] }) {
@@ -93,7 +92,13 @@ export default function SemesterTabs({ groups, workers }: { groups: any[]; worke
             <Pagination className="mt-6">
               <PaginationContent>
                 <PaginationItem>
-                  <PaginationPrevious onClick={() => setHistoryPage(p => Math.max(p - 1, 1))} disabled={historyPage === 1} />
+                  <button
+                    onClick={() => setHistoryPage(p => Math.max(p - 1, 1))}
+                    disabled={historyPage === 1}
+                    className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 disabled:opacity-50 hover:bg-gray-50 transition-colors"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
                 </PaginationItem>
                 {[...Array(totalHistoryPages)].map((_, i) => (
                   <PaginationItem key={i}>
@@ -103,7 +108,13 @@ export default function SemesterTabs({ groups, workers }: { groups: any[]; worke
                   </PaginationItem>
                 ))}
                 <PaginationItem>
-                  <PaginationNext onClick={() => setHistoryPage(p => Math.min(p + 1, totalHistoryPages))} disabled={historyPage === totalHistoryPages} />
+                  <button
+                    onClick={() => setHistoryPage(p => Math.min(p + 1, totalHistoryPages))}
+                    disabled={historyPage === totalHistoryPages}
+                    className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 disabled:opacity-50 hover:bg-gray-50 transition-colors"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
                 </PaginationItem>
               </PaginationContent>
             </Pagination>
@@ -141,7 +152,13 @@ export default function SemesterTabs({ groups, workers }: { groups: any[]; worke
             <Pagination className="mt-6">
               <PaginationContent>
                 <PaginationItem>
-                  <PaginationPrevious onClick={() => setAccumPage(p => Math.max(p - 1, 1))} disabled={accumPage === 1} />
+                  <button
+                    onClick={() => setAccumPage(p => Math.max(p - 1, 1))}
+                    disabled={accumPage === 1}
+                    className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 disabled:opacity-50 hover:bg-gray-50 transition-colors"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
                 </PaginationItem>
                 {[...Array(totalAccumPages)].map((_, i) => (
                   <PaginationItem key={i}>
@@ -151,7 +168,13 @@ export default function SemesterTabs({ groups, workers }: { groups: any[]; worke
                   </PaginationItem>
                 ))}
                 <PaginationItem>
-                  <PaginationNext onClick={() => setAccumPage(p => Math.min(p + 1, totalAccumPages))} disabled={accumPage === totalAccumPages} />
+                  <button
+                    onClick={() => setAccumPage(p => Math.min(p + 1, totalAccumPages))}
+                    disabled={accumPage === totalAccumPages}
+                    className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 disabled:opacity-50 hover:bg-gray-50 transition-colors"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
                 </PaginationItem>
               </PaginationContent>
             </Pagination>
