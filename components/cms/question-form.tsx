@@ -46,8 +46,8 @@ const defaultAnswers: Record<QuestionType, AnswerOption[]> = {
     { text: "", isCorrect: false },
   ],
   TRUE_FALSE: [
-    { text: "True", isCorrect: true },
-    { text: "False", isCorrect: false },
+    { text: "Benar", isCorrect: true },
+    { text: "Salah", isCorrect: false },
   ],
 };
 
@@ -102,7 +102,7 @@ export default function QuestionForm({ onSuccess }: { onSuccess: () => void }) {
 if (!formData.text.trim()) {
   toast({
     title: "Error",
-    description: "Question text wajib diisi",
+    description: "Text Soal wajib diisi",
     variant: "destructive",
   });
   return;
@@ -162,14 +162,14 @@ if (!formData.text.trim()) {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium mb-2">
-            Question Text
+            Teks Soal
           </label>
           <Textarea
             value={formData.text}
             onChange={(e) =>
               setFormData({ ...formData, text: e.target.value })
             }
-            placeholder="Enter question"
+            placeholder="Masukan Soal"
             rows={3}
           />
         </div>
@@ -194,7 +194,7 @@ if (!formData.text.trim()) {
           </div>
           <div>
             <label className="block text-sm font-medium mb-2">
-              Difficulty
+              Level
             </label>
             <Select
               value={formData.difficulty}
@@ -233,14 +233,14 @@ if (!formData.text.trim()) {
         {formData.type === "MULTIPLE_CHOICE" && (
           <div className="space-y-3">
             <label className="block text-sm font-medium">
-              Answer Options
+              Pilihan Jawaban
             </label>
             {formData.answers.map((answer, idx) => (
               <div key={idx} className="flex gap-2 items-center">
                 <Input
                   value={answer.text}
                   onChange={(e) => handleAnswerChange(idx, e.target.value)}
-                  placeholder={`Option ${idx + 1}`}
+                  placeholder={`Pilihan ${idx + 1}`}
                 />
                 <Button
                   type="button"
@@ -252,7 +252,7 @@ if (!formData.text.trim()) {
                       : "border-[#E2E8F0] hover:border-[#FF4B4B] hover:text-[#FF4B4B]"
                   }`}
                 >
-                  {answer.isCorrect ? "✓ Correct" : "Set Correct"}
+                  {answer.isCorrect ? "✓ Benar" : "Set Jawaban"}
                 </Button>
                 {formData.answers.length > 2 && (
                   <Button
@@ -283,7 +283,7 @@ if (!formData.text.trim()) {
         {formData.type === "TRUE_FALSE" && (
           <div className="space-y-2">
             <label className="block text-sm font-medium">
-              Correct Answer
+              Jawaban Benar
             </label>
             {formData.answers.map((answer, idx) => (
               <div key={idx} className="flex gap-2 items-center">
@@ -298,7 +298,7 @@ if (!formData.text.trim()) {
                       : "border-[#E2E8F0] hover:border-[#FF4B4B] hover:text-[#FF4B4B]"
                   }`}
                 >
-                  {answer.isCorrect ? "✓ Correct" : "Set Correct"}
+                  {answer.isCorrect ? "✓ Benar" : "Set Jawaban"}
                 </Button>
               </div>
             ))}
@@ -309,7 +309,7 @@ if (!formData.text.trim()) {
         {formData.type === "MULTIPLE_SELECT" && (
           <div className="space-y-3">
             <label className="block text-sm font-medium">
-              Answer Options{" "}
+              Pilihan Jawaban{" "}
               <span className="text-xs text-muted-foreground font-normal">
                 (bisa pilih lebih dari 1 benar)
               </span>
@@ -370,7 +370,7 @@ if (!formData.text.trim()) {
           disabled={loading}
           className="w-full bg-[#FF4B4B] hover:bg-[#FF3333] text-white rounded-[24px] px-6 h-12 shadow-sm transition-all font-semibold"
         >
-          {loading ? "Creating..." : "Create Question"}
+          {loading ? "Membuat..." : "Buat Soal"}
         </Button>
       </form>
     </div>

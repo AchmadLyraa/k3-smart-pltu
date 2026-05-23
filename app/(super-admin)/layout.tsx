@@ -32,6 +32,8 @@ export default async function AdminLayout({
         className="sa-main-content"
         style={{
           flex: 1,
+          minWidth: 0,
+          width: "calc(100% - var(--sa-sidebar-width, 250px) - 32px)",
           marginLeft: "calc(var(--sa-sidebar-width, 250px) + 32px)",
           display: "flex",
           flexDirection: "column",

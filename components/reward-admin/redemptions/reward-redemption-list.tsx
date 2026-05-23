@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { RefreshCw, Save, Check, X, CheckCircle2, Search } from "lucide-react";
+import { RefreshCw, Save, Check, X, CheckCircle2, Search, ChevronLeft, ChevronRight } from "lucide-react";
 
 type RedemptionItem = {
   id: string;
@@ -39,7 +39,7 @@ type RedemptionItem = {
 
 export default function RewardRedemptionList() {
   const { toast } = useToast();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [redemptions, setRedemptions] = useState<RedemptionItem[]>([]);
   const [drafts, setDrafts] = useState<Record<string, string>>({});
@@ -286,9 +286,9 @@ export default function RewardRedemptionList() {
                           className={
                             item.status === "COMPLETED" 
                               ? "bg-green-100 text-green-700 hover:bg-green-100 border-green-200" 
-                              : item.status === "APPROVED"
+                              : item.status === "Disetujui"
                                 ? "bg-blue-100 text-blue-700 hover:bg-blue-100 border-blue-200"
-                                : item.status === "REJECTED"
+                                : item.status === "Ditolak"
                                   ? "bg-red-100 text-red-700 hover:bg-red-100 border-red-200"
                                   : "bg-yellow-100 text-yellow-700 hover:bg-yellow-100 border-yellow-200"
                           }
@@ -323,7 +323,7 @@ export default function RewardRedemptionList() {
                                 className="bg-green-600 hover:bg-green-700 h-8 w-8 p-0"
                                 onClick={() => handleApprove(item.id)}
                                 disabled={savingId === item.id}
-                                title="Approve"
+                                title="Disetujui"
                               >
                                 <Check className="h-4 w-4" />
                               </Button>
@@ -333,7 +333,7 @@ export default function RewardRedemptionList() {
                                 className="h-8 w-8 p-0"
                                 onClick={() => handleReject(item.id)}
                                 disabled={savingId === item.id}
-                                title="Reject"
+                                title="Ditolak"
                               >
                                 <X className="h-4 w-4" />
                               </Button>
@@ -356,7 +356,7 @@ export default function RewardRedemptionList() {
                             className="h-8 w-8 p-0"
                             onClick={() => handleSave(item.id)}
                             disabled={savingId === item.id}
-                            title="Update Shipping Status"
+                            title="Update Status Pengiriman"
                           >
                             <Save className="h-4 w-4" />
                           </Button>
@@ -368,28 +368,26 @@ export default function RewardRedemptionList() {
               </table>
             </div>
 
-            {pagination.pages > 1 && (
-              <div className="mt-4 flex items-center justify-between gap-3">
+            {pagination.total > 0 && (
+              <div className="flex justify-between items-center mt-6">
                 <p className="text-sm text-muted-foreground">
-                  Page {pagination.page} of {pagination.pages} (Total: {pagination.total})
+                  Page {pagination.page} of {pagination.pages || 1}
                 </p>
                 <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
+                  <button
                     onClick={() => loadRedemptions(Math.max(1, page - 1), debouncedSearch)}
                     disabled={page === 1 || loading}
+                    className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 disabled:opacity-50 hover:bg-gray-50 transition-colors"
                   >
-                    Previous
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <button
                     onClick={() => loadRedemptions(Math.min(pagination.pages, page + 1), debouncedSearch)}
-                    disabled={page === pagination.pages || loading}
+                    disabled={page >= pagination.pages || loading}
+                    className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 disabled:opacity-50 hover:bg-gray-50 transition-colors"
                   >
-                    Next
-                  </Button>
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
             )}

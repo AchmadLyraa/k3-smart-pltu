@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -43,13 +42,9 @@ export default function UserManagementPage() {
             </Button>
           </DialogTrigger>
 
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="max-w-lg w-full max-h-screen overflow-y-auto rounded-[24px] p-6">
             <DialogHeader>
-              <DialogTitle>Tambah Pengguna</DialogTitle>
-
-              <DialogDescription>
-                Form untuk menambahkan pengguna baru ke sistem K3 Smart.
-              </DialogDescription>
+              <DialogTitle className="text-xl font-bold text-slate-900">Tambah Pengguna</DialogTitle>
             </DialogHeader>
 
             <CreateUserForm onSuccess={handleCreateSuccess} />

@@ -85,7 +85,6 @@ export default function RewardTable({ rewards, onRefresh }: RewardTableProps) {
               rewards.map((reward) => (
                 <tr key={reward.id} className="border-b border-gray-100 hover:bg-slate-50/50 transition-colors">
                   <td className="py-4 px-6 font-medium text-gray-700">{reward.name}</td>
-                  <td className="py-4 px-6 text-center text-gray-500">-</td>
                   <td className="py-4 px-6 text-gray-500 max-w-[200px] truncate">
                     {reward.description || "-"}
                   </td>

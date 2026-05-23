@@ -132,7 +132,7 @@ export default function MaterialForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.topicId) return alert("Topic wajib diisi");
+    if (!formData.topicId) return alert("Topik wajib diisi");
     if (!formData.title.trim()) return alert("Title wajib diisi");
     if (formData.type === "VIDEO" && !formData.videoUrl.trim())
       return alert("URL video wajib diisi");
@@ -256,7 +256,7 @@ export default function MaterialForm({
           {/* Topic & Type */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Topic</label>
+              <label className="block text-sm font-medium mb-2">Topik</label>
               <Select
                 value={formData.topicId}
                 onValueChange={(val) =>
@@ -264,7 +264,7 @@ export default function MaterialForm({
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select topic" />
+                  <SelectValue placeholder="Pilih Topik" />
                 </SelectTrigger>
                 <SelectContent>
                   {topics.map((t) => (
@@ -292,27 +292,27 @@ export default function MaterialForm({
 
           {/* Title */}
           <div>
-            <label className="block text-sm font-medium mb-2">Title</label>
+            <label className="block text-sm font-medium mb-2">Judul</label>
             <Input
               value={formData.title}
               onChange={(e) =>
                 setFormData({ ...formData, title: e.target.value })
               }
-              placeholder="Material title"
+              placeholder="Judul Materi"
             />
           </div>
 
           {/* Description */}
           <div>
             <label className="block text-sm font-medium mb-2">
-              Description
+              Deskripsi
             </label>
             <Textarea
               value={formData.description}
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
               }
-              placeholder="Brief description"
+              placeholder="Deskripsi Singkat"
               rows={2}
             />
           </div>
@@ -486,9 +486,9 @@ export default function MaterialForm({
           <Button
             type="submit"
             disabled={loading || uploading}
-            className="bg-[#FF4B4B] hover:bg-[#FF3333] text-white rounded-[24px] px-6 h-10 shadow-sm transition-all font-semibold"
+            className="bg-[#FF4B4B] w-full hover:bg-[#FF3333] text-white rounded-[24px] px-6 h-10 shadow-sm transition-all font-semibold"
           >
-            {loading ? "Creating..." : "Create Material"}
+            {loading ? "Membuat..." : "Buat Materi"}
           </Button>
         </form>
       </CardContent>

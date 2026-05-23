@@ -5,7 +5,13 @@ import CreateRewardForm from "@/components/reward-admin/rewards/create-reward-fo
 import RewardList from "@/components/reward-admin/rewards/reward-list";
 import RewardRedemptionList from "@/components/reward-admin/redemptions/reward-redemption-list";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
 
 export default function RewardManagementPage() {
@@ -33,12 +39,12 @@ export default function RewardManagementPage() {
               <Plus className="w-5 h-5 mr-1" strokeWidth={3} /> Tambah
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-  <DialogHeader>
-    <DialogTitle>Buat Reward Baru</DialogTitle>
-  </DialogHeader>
-  <CreateRewardForm onSuccess={handleRewardCreated} />
-</DialogContent>
+          <DialogContent className="max-w-lg w-full max-h-screen overflow-y-auto rounded-[24px] p-6">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-bold text-slate-900">Buat Reward Baru</DialogTitle>
+            </DialogHeader>
+            <CreateRewardForm onSuccess={handleRewardCreated} />
+          </DialogContent>
         </Dialog>
       </div>
       <RewardList refreshTrigger={refreshTrigger} />

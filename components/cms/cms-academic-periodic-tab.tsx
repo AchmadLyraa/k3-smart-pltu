@@ -21,13 +21,14 @@ import {
 import {
   ChevronDown,
   ChevronRight,
-  Pencil,
+  SquarePen,
   Trash2,
   Plus,
   FileVideo,
   FileImage,
   FileText,
   CheckCircle,
+  X,
 } from "lucide-react";
 import {
   createAcademicPeriod,
@@ -327,43 +328,39 @@ export default function CmsAcademicPeriodTab({
             {m.status}
           </span>
           {m.status !== "PUBLISHED" && (
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 px-2 text-xs text-green-600 hover:bg-green-50"
+            <button
+              className="p-1.5 text-green-600 hover:bg-green-50 rounded transition-colors"
+              title="Publish"
               onClick={() => handlePublish(m.id)}
             >
-              Publish
-            </Button>
+              <CheckCircle className="w-[18px] h-[18px]" strokeWidth={2} />
+            </button>
           )}
           {m.status === "PUBLISHED" && (
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 px-2 text-xs"
+            <button
+              className="p-1.5 text-gray-500 hover:bg-gray-100 rounded transition-colors"
+              title="Archive"
               onClick={() => handleArchive(m.id)}
             >
-              Archive
-            </Button>
+              <X className="w-[18px] h-[18px]" strokeWidth={2} />
+            </button>
           )}
           {periodId && (
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 px-2 text-xs text-orange-600 hover:bg-orange-50"
+            <button
+              className="p-1.5 text-orange-600 hover:bg-orange-50 rounded transition-colors"
+              title="Unassign"
               onClick={() => handleUnassign(m.id)}
             >
-              Unassign
-            </Button>
+              <X className="w-[18px] h-[18px]" strokeWidth={2} />
+            </button>
           )}
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-7 px-2 text-xs text-red-600 hover:bg-red-50"
+          <button
+            className="p-1.5 text-[#E74C3C] hover:bg-red-50 rounded transition-colors"
+            title="Delete"
             onClick={() => handleDeleteMaterial(m.id)}
           >
-            <Trash2 className="w-3 h-3" />
-          </Button>
+            <Trash2 className="w-[18px] h-[18px]" strokeWidth={2} />
+          </button>
         </div>
       </div>
     );
@@ -462,30 +459,27 @@ export default function CmsAcademicPeriodTab({
 
                 {/* Right: actions */}
                 <div className="flex gap-1 shrink-0">
-                  <Button
-                    size="sm"
-                    variant={period.isActive ? "default" : "outline"}
-                    className={`h-7 px-2 text-xs ${
+                  <button
+                    className={`p-1.5 rounded transition-colors ${
                       period.isActive
-                        ? "bg-green-600 hover:bg-green-700"
+                        ? "text-green-600 bg-green-50"
                         : "text-green-600 hover:bg-green-50"
                     }`}
+                    title={period.isActive ? "Aktif" : "Set Aktif"}
                     onClick={() => handleSetActive(period.id)}
                   >
-                    {period.isActive ? "Aktif" : "Set Aktif"}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-7 px-2 text-xs"
+                    <CheckCircle className="w-[18px] h-[18px]" strokeWidth={2} />
+                  </button>
+                  <button
+                    className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                    title="Assign Materi"
                     onClick={() => setShowAssignDialog(period.id)}
                   >
-                    + Assign Materi
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-7 px-2 text-xs"
+                    <Plus className="w-[18px] h-[18px]" strokeWidth={2} />
+                  </button>
+                  <button
+                    className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                    title="Edit"
                     onClick={() =>
                       setEditPeriod({
                         ...period,
@@ -494,16 +488,15 @@ export default function CmsAcademicPeriodTab({
                       })
                     }
                   >
-                    <Pencil className="w-3 h-3" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-7 px-2 text-xs text-red-600 hover:bg-red-50"
+                    <SquarePen className="w-[18px] h-[18px]" strokeWidth={2} />
+                  </button>
+                  <button
+                    className="p-1.5 text-[#E74C3C] hover:bg-red-50 rounded transition-colors"
+                    title="Delete"
                     onClick={() => handleDelete(period.id)}
                   >
-                    <Trash2 className="w-3 h-3" />
-                  </Button>
+                    <Trash2 className="w-[18px] h-[18px]" strokeWidth={2} />
+                  </button>
                 </div>
               </div>
             </CardHeader>

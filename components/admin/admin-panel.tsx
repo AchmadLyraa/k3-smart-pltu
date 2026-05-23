@@ -536,6 +536,9 @@ export default function AdminDashboard({
       >
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" aria-describedby="worker-dialog-description" aria-labelledby="worker-dialog-title">
           <DialogHeader>
+            <DialogTitle className="sr-only">Worker Dialog</DialogTitle>
+          </DialogHeader>
+          <DialogHeader>
             <DialogTitle id="worker-dialog-title">{selectedWorker?.name}</DialogTitle>
             <p className="text-sm text-muted-foreground">
               {selectedWorker?.email}

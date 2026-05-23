@@ -226,3 +226,9 @@ pnpm prisma:generate
 ---
 
 **Last Updated**: May 2026
+
+
+
+lihat referensi yang saya inginkan dan sudah tepat tampilannya untuktampilan popup buat topik misalnya.
+
+saya mau merubah tampilan popup pada halaman kelola user, dan halaman manajemen hadiah, yaitu spesifiknya pada popup edit user, tambah user, tambah hadiah, edit hadiah.apakah kamu paham>

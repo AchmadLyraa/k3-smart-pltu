@@ -104,7 +104,7 @@ export default function SuperAdminSidebar() {
             width={140}
             height={50}
             priority
-            style={{ objectFit: "contain" }}
+            style={{ objectFit: "contain", width: "auto", height: "auto" }}
           />
         </div>
         <div className="sa-logo-collapsed">
@@ -115,7 +115,7 @@ export default function SuperAdminSidebar() {
             height={35}
             priority
             className="sa-logo-img"
-            style={{ objectFit: "contain" }}
+            style={{ objectFit: "contain", width: "auto", height: "auto" }}
           />
         </div>
       </div>

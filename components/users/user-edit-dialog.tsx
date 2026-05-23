@@ -5,13 +5,11 @@ import { updateUserProfile } from "@/app/actions/users";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 
 interface UserEditDialogProps {
@@ -20,6 +18,9 @@ interface UserEditDialogProps {
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
 }
+
+const inputStyleClass =
+  "w-full rounded-[24px] h-11 px-5 border-[#E2E8F0] focus-visible:border-[#FF4B4B] focus-visible:ring-[#FF4B4B]/20 focus-visible:ring-[3px] focus-visible:outline-none transition-all shadow-sm";
 
 export default function UserEditDialog({
   user,
@@ -72,56 +73,58 @@ export default function UserEditDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-w-lg w-full max-h-screen overflow-y-auto rounded-[24px] p-6">
         <DialogHeader>
-          <DialogTitle>Edit User</DialogTitle>
-          <DialogDescription>Update user information</DialogDescription>
+          <DialogTitle className="text-xl font-bold text-slate-900">Edit User</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 pt-2">
           <div>
-            <Label htmlFor="name">Name</Label>
+            <label className="block text-sm font-medium mb-1.5 text-slate-700">Name</label>
             <Input
-              id="name"
+              placeholder="Full name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Full name"
+              className={inputStyleClass}
             />
           </div>
 
           <div>
-            <Label htmlFor="email">Email</Label>
+            <label className="block text-sm font-medium mb-1.5 text-slate-700">Email</label>
             <Input
-              id="email"
               type="email"
+              placeholder="Email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email address"
+              className={inputStyleClass}
             />
           </div>
 
           <div>
-            <Label htmlFor="nip">NIP</Label>
+            <label className="block text-sm font-medium mb-1.5 text-slate-700">NIP</label>
             <Input
-              id="nip"
+              placeholder="Employee ID"
               value={nip}
               onChange={(e) => setNip(e.target.value)}
-              placeholder="Employee ID"
+              className={inputStyleClass}
             />
           </div>
 
-
-
-          <div className="flex gap-2 justify-end">
+          <div className="flex gap-2 pt-2">
             <Button
               type="button"
               variant="outline"
+              className="flex-1 rounded-[24px] h-10 border-[#E2E8F0] hover:border-gray-300 transition-all font-semibold"
               onClick={() => onOpenChange(false)}
               disabled={loading}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button
+              type="submit"
+              disabled={loading}
+              className="flex-1 bg-[#FF4B4B] hover:bg-[#FF3333] text-white rounded-[24px] h-10 shadow-sm transition-all font-semibold"
+            >
               {loading ? "Saving..." : "Save Changes"}
             </Button>
           </div>

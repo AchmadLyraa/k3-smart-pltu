@@ -24,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CheckCircle2, Circle, Pencil, X, Plus, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { CheckCircle2, Circle, SquarePen, X, Plus, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import QuestionForm from "./question-form";
 import { updateQuestion, deleteQuestion, getQuestions as fetchQuestions } from "@/app/actions/quiz";
 import { useRouter } from "next/navigation";
@@ -358,22 +358,20 @@ export default function CMSQuestionsTab({ questions: initialQuestions }: CMSQues
                         <span className="text-xs text-muted-foreground">
                           {q.points} pts
                         </span>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="mt-1 h-7 px-2 text-xs"
+                        <button
+                          className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                          title="Edit"
                           onClick={() => openEdit(q)}
                         >
-                          <Pencil className="w-3 h-3 mr-1" /> Edit
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="mt-1 h-7 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+                          <SquarePen className="w-[18px] h-[18px]" strokeWidth={2} />
+                        </button>
+                        <button
+                          className="p-1.5 text-[#E74C3C] hover:bg-red-50 rounded transition-colors"
+                          title="Delete"
                           onClick={() => handleDelete(q.id)}
                         >
-                          <Trash2 className="w-3 h-3 mr-1" /> Delete
-                        </Button>
+                          <Trash2 className="w-[18px] h-[18px]" strokeWidth={2} />
+                        </button>
                       </div>
                     </div>
                   </div>

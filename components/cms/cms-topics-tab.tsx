@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createTopic, deleteTopic, updateTopic } from "@/app/actions/topic";
-import { Trash2, Pencil } from "lucide-react";
+import { Trash2, SquarePen } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -208,7 +208,7 @@ export default function CMSTopicsTab({ initialTopics }: CMSTopicsTabProps) {
         <CardContent className="space-y-4">
           {/* Search Bar */}
           <Input
-            placeholder="Cari Topic..."
+            placeholder="Cari Topik..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="bg-white rounded-[24px] shadow-sm border border-slate-100 p-6"
@@ -237,7 +237,7 @@ export default function CMSTopicsTab({ initialTopics }: CMSTopicsTabProps) {
                       className="text-slate-500 hover:text-slate-600 hover:bg-slate-50 rounded-full w-8 h-8 p-0 flex items-center justify-center"
                       onClick={() => handleEditClick(topic)}
                     >
-                      <Pencil className="w-4 h-4" />
+                      <SquarePen className="w-4 h-4" />
                     </Button>
                     <Button
                       variant="ghost"

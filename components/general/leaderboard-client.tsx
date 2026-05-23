@@ -90,7 +90,7 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
+          <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
 
             {/* Tab Selector */}
             <Tabs
@@ -98,16 +98,16 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
               onValueChange={(val) => setActiveTab(val as "semester" | "alltime")}
               className="w-full sm:w-auto"
             >
-              <TabsList className="grid grid-cols-2 bg-white border border-slate-800 p-1 text-slate-400">
+              <TabsList className="grid grid-cols-2 bg-white border border-slate-800 text-slate-400">
                 <TabsTrigger
                   value="semester"
-                  className="data-[state=active]:bg-red-600 data-[state=active]:text-white text-xs whitespace-nowrap py-1.5 px-3"
+                  className="data-[state=active]:bg-red-600 data-[state=active]:text-white text-md whitespace-nowrap px-3"
                 >
                   Semester Ini
                 </TabsTrigger>
                 <TabsTrigger
                   value="alltime"
-                  className="data-[state=active]:bg-red-600 data-[state=active]:text-white text-xs whitespace-nowrap py-1.5 px-3"
+                  className="data-[state=active]:bg-red-600 data-[state=active]:text-white text-md whitespace-nowrap px-3"
                 >
                   All-Time
                 </TabsTrigger>

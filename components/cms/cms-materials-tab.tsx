@@ -45,7 +45,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Pencil,
+  SquarePen,
   Trash2,
   FileVideo,
   FileImage,
@@ -412,7 +412,7 @@ export default function CMSMaterialsTab({
     if (!editData.title.trim()) {
       toast({
         title: "Validasi Gagal",
-        description: "Title wajib diisi",
+        description: "Judul wajib diisi",
         variant: "destructive",
       });
       return;
@@ -420,7 +420,7 @@ export default function CMSMaterialsTab({
     if (!editData.topicId) {
       toast({
         title: "Validasi Gagal",
-        description: "Topic wajib diisi",
+        description: "Topik wajib diisi",
         variant: "destructive",
       });
       return;
@@ -605,7 +605,7 @@ export default function CMSMaterialsTab({
 
           {materials.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
-              No materials found.
+              Materi Tidak Ditemukan
             </div>
           ) : (
             <>
@@ -633,6 +633,7 @@ export default function CMSMaterialsTab({
                           <span className="text-sm text-muted-foreground mt-0.5 shrink-0">#
                             {(materialPagination.page - 1) * materialPagination.limit + idx + 1}
                           </span>
+                          <Icon className="w-4 h-4 mt-0.5 shrink-0 text-muted-foreground" />
                           {thumbnailUrl && (
                             <img src={thumbnailUrl} alt="thumbnail" className="w-24 h-14 object-cover rounded mr-2" />
                           )}
@@ -657,20 +658,24 @@ export default function CMSMaterialsTab({
                           <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">{typeLabel[m.type] ?? m.type}</span>
                           <div className="flex gap-1 mt-1 flex-wrap justify-end">
                             {m.status !== "PUBLISHED" && (
-                              <Button size="sm" variant="outline" className="h-7 px-2 text-xs text-green-600 hover:text-green-700 hover:bg-green-50" onClick={() => handlePublish(m.id)}>Publish</Button>
+                              <button className="p-1.5 text-green-600 hover:bg-green-50 rounded transition-colors" title="Publish" onClick={() => handlePublish(m.id)}>
+                                <CheckCircle2 className="w-[18px] h-[18px]" strokeWidth={2} />
+                              </button>
                             )}
                             {m.status === "PUBLISHED" && (
-                              <Button size="sm" variant="outline" className="h-7 px-2 text-xs text-gray-600 hover:bg-gray-50" onClick={() => handleArchive(m.id)}>Archive</Button>
+                              <button className="p-1.5 text-gray-500 hover:bg-gray-100 rounded transition-colors" title="Archive" onClick={() => handleArchive(m.id)}>
+                                <X className="w-[18px] h-[18px]" strokeWidth={2} />
+                              </button>
                             )}
-                            <Button size="sm" variant="outline" className="h-7 px-2 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50" onClick={() => openQuizDialog(m)}>
-                              <ClipboardList className="w-3 h-3 mr-1" /> Quiz
-                            </Button>
-                            <Button size="sm" variant="outline" className="h-7 px-2 text-xs" onClick={() => openEdit(m)}>
-                              <Pencil className="w-3 h-3 mr-1" /> Edit
-                            </Button>
-                            <Button size="sm" variant="outline" className="h-7 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => handleDelete(m.id)}>
-                              <Trash2 className="w-3 h-3" />
-                            </Button>
+                            <button className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors" title="Quiz" onClick={() => openQuizDialog(m)}>
+                              <ClipboardList className="w-[18px] h-[18px]" strokeWidth={2} />
+                            </button>
+                            <button className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" title="Edit" onClick={() => openEdit(m)}>
+                              <SquarePen className="w-[18px] h-[18px]" strokeWidth={2} />
+                            </button>
+                            <button className="p-1.5 text-[#E74C3C] hover:bg-red-50 rounded transition-colors" title="Delete" onClick={() => handleDelete(m.id)}>
+                              <Trash2 className="w-[18px] h-[18px]" strokeWidth={2} />
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -1040,7 +1045,7 @@ export default function CMSMaterialsTab({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Topic
+                    Topik
                   </label>
                   <Select
                     value={editData.topicId}
@@ -1087,7 +1092,7 @@ export default function CMSMaterialsTab({
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Title</label>
+                <label className="block text-sm font-medium mb-2">Judul</label>
                 <Input
                   value={editData.title}
                   onChange={(e) =>
@@ -1098,7 +1103,7 @@ export default function CMSMaterialsTab({
 
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  Description
+                  Deskripsi
                 </label>
                 <Textarea
                   value={editData.description}
@@ -1111,7 +1116,7 @@ export default function CMSMaterialsTab({
 
               {editData.type === "VIDEO" && (
                 <div className="space-y-3 border rounded-lg p-4 bg-muted/30">
-                  <p className="text-sm font-medium">Video Settings</p>
+                  <p className="text-sm font-medium">Pengaturan Video</p>
                   <div>
                     <label className="block text-sm mb-1">URL Video</label>
                     <Input
@@ -1124,7 +1129,7 @@ export default function CMSMaterialsTab({
                   </div>
                   <div>
                     <label className="block text-sm mb-1">
-                      Duration (seconds)
+                      Durasi (detik)
                     </label>
                     <Input
                       type="number"
@@ -1152,7 +1157,7 @@ export default function CMSMaterialsTab({
 
               {editData.type === "INFOGRAPHIC" && (
                 <div className="space-y-3 border rounded-lg p-4 bg-muted/30">
-                  <p className="text-sm font-medium">Infographic Settings</p>
+                  <p className="text-sm font-medium">Pengaturan Infografik</p>
                   <Input
                     value={editData.imageUrl}
                     onChange={(e) =>
@@ -1173,7 +1178,7 @@ export default function CMSMaterialsTab({
 
               {editData.type === "ARTICLE" && (
                 <div className="space-y-3 border rounded-lg p-4 bg-muted/30">
-                  <p className="text-sm font-medium">Article Settings</p>
+                  <p className="text-sm font-medium">Pengaturan Artikel</p>
                   <Textarea
                     value={editData.articleContent}
                     onChange={(e) =>
@@ -1207,10 +1212,10 @@ export default function CMSMaterialsTab({
               <div className="flex gap-2 pt-2">
                 <Button
                   variant="outline"
-                  className="flex-1"
+                  className="flex-1 rounded-[20px]"
                   onClick={() => setEditMaterial(null)}
                 >
-                  Cancel
+                  Batal
                 </Button>
                 <Button
                   type="submit"
@@ -1218,7 +1223,7 @@ export default function CMSMaterialsTab({
                   className="bg-[#FF4B4B] hover:bg-[#FF3333] text-white rounded-[20px] px-6 h-10 shadow-sm transition-all font-semibold flex-1"
                   onClick={handleSave}
                 >
-                  {saving ? "Saving..." : "Save Changes"}
+                  {saving ? "Menyimpan..." : "Simpan Perubahan"}
                 </Button>
               </div>
             </div>
