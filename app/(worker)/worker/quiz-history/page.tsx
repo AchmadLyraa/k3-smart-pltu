@@ -1,5 +1,6 @@
 import { getWorkerQuizHistory } from "@/app/actions/worker";
 import WorkerQuizHistoryList from "@/components/worker/worker-quiz-history-list";
+import { History, Sparkles } from "lucide-react";
 
 export default async function WorkerHistoryPage() {
   const result = await getWorkerQuizHistory();
@@ -15,12 +16,22 @@ export default async function WorkerHistoryPage() {
       };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Quiz History</h1>
-
-        <p className="text-muted-foreground">
-          Riwayat seluruh quiz yang pernah Anda kerjakan
+    <div className="mx-auto max-w-7xl space-y-6 animate-in fade-in duration-500 pb-16">
+      {/* Sleek Local Header */}
+      <div className="flex flex-col gap-1 pb-4 border-b border-zinc-200/80">
+        <div className="flex items-center gap-2">
+          <span className="p-1.5 rounded-xl bg-red-50 text-red-500 border border-red-100 shadow-sm">
+            <History className="w-5 h-5" />
+          </span>
+          <span className="text-[10px] font-bold tracking-wider uppercase text-red-500 flex items-center gap-1">
+            Riwayat K3 <Sparkles className="w-3 h-3 text-red-500 animate-pulse" />
+          </span>
+        </div>
+        <h1 className="text-2xl font-extrabold text-zinc-950 mt-2" style={{ fontFamily: 'Buckin, sans-serif' }}>
+          Riwayat Kuis
+        </h1>
+        <p className="text-xs text-zinc-400 font-semibold uppercase tracking-wider">
+          Pantau riwayat pengerjaan seluruh kuis keselamatan kerja Anda
         </p>
       </div>
 

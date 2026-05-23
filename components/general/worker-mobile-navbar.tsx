@@ -2,53 +2,38 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
 import Image from "next/image"
 import {
   Home,
   BookOpen,
   Trophy,
-  Gift,
-  History,
   User,
-  ChevronDown,
-  LogOut,
 } from "lucide-react";
 
 import { Session } from "next-auth";
-
 import { cn } from "@/lib/utils";
-
 import { NotificationBell } from "@/components/worker/notification-bell";
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 const MENUS = [
   {
-    label: "Home",
+    label: "Beranda",
     href: "/worker/home",
     icon: Home,
   },
   {
-    label: "Reward",
-    href: "/worker/reward-users",
-    icon: Gift,
+    label: "Materi",
+    href: "/worker/materials",
+    icon: BookOpen,
   },
   {
-    label: "History",
-    href: "/worker/quiz-history",
-    icon: History,
-  },
-  {
-    label: "Rank",
+    label: "Peringkat",
     href: "/worker/leaderboard",
     icon: Trophy,
+  },
+  {
+    label: "Profil",
+    href: "/worker/profile",
+    icon: User,
   },
 ];
 
@@ -58,121 +43,65 @@ interface Props {
 
 export default function WorkerMobileNavbar({ session }: Props) {
   const pathname = usePathname();
-
-  const name = session.user?.name ?? session.user?.email ?? "Worker";
-
-  const initials = name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
+  const isHome = pathname === "/worker/home";
 
   return (
     <>
-      {/* TOP NAVBAR */}
-      <header className="sticky top-0 z-50 border-b border-zinc-200 bg-white/90 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 md:px-6 lg:px-8">
-          {/* LOGO */}
-          <Link
-  href="/worker/home"
-  className="flex items-center gap-3 shrink-0"
->
-  <div className="relative h-28 w-28 overflow-hidden rounded-2xl">
-    <Image
-      src="/images/logok3new.png"
-      alt="K3 SMART"
-      fill
-      className="object-contain"
-      priority
-    />
-  </div>
+      {/* TOP NAVBAR (HANYA MUNCUL DI BERANDA / HOME) */}
+      {isHome && (
+        <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md">
+          <div className="mx-auto flex h-16 w-full max-w-md items-center justify-between px-6 pt-5 pb-4">
+            
+            {/* LOGO ASLI ANDA (TETAP DIPERTAHANKAN) */}
+            <Link
+              href="/worker/home"
+              className="flex items-center gap-3 shrink-0 transition-transform duration-200 active:scale-95"
+            >
+              <div className="relative h-10 w-32 overflow-hidden">
+                <Image
+                  src="/images/logonew-k3.svg"
+                  alt="K3 SMART"
+                  fill
+                  className="object-contain object-left"
+                  priority
+                />
+              </div>
+            </Link>
 
-</Link>
+            {/* RIGHT - MEMPERBESAR DAN MENGUBAH WARNA NOTIFIKASI MENJADI MERAH */}
+            <div className="flex items-center justify-center text-[#FF3B30] stroke-red-500">
+              <NotificationBell />
+            </div>
 
-          {/* RIGHT */}
-          <div className="flex items-center gap-2">
-            <NotificationBell />
-
-            {/* PROFILE */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 rounded-2xl border border-zinc-200 bg-white px-2 py-1.5 transition hover:bg-zinc-50">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-black text-sm font-bold text-white">
-                    {initials}
-                  </div>
-
-                  <div className="hidden text-left sm:block">
-                    <p className="max-w-[120px] truncate text-sm font-semibold text-zinc-900">
-                      {name}
-                    </p>
-
-                    <p className="text-[11px] text-zinc-500">Worker</p>
-                  </div>
-
-                  <ChevronDown className="hidden h-4 w-4 text-zinc-500 sm:block" />
-                </button>
-              </DropdownMenuTrigger>
-
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem asChild>
-                  <Link href="/worker/profile" className="cursor-pointer">
-                    <User className="mr-2 h-4 w-4" />
-                    Profile
-                  </Link>
-                </DropdownMenuItem>
-
-                <DropdownMenuSeparator />
-
-                <DropdownMenuItem
-                  className="cursor-pointer text-red-600 focus:text-red-600"
-                  onClick={() =>
-                    signOut({
-                      callbackUrl: "/login",
-                    })
-                  }
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
-      {/* BOTTOM NAVBAR */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 rounded-t-[24px] border-t border-zinc-800 bg-black/95 shadow-[0_-10px_30px_rgba(0,0,0,0.35)] backdrop-blur-xl">
-        <div className="mx-auto flex h-20 w-full max-w-md items-center justify-between px-3 md:max-w-2xl md:px-6">
+      {/* BOTTOM NAVBAR (FLOATING PREMIUM DOCK - HITAM SOLID OVAL) */}
+      <nav className="fixed bottom-4 left-4 right-4 md:left-1/2 md:right-auto md:w-[448px] md:-translate-x-1/2 z-50 rounded-full bg-black shadow-[0_10px_30px_rgba(0,0,0,0.3)] px-2 py-1">
+        <div className="flex h-14 w-full items-center justify-between px-2">
           {MENUS.map((menu) => {
             const Icon = menu.icon;
-
-            const active =
-              pathname === menu.href || pathname.startsWith(`${menu.href}/`);
+            const active = pathname === menu.href || pathname.startsWith(`${menu.href}/`);
 
             return (
               <Link
                 key={menu.href}
                 href={menu.href}
-                className="flex min-w-[58px] flex-col items-center justify-center gap-1"
+                className={cn(
+                  "flex items-center justify-center gap-2 rounded-full text-xs font-bold transition-all duration-300 py-2 px-4",
+                  active 
+                    ? "bg-[#FF3B30] text-white shadow-md scale-105" 
+                    : "text-white/70 hover:text-white"
+                )}
               >
-                <div
-                  className={cn(
-                    "rounded-2xl p-2 transition-all duration-200",
-                    active ? "bg-red-600/20 text-red-500" : "text-zinc-500",
-                  )}
-                >
-                  <Icon className="h-5 w-5" />
-                </div>
-
-                <span
-                  className={cn(
-                    "text-[10px] font-medium",
-                    active ? "text-red-500" : "text-zinc-500",
-                  )}
-                >
-                  {menu.label}
-                </span>
+                <Icon className={cn("h-4.5 w-4.5", active ? "stroke-[2.5]" : "stroke-[2]")} />
+                
+                {active && (
+                  <span className="text-[11px] font-bold tracking-tight">
+                    {menu.label}
+                  </span>
+                )}
               </Link>
             );
           })}

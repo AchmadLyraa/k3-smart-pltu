@@ -609,7 +609,7 @@ export default function CMSMaterialsTab({
             </div>
           ) : (
             <>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {materials.map((m: MaterialItem, idx: number) => {
                   const Icon = typeIcon[m.type] ?? FileText;
                   // Determine thumbnail URL
@@ -633,9 +633,8 @@ export default function CMSMaterialsTab({
                           <span className="text-sm text-muted-foreground mt-0.5 shrink-0">#
                             {(materialPagination.page - 1) * materialPagination.limit + idx + 1}
                           </span>
-                          <Icon className="w-4 h-4 mt-0.5 shrink-0 text-muted-foreground" />
                           {thumbnailUrl && (
-                            <img src={thumbnailUrl} alt="thumbnail" className="w-24 h-14 object-cover rounded mr-2" />
+                            <img src={thumbnailUrl} alt="thumbnail" className="w-32 h-20 object-cover rounded-[12px]" />
                           )}
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-sm">{m.title}</p>
