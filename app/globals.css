@@ -158,3 +158,14 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ── Progress Card (Worker Dashboard) ── */
+.progress-card-wrapper {
+  max-height: 360px !important;
+  overflow: hidden !important;
+}
+
+.progress-card-scroll {
+  max-height: 280px !important;
+  overflow-y: auto !important;
+}

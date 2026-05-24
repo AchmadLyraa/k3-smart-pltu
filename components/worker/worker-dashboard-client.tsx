@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Trophy, BookOpen, Check, ShieldAlert, Lock, Gift, Coins, Award } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -68,6 +68,9 @@ export default function WorkerDashboardClient({
   const [stats, setStats] = useState(initialStats);
   const [statsLoading, setStatsLoading] = useState(false);
 
+  const progressCardRef = useRef<HTMLDivElement>(null);
+  const progressScrollRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (!selectedPeriodId) return;
 
@@ -119,6 +122,18 @@ export default function WorkerDashboardClient({
     const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
     return { total, completed, percent };
   }, [currentPeriod]);
+
+  // Force height constraints on progress card via useRef + useEffect (bypasses any CSS override)
+  useEffect(() => {
+    if (progressCardRef.current) {
+      progressCardRef.current.style.setProperty('max-height', '360px', 'important');
+      progressCardRef.current.style.setProperty('overflow', 'hidden', 'important');
+    }
+    if (progressScrollRef.current) {
+      progressScrollRef.current.style.setProperty('max-height', '280px', 'important');
+      progressScrollRef.current.style.setProperty('overflow-y', 'auto', 'important');
+    }
+  }, [currentPeriod?.materials]);
 
   const latestMaterialItem = latestMaterials?.[0];
   const latestMaterialThumbnail = getMaterialThumbnail(latestMaterialItem);
@@ -173,17 +188,6 @@ export default function WorkerDashboardClient({
               </div>
             </div>
           </div>
-
-          {/* <div className="grid grid-cols-2 divide-x divide-zinc-100 bg-white p-4 text-center">
-            <div className="flex flex-col justify-center py-0">
-              <span className="text-[12px] font-medium text-zinc-500 mb-1">Poin saya/Semester</span>
-              <span className="text-2xl font-bold text-zinc-900">{stats?.totalPoints ?? 0}</span>
-            </div>
-            <div className="flex flex-col justify-center py-0">
-              <span className="text-[12px] font-medium text-zinc-500 mb-1">Saldo Poin</span>
-              <span className="text-2xl font-bold text-zinc-900">{stats?.availablePoints ?? 0}</span>
-            </div>
-          </div> */}
         </section>
 
         {/* 2. MATERI TERBARU SECTION */}
@@ -232,9 +236,19 @@ export default function WorkerDashboardClient({
             </Link>
           </div>
 
-          <div className="bg-white rounded-[28px] p-5 shadow-sm border border-zinc-100 relative">
+          {/* ─── FIX: Card wrapper diberi max-height tetap + overflow hidden ─── */}
+          <div
+            ref={progressCardRef}
+            className="bg-white rounded-[28px] p-5 shadow-sm border border-zinc-100 relative"
+            style={{ maxHeight: 360, overflow: 'hidden' }}
+          >
             <div className="absolute left-[29px] top-8 bottom-12 w-0.5 bg-zinc-100" />
-            <div className="max-h-[320px] overflow-y-auto no-scrollbar space-y-5">
+            {/* ─── Container scroll dengan max-height tetap ─── */}
+            <div
+              ref={progressScrollRef}
+              className="space-y-2"
+              style={{ maxHeight: 280, overflowY: 'auto' }}
+            >
               {/* Progress Timeline Items */}
               {(() => {
                 const currentMaterials = currentPeriod?.materials || [];

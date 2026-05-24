@@ -285,45 +285,7 @@ export default function UserProfile() {
           </div>
 
           {/* Action Buttons */}
-          <div className="mt-8 pt-6 border-t border-slate-100 flex flex-wrap gap-3">
-            <Link href="/worker/quiz-history">
-              <Button
-                variant="outline"
-                className="rounded-[24px] h-10 px-6 border-[#E2E8F0] hover:border-gray-300 hover:bg-zinc-50 transition-all font-semibold gap-2"
-              >
-                <History className="h-4 w-4 text-red-500" />
-                Riwayat Kuis
-              </Button>
-            </Link>
-
-            <Link href="/worker/reward-users">
-              <Button
-                variant="outline"
-                className="rounded-[24px] h-10 px-6 border-[#E2E8F0] hover:border-gray-300 hover:bg-zinc-50 transition-all font-semibold gap-2"
-              >
-                <Gift className="h-4 w-4 text-red-500" />
-                Tukar Poin (Reward)
-              </Button>
-            </Link>
-
-            <Button
-              onClick={() => setShowPasswordDialog(true)}
-              variant="outline"
-              className="rounded-[24px] h-10 px-6 border-[#E2E8F0] hover:border-gray-300 hover:bg-zinc-50 transition-all font-semibold gap-2"
-            >
-              <Lock className="h-4 w-4 text-zinc-400" />
-              Change Password
-            </Button>
-
-            <Button
-              onClick={() => signOut({ callbackUrl: "/login" })}
-              variant="outline"
-              className="rounded-[24px] h-10 px-6 border-red-200 hover:border-red-300 hover:bg-red-50/30 text-red-600 transition-all font-semibold gap-2"
-            >
-              <LogOut className="h-4 w-4" />
-              Keluar (Logout)
-            </Button>
-          </div>
+          
         </div>
       </div>
 
