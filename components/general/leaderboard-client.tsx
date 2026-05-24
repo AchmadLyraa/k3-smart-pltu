@@ -74,7 +74,7 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
             activeTab === "bulanan" ? "bg-[#FF3B30] text-white font-black" : "text-zinc-800"
           )}
         >
-          Bulanan
+          All-time
         </button>
         <button
           onClick={() => { setActiveTab("semester"); setCurrentPage(1); }}

@@ -55,13 +55,14 @@ export async function checkAndSubmitExpiredSessions() {
     });
 
     for (const session of expiredSessions) {
-      if (!session.quizConfig) continue; // skip campaign sessions
+      const quizConfig = session.quizConfig;
+      if (!quizConfig) continue; // skip campaign sessions
 
       const elapsed = Math.floor(
         (Date.now() - new Date(session.startedAt).getTime()) / 1000,
       );
 
-      if (elapsed >= session.quizConfig.timeLimit) {
+      if (elapsed >= quizConfig.timeLimit) {
         // Auto submit dengan jawaban yang sudah ada
         await completeQuiz(session.id);
       }
@@ -294,6 +295,9 @@ export async function completeQuiz(sessionId: string) {
 
     if (!session) return { success: false, error: "Session not found" };
 
+    const quizConfig = session.quizConfig;
+    if (!quizConfig) return { success: false, error: "Quiz config not found" };
+
     // Filter null — soal mungkin sudah dihapus
     const validAnswers = userAnswers.filter((a): a is typeof a & { question: NonNullable<typeof a.question> } => a.question !== null);
 
@@ -342,7 +346,7 @@ export async function completeQuiz(sessionId: string) {
       maxPossiblePoints > 0
         ? Math.round((totalPoints / maxPossiblePoints) * 100)
         : 0;
-    const passed = percentage >= session.quizConfig.passingScore;
+    const passed = percentage >= quizConfig.passingScore;
 
     // Hitung time bonus
     const startedAt = session.startedAt;
@@ -350,7 +354,7 @@ export async function completeQuiz(sessionId: string) {
     const timeUsed = Math.round(
       (submittedAt.getTime() - startedAt.getTime()) / 1000,
     );
-    const timeLimit = session.quizConfig.timeLimit;
+    const timeLimit = quizConfig.timeLimit;
     const unusedTime = Math.max(0, timeLimit - timeUsed);
     const unusedPercentage = unusedTime / timeLimit;
     const timeBonus = Math.floor(unusedPercentage * 100);
@@ -383,10 +387,10 @@ export async function completeQuiz(sessionId: string) {
       });
 
       if (!alreadyPassed) {
-        let description = `Quiz selesai: ${session.quizConfig.name}`;
+        let description = `Quiz selesai: ${quizConfig.name}`;
 
-        if (session.quizConfig.deadline) {
-          const deadlineDate = new Date(session.quizConfig.deadline);
+        if (quizConfig.deadline) {
+          const deadlineDate = new Date(quizConfig.deadline);
           if (submittedAt > deadlineDate) {
             daysLate = Math.ceil(
               (submittedAt.getTime() - deadlineDate.getTime()) /
@@ -408,15 +412,15 @@ export async function completeQuiz(sessionId: string) {
         }
 
         // Get the periodId from the material associated with this quiz
-        const quizConfigWithMaterial = await prisma.quizConfig.findUnique({
-          where: { id: session.quizConfigId },
-          select: { material: { select: { periodId: true } } },
+        const material = await prisma.material.findUnique({
+          where: { id: quizConfig.materialId },
+          select: { periodId: true },
         });
 
         await prisma.pointTransaction.create({
           data: {
             userId: user.id,
-            periodId: quizConfigWithMaterial?.material?.periodId ?? undefined,
+            periodId: material?.periodId ?? undefined,
             points: totalPointsWithBonus,
             transactionType: "QUIZ_COMPLETION",
             description,
@@ -440,7 +444,7 @@ export async function completeQuiz(sessionId: string) {
         daysLate,
         adjustedPoints,
         totalPointsWithBonus,
-        showCorrectAns: session.quizConfig.showCorrectAns,
+        showCorrectAns: quizConfig.showCorrectAns,
         answers: updatedAnswers,
       },
     };

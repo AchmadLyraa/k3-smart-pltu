@@ -138,7 +138,7 @@ export default function WorkerMaterialList({
 
   return (
     // Mengunci container agar fit screen tanpa scroll palsu di area global
-    <div className="w-full space-y-5 px-1 pt-2 h-full flex flex-col justify-start overflow-hidden">
+    <div className="w-full space-y-4 px-2 pt-2 h-full flex flex-col justify-start overflow-hidden">
       
       {/* 1. SEMESTER CAROUSEL SELECTOR */}
       <div className="w-full flex items-center justify-between bg-white rounded-full border border-zinc-100 shadow-sm px-2 py-1.5 shrink-0">
@@ -422,13 +422,15 @@ export default function WorkerMaterialList({
                             {material.quizMeta?.count || 0} quiz tersedia
                           </p>
                         </div>
-                        <div className="text-xs font-bold text-[#FF3B30] shrink-0 ml-2 flex items-center gap-1">
-                          {material.quizMeta?.allDone ? (
+                        <div className="text-xs font-bold shrink-0 ml-2 flex items-center gap-1">
+                          {!material.quizMeta || material.quizMeta.count === 0 ? (
+                            <span className="text-zinc-300">Tidak ada quiz</span>
+                          ) : material.quizMeta.allDone ? (
                             <span className="text-emerald-600 flex items-center gap-1">
                               <CheckCircle2 className="w-3.5 h-3.5" /> Selesai
                             </span>
                           ) : (
-                            <span>Kerjakan →</span>
+                            <span className="text-[#FF3B30]">Kerjakan →</span>
                           )}
                         </div>
                       </Link>

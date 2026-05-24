@@ -86,9 +86,6 @@ export default function SuperAdminHeader({
 
       <div className="sa-header__right">
 
-        {/* Notification Bell */}
-        <SuperAdminNotificationBell />
-
         {/* User Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

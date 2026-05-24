@@ -109,7 +109,8 @@ export default function WorkerProfileClient({ user }: WorkerProfileClientProps) 
   };
 
   const handleLogout = async () => {
-    await signOut({ callbackUrl: "/login" });
+    await signOut({ redirect: false });
+    window.location.href = "/login";
   };
 
   return (

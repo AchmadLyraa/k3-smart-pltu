@@ -1,12 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { Providers } from "./providers";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
-
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "K3-SMART - Keselamatan Kerja Learning Platform",
@@ -26,6 +22,29 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* Preload font kritis untuk halaman login */}
+        <link
+          rel="preload"
+          href="/fonts/Buckin-Regular%20Regular.otf"
+          as="font"
+          type="font/otf"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/Buckin-Bold%20Regular.otf"
+          as="font"
+          type="font/otf"
+          crossOrigin="anonymous"
+        />
+        {/* Preload gambar hero login */}
+        <link
+          rel="preload"
+          href="/images/hero-login.png"
+          as="image"
+        />
+      </head>
       <body className="font-sans antialiased">
         <Providers>
           {children}

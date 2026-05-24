@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
-import { Trophy, BookOpen, Check, ShieldAlert, Lock } from "lucide-react";
+import { Trophy, BookOpen, Check, ShieldAlert, Lock, Gift, Coins, Award } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getWorkerStatsByPeriod } from "@/app/actions/worker";
 
@@ -28,6 +28,20 @@ interface Period {
   materials: Material[];
 }
 
+interface Redemption {
+  id: string;
+  status: string;
+  shippingStatus: string | null;
+  pointsUsed: number;
+  createdAt: string | Date;
+  completedAt: string | Date | null;
+  reward: {
+    id: string;
+    name: string;
+    pointCost: number;
+  };
+}
+
 interface WorkerDashboardClientProps {
   stats: {
     totalPoints: number;
@@ -38,6 +52,7 @@ interface WorkerDashboardClientProps {
   periods: Period[];
   latestMaterials: any[];
   userName?: string;
+  redemptions?: Redemption[];
 }
 
 export default function WorkerDashboardClient({
@@ -45,6 +60,7 @@ export default function WorkerDashboardClient({
   periods,
   latestMaterials,
   userName = "Electricity Warrior",
+  redemptions = [],
 }: WorkerDashboardClientProps) {
   const [selectedPeriodId, setSelectedPeriodId] = useState<string>(
     periods.find((p) => p.isActive)?.id || periods[0]?.id || ""
@@ -94,47 +110,14 @@ export default function WorkerDashboardClient({
     return null;
   };
 
-  const stepStatuses = useMemo(() => {
+  const progressData = useMemo(() => {
     const currentMaterials = currentPeriod?.materials || [];
-    const totalMaterials = currentMaterials.length;
-    
-    const steps = [
-      { id: 1, label: "1", status: "LOCKED" },
-      { id: 2, label: "2", status: "LOCKED" },
-      { id: 3, label: "3", status: "LOCKED" },
-      { id: 4, label: "4", status: "LOCKED" },
-    ];
-
-    if (totalMaterials === 0) return steps;
-
-    const baseItemsPerStep = Math.floor(totalMaterials / 4);
-    const remainder = totalMaterials % 4;
-
-    let currentIdx = 0;
-    for (let i = 0; i < 4; i++) {
-      const itemsInThisStep = baseItemsPerStep + (i < remainder ? 1 : 0);
-      if (itemsInThisStep === 0) continue;
-
-      const stepMaterials = currentMaterials.slice(currentIdx, currentIdx + itemsInThisStep);
-      currentIdx += itemsInThisStep;
-
-      const allCompleted = stepMaterials.every(
-        (m) => m.progress?.[0]?.status === "COMPLETED"
-      );
-
-      if (allCompleted) {
-        steps[i].status = "COMPLETED";
-      } else {
-        steps[i].status = "ACTIVE";
-        break;
-      }
-    }
-
-    if (steps.every(s => s.status === "LOCKED")) {
-      steps[0].status = "ACTIVE";
-    }
-
-    return steps;
+    const total = currentMaterials.length;
+    const completed = currentMaterials.filter(
+      (m: any) => m.progress?.[0]?.status === "COMPLETED"
+    ).length;
+    const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+    return { total, completed, percent };
   }, [currentPeriod]);
 
   const latestMaterialItem = latestMaterials?.[0];
@@ -142,75 +125,65 @@ export default function WorkerDashboardClient({
 
   return (
     /* PERBAIKAN DI SINI: min-h-screen diganti h-auto, pb-28 dikurangi jadi pb-24 agar fit pas layar */
-    <div className="mx-auto max-w-md h-auto bg-slate-50/50 pb-24 font-sans antialiased overflow-x-hidden">
-      <div className="px-1 space-y-6 pt-0">
+    <div className="mx-auto max-w-md h-auto bg-slate-50/50 pb-30 font-sans antialiased overflow-x-hidden">
+      <div className="px-2 space-y-6 pt-0">
         
         {/* 1. WELCOME CARD */}
         <section className="bg-white rounded-[32px] overflow-hidden shadow-sm border border-zinc-100">
           <div className="bg-[#FF3B30] p-5 text-white space-y-4">
             <div>
               <p className="text-xs text-white/80 font-medium uppercase tracking-wider">Selamat datang</p>
-              <h2 className="text-xl font-bold tracking-tight mt-0.5">
-                Electricity Warrior
+              <h2 className="text-2xl font-bold tracking-tight mt-0.5">
+                Electricity Warrior👋
               </h2>
             </div>
 
-            <div className="w-full flex items-center justify-between bg-white/10 p-2 rounded-[20px] backdrop-blur-sm border border-white/5">
-              <div className="bg-[#FF3B30] text-white text-xs font-bold px-3 py-2 rounded-xl flex items-center shrink-0 shadow-sm border border-white/10">
-                <select
-                  value={selectedPeriodId}
-                  onChange={(e) => setSelectedPeriodId(e.target.value)}
-                  className="bg-transparent text-xs font-bold text-white outline-none cursor-pointer pr-1"
-                >
-                  {periods.map((p) => (
-                    <option key={p.id} value={p.id} className="bg-zinc-900 text-white font-semibold">
-                      {p.name}
-                    </option>
-                  ))}
-                </select>
+            <div className="w-full bg-white/10 p-3 rounded-[20px] backdrop-blur-sm space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="bg-[#FF3B30] text-white text-xs font-bold px-3 py-2 rounded-xl flex items-center shrink-0 shadow-sm border border-white/10">
+                  <select
+                    value={selectedPeriodId}
+                    onChange={(e) => setSelectedPeriodId(e.target.value)}
+                    className="bg-transparent text-xs font-bold text-white outline-none cursor-pointer pr-1"
+                  >
+                    {periods.map((p) => (
+                      <option key={p.id} value={p.id} className="bg-zinc-900 text-white font-semibold">
+                        {p.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <span className="text-[11px] font-bold text-white/80">
+                  {progressData.completed}/{progressData.total} materi
+                </span>
               </div>
-              
-              <div className="flex items-center justify-around w-full pl-2">
-                {stepStatuses.map((step, idx) => (
-                  <div key={step.id} className="flex items-center relative w-full justify-center">
-                    {step.status === "COMPLETED" ? (
-                      <div className="w-6 h-6 rounded-full bg-white text-[#FF3B30] flex items-center justify-center font-bold text-[11px] shadow-sm z-10">
-                        ✓
-                      </div>
-                    ) : step.status === "ACTIVE" ? (
-                      <div className="w-6 h-6 rounded-full bg-white text-[#FF3B30] flex items-center justify-center font-extrabold text-[11px] shadow-sm z-10">
-                        {step.label}
-                      </div>
-                    ) : (
-                      <div className="w-6 h-6 rounded-full bg-white/20 text-white/50 flex items-center justify-center font-bold text-[11px] z-10">
-                        🔒
-                      </div>
-                    )}
-                    
-                    {idx < 3 && (
-                      <div 
-                        className={cn(
-                          "absolute left-[50%] right-[-50%] top-1/2 h-[2px] -translate-y-1/2 z-0",
-                          stepStatuses[idx].status === "COMPLETED" ? "bg-white" : "bg-white/20"
-                        )} 
-                      />
-                    )}
-                  </div>
-                ))}
+
+              {/* Progress Bar */}
+              <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-white rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${progressData.percent}%` }}
+                />
+              </div>
+
+              <div className="flex items-center justify-between text-[12px] text-white/60 font-medium">
+                <span>Progress belajar</span>
+                <span>{progressData.percent}%</span>
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 divide-x divide-zinc-100 bg-white p-4 text-center">
-            <div className="flex flex-col justify-center py-1">
-              <span className="text-[11px] font-medium text-zinc-500 mb-1">Poin saya/Semester</span>
+          {/* <div className="grid grid-cols-2 divide-x divide-zinc-100 bg-white p-4 text-center">
+            <div className="flex flex-col justify-center py-0">
+              <span className="text-[12px] font-medium text-zinc-500 mb-1">Poin saya/Semester</span>
               <span className="text-2xl font-bold text-zinc-900">{stats?.totalPoints ?? 0}</span>
             </div>
-            <div className="flex flex-col justify-center py-1">
-              <span className="text-[11px] font-medium text-zinc-500 mb-1">Saldo Poin</span>
+            <div className="flex flex-col justify-center py-0">
+              <span className="text-[12px] font-medium text-zinc-500 mb-1">Saldo Poin</span>
               <span className="text-2xl font-bold text-zinc-900">{stats?.availablePoints ?? 0}</span>
             </div>
-          </div>
+          </div> */}
         </section>
 
         {/* 2. MATERI TERBARU SECTION */}
@@ -254,7 +227,7 @@ export default function WorkerDashboardClient({
         <section className="space-y-3">
           <div className="flex items-center justify-between px-1">
             <h3 className="text-base font-bold text-zinc-800">Progress Belajar</h3>
-            <Link href="/worker/materials" className="text-xs font-semibold text-[#FF3B30] hover:underline">
+            <Link href="/worker/materials" className="text-s font-semibold text-[#FF3B30] hover:underline">
               Lihat semua
             </Link>
           </div>
@@ -335,6 +308,72 @@ export default function WorkerDashboardClient({
                 );
               })()}
             </div>
+          </div>
+        </section>
+
+        {/* 4. RIWAYAT PENUKARAN SECTION */}
+        <section className="space-y-3">
+          <div className="flex items-center justify-between px-1">
+            <h3 className="text-base font-bold text-zinc-800">Riwayat Penukaran</h3>
+            <Link href="/worker/reward-users" className="text-s font-semibold text-[#FF3B30] hover:underline">
+              Lihat semua
+            </Link>
+          </div>
+
+          <div className="bg-white rounded-[28px] p-5 shadow-sm border border-zinc-100">
+            {redemptions.length === 0 ? (
+              <div className="flex flex-col items-center py-6 text-center">
+                <div className="w-12 h-12 rounded-full bg-zinc-50 border border-zinc-100 flex items-center justify-center mb-3">
+                  <Gift className="w-5 h-5 text-zinc-300" />
+                </div>
+                <p className="text-xs font-bold text-zinc-400">Belum ada penukaran</p>
+                <Link
+                  href="/worker/reward-users"
+                  className="mt-2 text-[11px] font-semibold text-[#FF3B30] hover:underline"
+                >
+                  Tukar poin sekarang
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-2.5 max-h-[320px] overflow-y-auto no-scrollbar">
+                {redemptions.slice(0, 5).map((r) => (
+                  <div
+                    key={r.id}
+                    className="flex items-center justify-between p-3 rounded-[18px] border border-zinc-100 bg-zinc-50/50"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-9 h-9 rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center shrink-0">
+                        <Award className="w-4 h-4 text-amber-500" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-bold text-zinc-900 truncate">
+                          {r.reward.name}
+                        </p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="text-[10px] font-bold text-amber-600 flex items-center gap-0.5">
+                            <Coins className="w-2.5 h-2.5" />
+                            {r.pointsUsed}
+                          </span>
+                          <span className={cn(
+                            "text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider",
+                            r.status === "APPROVED" || r.status === "COMPLETED"
+                              ? "bg-emerald-50 text-emerald-600"
+                              : r.status === "PENDING"
+                              ? "bg-amber-50 text-amber-600"
+                              : "bg-red-50 text-red-600"
+                          )}>
+                            {r.status === "APPROVED" ? "Disetujui" : r.status === "PENDING" ? "Proses" : r.status}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-[9px] text-zinc-400 font-medium shrink-0">
+                      {new Date(r.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "short" })}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 

@@ -95,7 +95,7 @@ export default function RewardUsersPage() {
 
 	if (!mounted) {
 		return (
-			<div className="space-y-6 animate-in fade-in duration-500 pb-16">
+			<div className="space-y-4 animate-in fade-in duration-500 pb-16">
 				<div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
 					<div className="space-y-3">
 						<div className="h-5 w-40 rounded-full bg-muted animate-pulse" />
