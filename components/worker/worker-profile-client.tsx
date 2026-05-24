@@ -114,7 +114,7 @@ export default function WorkerProfileClient({ user }: WorkerProfileClientProps) 
 
   return (
     <>
-      <div className="w-full max-w-md mx-auto space-y-6 px-4 pt-6 pb-24 animate-in fade-in duration-300">
+      <div className="w-full max-w-md mx-auto space-y-6 px-2 pt-0 pb-24 animate-in fade-in duration-300">
         
         {/* SEKSI 1: REAL USER HEADER */}
         <div className="flex items-center gap-4 pt-2">
@@ -148,63 +148,41 @@ export default function WorkerProfileClient({ user }: WorkerProfileClientProps) 
           </div>
         </div>
 
-        {/* SEKSI 2: KARTU CAPAIAN SEMESTER & TIMELINE PROGRESS */}
-        <div className="w-full bg-white rounded-[32px] border border-zinc-100 shadow-[0_10px_30px_rgba(0,0,0,0.02)] overflow-hidden">
-          
-          <div className="p-4 flex items-center justify-between border-b border-zinc-50">
-            
-            <div className="bg-[#FF3B30] text-white rounded-2xl py-2 px-3.5 flex items-center gap-2 shrink-0 shadow-sm">
-              <Calendar className="w-4 h-4 stroke-[2.5]" />
-              <span className="text-xs font-black tracking-tight">
-                Semester {user.currentSemester}
-              </span>
-            </div>
+		{/* SEKSI 2: KARTU CAPAIAN SEMESTER & TIMELINE PROGRESS */}
+		<div className="w-full bg-white rounded-[32px] border border-zinc-100 shadow-[0_10px_30px_rgba(0,0,0,0.02)] overflow-hidden">
+		  
+		  <div className="grid grid-cols-2 text-center py-5 relative">
+		    <div className="absolute top-4 bottom-4 left-1/2 w-[1px] bg-zinc-100 -translate-x-1/2" />
 
-            <div className="flex items-center justify-end flex-1 pl-4 relative">
-              <div className="absolute top-1/2 left-6 right-6 h-1 bg-[#FF3B30] -translate-y-1/2 z-0" />
-              
-              <div className="flex items-center justify-between w-full max-w-[180px] z-10">
-                {user.progressSteps.map((isCompleted, index) => (
-                  <div
-                    key={index}
-                    className={cn(
-                      "w-7 h-7 rounded-full flex items-center justify-center border text-[10px] font-black transition-all shadow-sm",
-                      isCompleted 
-                        ? "bg-[#FF3B30] border-[#FF3B30] text-white" 
-                        : "bg-white border-zinc-200 text-zinc-300"
-                    )}
-                  >
-                    {isCompleted ? "✓" : index + 1}
-                  </div>
-                ))}
-              </div>
-            </div>
+		    <div className="space-y-1">
+		      <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-tight">
+		        Poin saya/Semester
+		      </p>
+		      <p className="text-2xl font-black text-zinc-900 font-mono tracking-tight">
+		        {user.earnedPoints}
+		      </p>
+		    </div>
 
-          </div>
+		    <div className="space-y-1">
+		      <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-tight">
+		        Saldo Poin
+		      </p>
+		      <p className="text-2xl font-black text-zinc-900 font-mono tracking-tight">
+		        {user.availablePoints}
+		      </p>
+		    </div>
+		  </div>
 
-          <div className="grid grid-cols-2 text-center py-5 relative">
-            <div className="absolute top-4 bottom-4 left-1/2 w-[1px] bg-zinc-100 -translate-x-1/2" />
+		  <div className="px-5 pb-5">
+		    <button
+		      onClick={() => router.push("/worker/reward-users")}
+		      className="w-full py-2.5 rounded-2xl bg-[#FF3B30] hover:bg-[#d4422f] text-white text-xs font-extrabold uppercase tracking-wider transition-all active:scale-[0.97] shadow-md hover:shadow-lg"
+		    >
+		      Tukar Hadiah
+		    </button>
+		  </div>
 
-            <div className="space-y-1">
-              <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-tight">
-                Poin saya/Semester
-              </p>
-              <p className="text-2xl font-black text-zinc-900 font-mono tracking-tight">
-                {user.earnedPoints}
-              </p>
-            </div>
-
-            <div className="space-y-1">
-              <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-tight">
-                Poin Tersedia
-              </p>
-              <p className="text-2xl font-black text-zinc-900 font-mono tracking-tight">
-                {user.availablePoints}
-              </p>
-            </div>
-          </div>
-
-        </div>
+		</div>
 
         {/* SEKSI 3: MENU NAVIGASI LIST */}
         <div className="w-full bg-white rounded-[28px] border border-zinc-100 shadow-[0_4px_20px_rgba(0,0,0,0.01)] px-5 py-2 divide-y divide-zinc-100">

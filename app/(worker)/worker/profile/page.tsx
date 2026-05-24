@@ -41,18 +41,40 @@ export default async function ProfilePage() {
     redirect("/login");
   }
 
+  // 2b. Dapatkan periode akademik aktif
+  const activePeriod = await db.academicPeriod.findFirst({
+    where: { isActive: true },
+    select: { id: true },
+  });
+
   // 3. Ambil semester aktif berjalan (fallback ke data summary semester terakhir atau default semester 1)
   const currentSemester = user.semesterSummaries[0]?.semester || 1;
 
-  // 4. Hitung Poin Saya / Semester dari riwayat transaksi poin K3 asli milik user
-  const earnedPoints = user.pointTransactions
-    .reduce((sum: number, tx: any) => sum + tx.points, 0);
+  // 4. Filter transaksi poin berdasarkan periode aktif (jika ada)
+  const periodTransactions = activePeriod
+    ? user.pointTransactions.filter((tx: any) => tx.periodId === activePeriod.id)
+    : user.pointTransactions;
 
-  // 5. Ambil semua material yang ditugaskan atau tersedia pada semester aktif tersebut
+  // 5. Hitung Poin Saya / Semester dari transaksi di periode aktif
+  const earnedPoints = periodTransactions
+    .filter((t: any) => t.points > 0)
+    .reduce((sum: number, t: any) => sum + t.points, 0);
+
+  // 6. Hitung saldo poin real (total poin didapat - total poin terpakai) dari SEMUA transaksi (all-time)
+  const totalEarnedAll = user.pointTransactions
+    .filter((t: any) => t.points > 0)
+    .reduce((sum: number, t: any) => sum + t.points, 0);
+
+  const totalSpentAll = user.pointTransactions
+    .filter((t: any) => t.points < 0)
+    .reduce((sum: number, t: any) => sum + Math.abs(t.points), 0);
+
+  const availablePoints = totalEarnedAll - totalSpentAll;
+
+  // 6. Ambil semua material yang ditugaskan atau tersedia pada semester aktif tersebut
   const allSemesterMaterials = await db.material.findMany({
     where: {
       status: "PUBLISHED",
-      // Mengambil material yang berelasi dengan AcademicPeriod aktif saat ini
       period: {
         isActive: true
       }
@@ -61,23 +83,6 @@ export default async function ProfilePage() {
       createdAt: "asc"
     }
   });
-
-  // 6. Hitung total poin yang tersedia dari konfigurasi quiz material semester ini
-  // Kita ambil quiz config dari material yang aktif untuk kalkulasi max poin tersedia
-  const materialIdsInSemester = allSemesterMaterials.map((m: any) => m.id);
-  const quizConfigs = await db.quizConfig.findMany({
-    where: {
-      materialId: { in: materialIdsInSemester }
-    },
-    include: {
-      questions: true
-    }
-  });
-
-  const totalAvailablePoints = quizConfigs.reduce((sum: number, config: any) => {
-    const quizMaxPoints = config.questions.reduce((qSum: number, q: any) => qSum + q.points, 0);
-    return sum + quizMaxPoints;
-  }, 0);
 
   // 7. Buat susunan array boolean status progress untuk komponen timeline stepper [true, true, false]
   const completedMaterialIds = new Set(
@@ -99,7 +104,7 @@ export default async function ProfilePage() {
     unit: user.unit?.name ?? undefined,
     currentSemester: currentSemester,
     earnedPoints: earnedPoints,
-    availablePoints: totalAvailablePoints,
+    availablePoints: availablePoints,
     progressSteps: progressSteps.length > 0 ? progressSteps : [false, false, false, false],
   };
 

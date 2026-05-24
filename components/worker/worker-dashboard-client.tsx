@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { Trophy, BookOpen, Check, ShieldAlert, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getWorkerStatsByPeriod } from "@/app/actions/worker";
 
 interface Material {
   id: string;
@@ -40,7 +41,7 @@ interface WorkerDashboardClientProps {
 }
 
 export default function WorkerDashboardClient({
-  stats,
+  stats: initialStats,
   periods,
   latestMaterials,
   userName = "Electricity Warrior",
@@ -48,6 +49,23 @@ export default function WorkerDashboardClient({
   const [selectedPeriodId, setSelectedPeriodId] = useState<string>(
     periods.find((p) => p.isActive)?.id || periods[0]?.id || ""
   );
+  const [stats, setStats] = useState(initialStats);
+  const [statsLoading, setStatsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!selectedPeriodId) return;
+
+    const fetchStats = async () => {
+      setStatsLoading(true);
+      const result = await getWorkerStatsByPeriod(selectedPeriodId);
+      if (result.success) {
+        setStats(result.data as any);
+      }
+      setStatsLoading(false);
+    };
+
+    fetchStats();
+  }, [selectedPeriodId]);
 
   const currentPeriod = useMemo(() => {
     return periods.find((p) => p.id === selectedPeriodId) || periods[0];
@@ -125,7 +143,7 @@ export default function WorkerDashboardClient({
   return (
     /* PERBAIKAN DI SINI: min-h-screen diganti h-auto, pb-28 dikurangi jadi pb-24 agar fit pas layar */
     <div className="mx-auto max-w-md h-auto bg-slate-50/50 pb-24 font-sans antialiased overflow-x-hidden">
-      <div className="px-1 space-y-5 pt-0">
+      <div className="px-1 space-y-6 pt-0">
         
         {/* 1. WELCOME CARD */}
         <section className="bg-white rounded-[32px] overflow-hidden shadow-sm border border-zinc-100">
@@ -189,7 +207,7 @@ export default function WorkerDashboardClient({
               <span className="text-2xl font-bold text-zinc-900">{stats?.totalPoints ?? 0}</span>
             </div>
             <div className="flex flex-col justify-center py-1">
-              <span className="text-[11px] font-medium text-zinc-500 mb-1">Poin Tersedia</span>
+              <span className="text-[11px] font-medium text-zinc-500 mb-1">Saldo Poin</span>
               <span className="text-2xl font-bold text-zinc-900">{stats?.availablePoints ?? 0}</span>
             </div>
           </div>
@@ -241,46 +259,81 @@ export default function WorkerDashboardClient({
             </Link>
           </div>
 
-          <div className="bg-white rounded-[28px] p-5 shadow-sm border border-zinc-100 space-y-5 relative">
+          <div className="bg-white rounded-[28px] p-5 shadow-sm border border-zinc-100 relative">
             <div className="absolute left-[29px] top-8 bottom-12 w-0.5 bg-zinc-100" />
+            <div className="max-h-[320px] overflow-y-auto no-scrollbar space-y-5">
+              {/* Progress Timeline Items */}
+              {(() => {
+                const currentMaterials = currentPeriod?.materials || [];
+                const sortedMaterials = [...currentMaterials].sort(
+                  (a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+                );
 
-            <div className="flex items-start gap-4 relative z-10">
-              <div className="w-5 h-5 rounded-full bg-[#FF3B30] flex items-center justify-center text-white text-[10px] font-bold shrink-0 shadow-sm mt-0.5">
-                <Check className="w-3 h-3 stroke-[3]" />
-              </div>
-              <div className="space-y-0.5">
-                <h4 className="text-xs font-bold text-zinc-900 leading-tight">
-                  {latestMaterials[0]?.title || "Materi Pembelajaran Utama K3 Kelistrikan"}
-                </h4>
-              </div>
-            </div>
+                // Find the first non-completed material index
+                let firstIncompleteIdx = sortedMaterials.findIndex(
+                  (m: any) => m.progress?.[0]?.status !== "COMPLETED"
+                );
 
-            <div className="flex items-start gap-4 relative z-10">
-              <div className="w-5 h-5 rounded-full bg-[#FF3B30] flex items-center justify-center text-white shrink-0 shadow-sm mt-0.5">
-                <ShieldAlert className="w-3.5 h-3.5" />
-              </div>
-              <div className="space-y-0.5">
-                {latestMaterials[1] ? (
-                  <Link href={`/worker/materials/${latestMaterials[1].id}`} className="text-xs font-bold text-[#FF3B30] leading-tight hover:underline block">
-                    {latestMaterials[1].title}
-                  </Link>
-                ) : (
-                  <h4 className="text-xs font-bold text-[#FF3B30] leading-tight">
-                    Bagaimana Api Bekerja
-                  </h4>
-                )}
-              </div>
-            </div>
+                // If all completed, firstIncompleteIdx = length (after last)
+                if (firstIncompleteIdx === -1) firstIncompleteIdx = sortedMaterials.length;
 
-            <div className="flex items-start gap-4 relative z-10">
-              <div className="w-5 h-5 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-400 shrink-0 border border-zinc-200 text-[10px] mt-0.5">
-                <Lock className="w-2.5 h-2.5" />
-              </div>
-              <div className="space-y-0.5">
-                <h4 className="text-xs font-bold text-zinc-400 leading-tight">
-                  {latestMaterials[2]?.title ? `Mendatang: ${latestMaterials[2].title}` : "Mendatang"}
-                </h4>
-              </div>
+                return (
+                  <>
+                    {sortedMaterials.map((material: any, idx: number) => {
+                      const isCompleted = material.progress?.[0]?.status === "COMPLETED";
+                      const isActive = idx === firstIncompleteIdx;
+                      const isLocked = idx > firstIncompleteIdx;
+
+                      return (
+                        <div key={material.id} className="flex items-start gap-4 relative z-10">
+                          {isCompleted ? (
+                            <Link href={`/worker/materials/${material.id}`} className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center text-white text-[10px] font-bold shrink-0 shadow-sm mt-0.5 hover:bg-emerald-600 transition-colors">
+                              <Check className="w-3 h-3 stroke-[3]" />
+                            </Link>
+                          ) : isActive ? (
+                            <Link href={`/worker/materials/${material.id}`} className="w-5 h-5 rounded-full bg-[#FF3B30] flex items-center justify-center text-white shrink-0 shadow-sm mt-0.5 hover:bg-red-700 transition-colors">
+                              <span className="text-[9px] font-extrabold">{idx + 1}</span>
+                            </Link>
+                          ) : (
+                            <div className="w-5 h-5 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-400 shrink-0 border border-zinc-200 text-[10px] mt-0.5">
+                              <Lock className="w-2.5 h-2.5" />
+                            </div>
+                          )}
+                          <div className="space-y-0.5 min-w-0 flex-1">
+                            {isCompleted || isActive ? (
+                              <Link
+                                href={`/worker/materials/${material.id}`}
+                                className={cn(
+                                  "text-xs leading-tight hover:underline block truncate",
+                                  isCompleted ? "font-bold text-zinc-900" : "font-bold text-[#FF3B30]"
+                                )}
+                              >
+                                {material.title}
+                              </Link>
+                            ) : (
+                              <h4 className="text-xs font-bold text-zinc-400 leading-tight truncate">
+                                {material.title}
+                              </h4>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    {/* Mendatang — always locked at bottom */}
+                    <div className="flex items-start gap-4 relative z-10">
+                      <div className="w-5 h-5 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-400 shrink-0 border border-zinc-200 text-[10px] mt-0.5">
+                        <Lock className="w-2.5 h-2.5" />
+                      </div>
+                      <div className="space-y-0.5">
+                        <h4 className="text-xs font-bold text-zinc-400 leading-tight">
+                          Mendatang
+                        </h4>
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
           </div>
         </section>

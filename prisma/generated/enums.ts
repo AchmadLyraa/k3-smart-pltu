@@ -46,7 +46,17 @@ export const MaterialStatus = {
 export type MaterialStatus = (typeof MaterialStatus)[keyof typeof MaterialStatus]
 
 
+export const CampaignStatus = {
+  DRAFT: 'DRAFT',
+  PUBLISHED: 'PUBLISHED',
+  ARCHIVED: 'ARCHIVED'
+} as const
+
+export type CampaignStatus = (typeof CampaignStatus)[keyof typeof CampaignStatus]
+
+
 export const QuestionType = {
+  REPLACE: 'REPLACE',
   MULTIPLE_CHOICE: 'MULTIPLE_CHOICE',
   TRUE_FALSE: 'TRUE_FALSE',
   MULTIPLE_SELECT: 'MULTIPLE_SELECT'

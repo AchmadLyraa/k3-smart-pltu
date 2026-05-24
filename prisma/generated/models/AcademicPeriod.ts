@@ -207,8 +207,10 @@ export type AcademicPeriodWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"AcademicPeriod"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AcademicPeriod"> | Date | string
   materials?: Prisma.MaterialListRelationFilter
+  quizCampaigns?: Prisma.QuizCampaignListRelationFilter
   questionBanks?: Prisma.QuestionBankListRelationFilter
   semesterSummaries?: Prisma.SemesterSummaryListRelationFilter
+  pointTransactions?: Prisma.PointTransactionListRelationFilter
 }
 
 export type AcademicPeriodOrderByWithRelationInput = {
@@ -221,8 +223,10 @@ export type AcademicPeriodOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   materials?: Prisma.MaterialOrderByRelationAggregateInput
+  quizCampaigns?: Prisma.QuizCampaignOrderByRelationAggregateInput
   questionBanks?: Prisma.QuestionBankOrderByRelationAggregateInput
   semesterSummaries?: Prisma.SemesterSummaryOrderByRelationAggregateInput
+  pointTransactions?: Prisma.PointTransactionOrderByRelationAggregateInput
 }
 
 export type AcademicPeriodWhereUniqueInput = Prisma.AtLeast<{
@@ -238,8 +242,10 @@ export type AcademicPeriodWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"AcademicPeriod"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AcademicPeriod"> | Date | string
   materials?: Prisma.MaterialListRelationFilter
+  quizCampaigns?: Prisma.QuizCampaignListRelationFilter
   questionBanks?: Prisma.QuestionBankListRelationFilter
   semesterSummaries?: Prisma.SemesterSummaryListRelationFilter
+  pointTransactions?: Prisma.PointTransactionListRelationFilter
 }, "id" | "name">
 
 export type AcademicPeriodOrderByWithAggregationInput = {
@@ -280,8 +286,10 @@ export type AcademicPeriodCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   materials?: Prisma.MaterialCreateNestedManyWithoutPeriodInput
+  quizCampaigns?: Prisma.QuizCampaignCreateNestedManyWithoutPeriodInput
   questionBanks?: Prisma.QuestionBankCreateNestedManyWithoutPeriodInput
   semesterSummaries?: Prisma.SemesterSummaryCreateNestedManyWithoutPeriodInput
+  pointTransactions?: Prisma.PointTransactionCreateNestedManyWithoutPeriodInput
 }
 
 export type AcademicPeriodUncheckedCreateInput = {
@@ -294,8 +302,10 @@ export type AcademicPeriodUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   materials?: Prisma.MaterialUncheckedCreateNestedManyWithoutPeriodInput
+  quizCampaigns?: Prisma.QuizCampaignUncheckedCreateNestedManyWithoutPeriodInput
   questionBanks?: Prisma.QuestionBankUncheckedCreateNestedManyWithoutPeriodInput
   semesterSummaries?: Prisma.SemesterSummaryUncheckedCreateNestedManyWithoutPeriodInput
+  pointTransactions?: Prisma.PointTransactionUncheckedCreateNestedManyWithoutPeriodInput
 }
 
 export type AcademicPeriodUpdateInput = {
@@ -308,8 +318,10 @@ export type AcademicPeriodUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   materials?: Prisma.MaterialUpdateManyWithoutPeriodNestedInput
+  quizCampaigns?: Prisma.QuizCampaignUpdateManyWithoutPeriodNestedInput
   questionBanks?: Prisma.QuestionBankUpdateManyWithoutPeriodNestedInput
   semesterSummaries?: Prisma.SemesterSummaryUpdateManyWithoutPeriodNestedInput
+  pointTransactions?: Prisma.PointTransactionUpdateManyWithoutPeriodNestedInput
 }
 
 export type AcademicPeriodUncheckedUpdateInput = {
@@ -322,8 +334,10 @@ export type AcademicPeriodUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   materials?: Prisma.MaterialUncheckedUpdateManyWithoutPeriodNestedInput
+  quizCampaigns?: Prisma.QuizCampaignUncheckedUpdateManyWithoutPeriodNestedInput
   questionBanks?: Prisma.QuestionBankUncheckedUpdateManyWithoutPeriodNestedInput
   semesterSummaries?: Prisma.SemesterSummaryUncheckedUpdateManyWithoutPeriodNestedInput
+  pointTransactions?: Prisma.PointTransactionUncheckedUpdateManyWithoutPeriodNestedInput
 }
 
 export type AcademicPeriodCreateManyInput = {
@@ -413,6 +427,22 @@ export type AcademicPeriodUpdateOneWithoutMaterialsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AcademicPeriodUpdateToOneWithWhereWithoutMaterialsInput, Prisma.AcademicPeriodUpdateWithoutMaterialsInput>, Prisma.AcademicPeriodUncheckedUpdateWithoutMaterialsInput>
 }
 
+export type AcademicPeriodCreateNestedOneWithoutQuizCampaignsInput = {
+  create?: Prisma.XOR<Prisma.AcademicPeriodCreateWithoutQuizCampaignsInput, Prisma.AcademicPeriodUncheckedCreateWithoutQuizCampaignsInput>
+  connectOrCreate?: Prisma.AcademicPeriodCreateOrConnectWithoutQuizCampaignsInput
+  connect?: Prisma.AcademicPeriodWhereUniqueInput
+}
+
+export type AcademicPeriodUpdateOneWithoutQuizCampaignsNestedInput = {
+  create?: Prisma.XOR<Prisma.AcademicPeriodCreateWithoutQuizCampaignsInput, Prisma.AcademicPeriodUncheckedCreateWithoutQuizCampaignsInput>
+  connectOrCreate?: Prisma.AcademicPeriodCreateOrConnectWithoutQuizCampaignsInput
+  upsert?: Prisma.AcademicPeriodUpsertWithoutQuizCampaignsInput
+  disconnect?: Prisma.AcademicPeriodWhereInput | boolean
+  delete?: Prisma.AcademicPeriodWhereInput | boolean
+  connect?: Prisma.AcademicPeriodWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AcademicPeriodUpdateToOneWithWhereWithoutQuizCampaignsInput, Prisma.AcademicPeriodUpdateWithoutQuizCampaignsInput>, Prisma.AcademicPeriodUncheckedUpdateWithoutQuizCampaignsInput>
+}
+
 export type AcademicPeriodCreateNestedOneWithoutQuestionBanksInput = {
   create?: Prisma.XOR<Prisma.AcademicPeriodCreateWithoutQuestionBanksInput, Prisma.AcademicPeriodUncheckedCreateWithoutQuestionBanksInput>
   connectOrCreate?: Prisma.AcademicPeriodCreateOrConnectWithoutQuestionBanksInput
@@ -427,6 +457,22 @@ export type AcademicPeriodUpdateOneWithoutQuestionBanksNestedInput = {
   delete?: Prisma.AcademicPeriodWhereInput | boolean
   connect?: Prisma.AcademicPeriodWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.AcademicPeriodUpdateToOneWithWhereWithoutQuestionBanksInput, Prisma.AcademicPeriodUpdateWithoutQuestionBanksInput>, Prisma.AcademicPeriodUncheckedUpdateWithoutQuestionBanksInput>
+}
+
+export type AcademicPeriodCreateNestedOneWithoutPointTransactionsInput = {
+  create?: Prisma.XOR<Prisma.AcademicPeriodCreateWithoutPointTransactionsInput, Prisma.AcademicPeriodUncheckedCreateWithoutPointTransactionsInput>
+  connectOrCreate?: Prisma.AcademicPeriodCreateOrConnectWithoutPointTransactionsInput
+  connect?: Prisma.AcademicPeriodWhereUniqueInput
+}
+
+export type AcademicPeriodUpdateOneWithoutPointTransactionsNestedInput = {
+  create?: Prisma.XOR<Prisma.AcademicPeriodCreateWithoutPointTransactionsInput, Prisma.AcademicPeriodUncheckedCreateWithoutPointTransactionsInput>
+  connectOrCreate?: Prisma.AcademicPeriodCreateOrConnectWithoutPointTransactionsInput
+  upsert?: Prisma.AcademicPeriodUpsertWithoutPointTransactionsInput
+  disconnect?: Prisma.AcademicPeriodWhereInput | boolean
+  delete?: Prisma.AcademicPeriodWhereInput | boolean
+  connect?: Prisma.AcademicPeriodWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AcademicPeriodUpdateToOneWithWhereWithoutPointTransactionsInput, Prisma.AcademicPeriodUpdateWithoutPointTransactionsInput>, Prisma.AcademicPeriodUncheckedUpdateWithoutPointTransactionsInput>
 }
 
 export type AcademicPeriodCreateNestedOneWithoutSemesterSummariesInput = {
@@ -454,8 +500,10 @@ export type AcademicPeriodCreateWithoutMaterialsInput = {
   lastResetAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  quizCampaigns?: Prisma.QuizCampaignCreateNestedManyWithoutPeriodInput
   questionBanks?: Prisma.QuestionBankCreateNestedManyWithoutPeriodInput
   semesterSummaries?: Prisma.SemesterSummaryCreateNestedManyWithoutPeriodInput
+  pointTransactions?: Prisma.PointTransactionCreateNestedManyWithoutPeriodInput
 }
 
 export type AcademicPeriodUncheckedCreateWithoutMaterialsInput = {
@@ -467,8 +515,10 @@ export type AcademicPeriodUncheckedCreateWithoutMaterialsInput = {
   lastResetAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  quizCampaigns?: Prisma.QuizCampaignUncheckedCreateNestedManyWithoutPeriodInput
   questionBanks?: Prisma.QuestionBankUncheckedCreateNestedManyWithoutPeriodInput
   semesterSummaries?: Prisma.SemesterSummaryUncheckedCreateNestedManyWithoutPeriodInput
+  pointTransactions?: Prisma.PointTransactionUncheckedCreateNestedManyWithoutPeriodInput
 }
 
 export type AcademicPeriodCreateOrConnectWithoutMaterialsInput = {
@@ -496,8 +546,10 @@ export type AcademicPeriodUpdateWithoutMaterialsInput = {
   lastResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  quizCampaigns?: Prisma.QuizCampaignUpdateManyWithoutPeriodNestedInput
   questionBanks?: Prisma.QuestionBankUpdateManyWithoutPeriodNestedInput
   semesterSummaries?: Prisma.SemesterSummaryUpdateManyWithoutPeriodNestedInput
+  pointTransactions?: Prisma.PointTransactionUpdateManyWithoutPeriodNestedInput
 }
 
 export type AcademicPeriodUncheckedUpdateWithoutMaterialsInput = {
@@ -509,8 +561,86 @@ export type AcademicPeriodUncheckedUpdateWithoutMaterialsInput = {
   lastResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  quizCampaigns?: Prisma.QuizCampaignUncheckedUpdateManyWithoutPeriodNestedInput
   questionBanks?: Prisma.QuestionBankUncheckedUpdateManyWithoutPeriodNestedInput
   semesterSummaries?: Prisma.SemesterSummaryUncheckedUpdateManyWithoutPeriodNestedInput
+  pointTransactions?: Prisma.PointTransactionUncheckedUpdateManyWithoutPeriodNestedInput
+}
+
+export type AcademicPeriodCreateWithoutQuizCampaignsInput = {
+  id?: string
+  name: string
+  startDate: Date | string
+  endDate: Date | string
+  isActive?: boolean
+  lastResetAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  materials?: Prisma.MaterialCreateNestedManyWithoutPeriodInput
+  questionBanks?: Prisma.QuestionBankCreateNestedManyWithoutPeriodInput
+  semesterSummaries?: Prisma.SemesterSummaryCreateNestedManyWithoutPeriodInput
+  pointTransactions?: Prisma.PointTransactionCreateNestedManyWithoutPeriodInput
+}
+
+export type AcademicPeriodUncheckedCreateWithoutQuizCampaignsInput = {
+  id?: string
+  name: string
+  startDate: Date | string
+  endDate: Date | string
+  isActive?: boolean
+  lastResetAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  materials?: Prisma.MaterialUncheckedCreateNestedManyWithoutPeriodInput
+  questionBanks?: Prisma.QuestionBankUncheckedCreateNestedManyWithoutPeriodInput
+  semesterSummaries?: Prisma.SemesterSummaryUncheckedCreateNestedManyWithoutPeriodInput
+  pointTransactions?: Prisma.PointTransactionUncheckedCreateNestedManyWithoutPeriodInput
+}
+
+export type AcademicPeriodCreateOrConnectWithoutQuizCampaignsInput = {
+  where: Prisma.AcademicPeriodWhereUniqueInput
+  create: Prisma.XOR<Prisma.AcademicPeriodCreateWithoutQuizCampaignsInput, Prisma.AcademicPeriodUncheckedCreateWithoutQuizCampaignsInput>
+}
+
+export type AcademicPeriodUpsertWithoutQuizCampaignsInput = {
+  update: Prisma.XOR<Prisma.AcademicPeriodUpdateWithoutQuizCampaignsInput, Prisma.AcademicPeriodUncheckedUpdateWithoutQuizCampaignsInput>
+  create: Prisma.XOR<Prisma.AcademicPeriodCreateWithoutQuizCampaignsInput, Prisma.AcademicPeriodUncheckedCreateWithoutQuizCampaignsInput>
+  where?: Prisma.AcademicPeriodWhereInput
+}
+
+export type AcademicPeriodUpdateToOneWithWhereWithoutQuizCampaignsInput = {
+  where?: Prisma.AcademicPeriodWhereInput
+  data: Prisma.XOR<Prisma.AcademicPeriodUpdateWithoutQuizCampaignsInput, Prisma.AcademicPeriodUncheckedUpdateWithoutQuizCampaignsInput>
+}
+
+export type AcademicPeriodUpdateWithoutQuizCampaignsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  materials?: Prisma.MaterialUpdateManyWithoutPeriodNestedInput
+  questionBanks?: Prisma.QuestionBankUpdateManyWithoutPeriodNestedInput
+  semesterSummaries?: Prisma.SemesterSummaryUpdateManyWithoutPeriodNestedInput
+  pointTransactions?: Prisma.PointTransactionUpdateManyWithoutPeriodNestedInput
+}
+
+export type AcademicPeriodUncheckedUpdateWithoutQuizCampaignsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  materials?: Prisma.MaterialUncheckedUpdateManyWithoutPeriodNestedInput
+  questionBanks?: Prisma.QuestionBankUncheckedUpdateManyWithoutPeriodNestedInput
+  semesterSummaries?: Prisma.SemesterSummaryUncheckedUpdateManyWithoutPeriodNestedInput
+  pointTransactions?: Prisma.PointTransactionUncheckedUpdateManyWithoutPeriodNestedInput
 }
 
 export type AcademicPeriodCreateWithoutQuestionBanksInput = {
@@ -523,7 +653,9 @@ export type AcademicPeriodCreateWithoutQuestionBanksInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   materials?: Prisma.MaterialCreateNestedManyWithoutPeriodInput
+  quizCampaigns?: Prisma.QuizCampaignCreateNestedManyWithoutPeriodInput
   semesterSummaries?: Prisma.SemesterSummaryCreateNestedManyWithoutPeriodInput
+  pointTransactions?: Prisma.PointTransactionCreateNestedManyWithoutPeriodInput
 }
 
 export type AcademicPeriodUncheckedCreateWithoutQuestionBanksInput = {
@@ -536,7 +668,9 @@ export type AcademicPeriodUncheckedCreateWithoutQuestionBanksInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   materials?: Prisma.MaterialUncheckedCreateNestedManyWithoutPeriodInput
+  quizCampaigns?: Prisma.QuizCampaignUncheckedCreateNestedManyWithoutPeriodInput
   semesterSummaries?: Prisma.SemesterSummaryUncheckedCreateNestedManyWithoutPeriodInput
+  pointTransactions?: Prisma.PointTransactionUncheckedCreateNestedManyWithoutPeriodInput
 }
 
 export type AcademicPeriodCreateOrConnectWithoutQuestionBanksInput = {
@@ -565,7 +699,9 @@ export type AcademicPeriodUpdateWithoutQuestionBanksInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   materials?: Prisma.MaterialUpdateManyWithoutPeriodNestedInput
+  quizCampaigns?: Prisma.QuizCampaignUpdateManyWithoutPeriodNestedInput
   semesterSummaries?: Prisma.SemesterSummaryUpdateManyWithoutPeriodNestedInput
+  pointTransactions?: Prisma.PointTransactionUpdateManyWithoutPeriodNestedInput
 }
 
 export type AcademicPeriodUncheckedUpdateWithoutQuestionBanksInput = {
@@ -578,6 +714,84 @@ export type AcademicPeriodUncheckedUpdateWithoutQuestionBanksInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   materials?: Prisma.MaterialUncheckedUpdateManyWithoutPeriodNestedInput
+  quizCampaigns?: Prisma.QuizCampaignUncheckedUpdateManyWithoutPeriodNestedInput
+  semesterSummaries?: Prisma.SemesterSummaryUncheckedUpdateManyWithoutPeriodNestedInput
+  pointTransactions?: Prisma.PointTransactionUncheckedUpdateManyWithoutPeriodNestedInput
+}
+
+export type AcademicPeriodCreateWithoutPointTransactionsInput = {
+  id?: string
+  name: string
+  startDate: Date | string
+  endDate: Date | string
+  isActive?: boolean
+  lastResetAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  materials?: Prisma.MaterialCreateNestedManyWithoutPeriodInput
+  quizCampaigns?: Prisma.QuizCampaignCreateNestedManyWithoutPeriodInput
+  questionBanks?: Prisma.QuestionBankCreateNestedManyWithoutPeriodInput
+  semesterSummaries?: Prisma.SemesterSummaryCreateNestedManyWithoutPeriodInput
+}
+
+export type AcademicPeriodUncheckedCreateWithoutPointTransactionsInput = {
+  id?: string
+  name: string
+  startDate: Date | string
+  endDate: Date | string
+  isActive?: boolean
+  lastResetAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  materials?: Prisma.MaterialUncheckedCreateNestedManyWithoutPeriodInput
+  quizCampaigns?: Prisma.QuizCampaignUncheckedCreateNestedManyWithoutPeriodInput
+  questionBanks?: Prisma.QuestionBankUncheckedCreateNestedManyWithoutPeriodInput
+  semesterSummaries?: Prisma.SemesterSummaryUncheckedCreateNestedManyWithoutPeriodInput
+}
+
+export type AcademicPeriodCreateOrConnectWithoutPointTransactionsInput = {
+  where: Prisma.AcademicPeriodWhereUniqueInput
+  create: Prisma.XOR<Prisma.AcademicPeriodCreateWithoutPointTransactionsInput, Prisma.AcademicPeriodUncheckedCreateWithoutPointTransactionsInput>
+}
+
+export type AcademicPeriodUpsertWithoutPointTransactionsInput = {
+  update: Prisma.XOR<Prisma.AcademicPeriodUpdateWithoutPointTransactionsInput, Prisma.AcademicPeriodUncheckedUpdateWithoutPointTransactionsInput>
+  create: Prisma.XOR<Prisma.AcademicPeriodCreateWithoutPointTransactionsInput, Prisma.AcademicPeriodUncheckedCreateWithoutPointTransactionsInput>
+  where?: Prisma.AcademicPeriodWhereInput
+}
+
+export type AcademicPeriodUpdateToOneWithWhereWithoutPointTransactionsInput = {
+  where?: Prisma.AcademicPeriodWhereInput
+  data: Prisma.XOR<Prisma.AcademicPeriodUpdateWithoutPointTransactionsInput, Prisma.AcademicPeriodUncheckedUpdateWithoutPointTransactionsInput>
+}
+
+export type AcademicPeriodUpdateWithoutPointTransactionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  materials?: Prisma.MaterialUpdateManyWithoutPeriodNestedInput
+  quizCampaigns?: Prisma.QuizCampaignUpdateManyWithoutPeriodNestedInput
+  questionBanks?: Prisma.QuestionBankUpdateManyWithoutPeriodNestedInput
+  semesterSummaries?: Prisma.SemesterSummaryUpdateManyWithoutPeriodNestedInput
+}
+
+export type AcademicPeriodUncheckedUpdateWithoutPointTransactionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastResetAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  materials?: Prisma.MaterialUncheckedUpdateManyWithoutPeriodNestedInput
+  quizCampaigns?: Prisma.QuizCampaignUncheckedUpdateManyWithoutPeriodNestedInput
+  questionBanks?: Prisma.QuestionBankUncheckedUpdateManyWithoutPeriodNestedInput
   semesterSummaries?: Prisma.SemesterSummaryUncheckedUpdateManyWithoutPeriodNestedInput
 }
 
@@ -591,7 +805,9 @@ export type AcademicPeriodCreateWithoutSemesterSummariesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   materials?: Prisma.MaterialCreateNestedManyWithoutPeriodInput
+  quizCampaigns?: Prisma.QuizCampaignCreateNestedManyWithoutPeriodInput
   questionBanks?: Prisma.QuestionBankCreateNestedManyWithoutPeriodInput
+  pointTransactions?: Prisma.PointTransactionCreateNestedManyWithoutPeriodInput
 }
 
 export type AcademicPeriodUncheckedCreateWithoutSemesterSummariesInput = {
@@ -604,7 +820,9 @@ export type AcademicPeriodUncheckedCreateWithoutSemesterSummariesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   materials?: Prisma.MaterialUncheckedCreateNestedManyWithoutPeriodInput
+  quizCampaigns?: Prisma.QuizCampaignUncheckedCreateNestedManyWithoutPeriodInput
   questionBanks?: Prisma.QuestionBankUncheckedCreateNestedManyWithoutPeriodInput
+  pointTransactions?: Prisma.PointTransactionUncheckedCreateNestedManyWithoutPeriodInput
 }
 
 export type AcademicPeriodCreateOrConnectWithoutSemesterSummariesInput = {
@@ -633,7 +851,9 @@ export type AcademicPeriodUpdateWithoutSemesterSummariesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   materials?: Prisma.MaterialUpdateManyWithoutPeriodNestedInput
+  quizCampaigns?: Prisma.QuizCampaignUpdateManyWithoutPeriodNestedInput
   questionBanks?: Prisma.QuestionBankUpdateManyWithoutPeriodNestedInput
+  pointTransactions?: Prisma.PointTransactionUpdateManyWithoutPeriodNestedInput
 }
 
 export type AcademicPeriodUncheckedUpdateWithoutSemesterSummariesInput = {
@@ -646,7 +866,9 @@ export type AcademicPeriodUncheckedUpdateWithoutSemesterSummariesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   materials?: Prisma.MaterialUncheckedUpdateManyWithoutPeriodNestedInput
+  quizCampaigns?: Prisma.QuizCampaignUncheckedUpdateManyWithoutPeriodNestedInput
   questionBanks?: Prisma.QuestionBankUncheckedUpdateManyWithoutPeriodNestedInput
+  pointTransactions?: Prisma.PointTransactionUncheckedUpdateManyWithoutPeriodNestedInput
 }
 
 
@@ -656,14 +878,18 @@ export type AcademicPeriodUncheckedUpdateWithoutSemesterSummariesInput = {
 
 export type AcademicPeriodCountOutputType = {
   materials: number
+  quizCampaigns: number
   questionBanks: number
   semesterSummaries: number
+  pointTransactions: number
 }
 
 export type AcademicPeriodCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   materials?: boolean | AcademicPeriodCountOutputTypeCountMaterialsArgs
+  quizCampaigns?: boolean | AcademicPeriodCountOutputTypeCountQuizCampaignsArgs
   questionBanks?: boolean | AcademicPeriodCountOutputTypeCountQuestionBanksArgs
   semesterSummaries?: boolean | AcademicPeriodCountOutputTypeCountSemesterSummariesArgs
+  pointTransactions?: boolean | AcademicPeriodCountOutputTypeCountPointTransactionsArgs
 }
 
 /**
@@ -686,6 +912,13 @@ export type AcademicPeriodCountOutputTypeCountMaterialsArgs<ExtArgs extends runt
 /**
  * AcademicPeriodCountOutputType without action
  */
+export type AcademicPeriodCountOutputTypeCountQuizCampaignsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.QuizCampaignWhereInput
+}
+
+/**
+ * AcademicPeriodCountOutputType without action
+ */
 export type AcademicPeriodCountOutputTypeCountQuestionBanksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.QuestionBankWhereInput
 }
@@ -695,6 +928,13 @@ export type AcademicPeriodCountOutputTypeCountQuestionBanksArgs<ExtArgs extends 
  */
 export type AcademicPeriodCountOutputTypeCountSemesterSummariesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.SemesterSummaryWhereInput
+}
+
+/**
+ * AcademicPeriodCountOutputType without action
+ */
+export type AcademicPeriodCountOutputTypeCountPointTransactionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PointTransactionWhereInput
 }
 
 
@@ -708,8 +948,10 @@ export type AcademicPeriodSelect<ExtArgs extends runtime.Types.Extensions.Intern
   createdAt?: boolean
   updatedAt?: boolean
   materials?: boolean | Prisma.AcademicPeriod$materialsArgs<ExtArgs>
+  quizCampaigns?: boolean | Prisma.AcademicPeriod$quizCampaignsArgs<ExtArgs>
   questionBanks?: boolean | Prisma.AcademicPeriod$questionBanksArgs<ExtArgs>
   semesterSummaries?: boolean | Prisma.AcademicPeriod$semesterSummariesArgs<ExtArgs>
+  pointTransactions?: boolean | Prisma.AcademicPeriod$pointTransactionsArgs<ExtArgs>
   _count?: boolean | Prisma.AcademicPeriodCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["academicPeriod"]>
 
@@ -749,8 +991,10 @@ export type AcademicPeriodSelectScalar = {
 export type AcademicPeriodOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "startDate" | "endDate" | "isActive" | "lastResetAt" | "createdAt" | "updatedAt", ExtArgs["result"]["academicPeriod"]>
 export type AcademicPeriodInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   materials?: boolean | Prisma.AcademicPeriod$materialsArgs<ExtArgs>
+  quizCampaigns?: boolean | Prisma.AcademicPeriod$quizCampaignsArgs<ExtArgs>
   questionBanks?: boolean | Prisma.AcademicPeriod$questionBanksArgs<ExtArgs>
   semesterSummaries?: boolean | Prisma.AcademicPeriod$semesterSummariesArgs<ExtArgs>
+  pointTransactions?: boolean | Prisma.AcademicPeriod$pointTransactionsArgs<ExtArgs>
   _count?: boolean | Prisma.AcademicPeriodCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AcademicPeriodIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -760,8 +1004,10 @@ export type $AcademicPeriodPayload<ExtArgs extends runtime.Types.Extensions.Inte
   name: "AcademicPeriod"
   objects: {
     materials: Prisma.$MaterialPayload<ExtArgs>[]
+    quizCampaigns: Prisma.$QuizCampaignPayload<ExtArgs>[]
     questionBanks: Prisma.$QuestionBankPayload<ExtArgs>[]
     semesterSummaries: Prisma.$SemesterSummaryPayload<ExtArgs>[]
+    pointTransactions: Prisma.$PointTransactionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1167,8 +1413,10 @@ readonly fields: AcademicPeriodFieldRefs;
 export interface Prisma__AcademicPeriodClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   materials<T extends Prisma.AcademicPeriod$materialsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AcademicPeriod$materialsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MaterialPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  quizCampaigns<T extends Prisma.AcademicPeriod$quizCampaignsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AcademicPeriod$quizCampaignsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$QuizCampaignPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   questionBanks<T extends Prisma.AcademicPeriod$questionBanksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AcademicPeriod$questionBanksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$QuestionBankPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   semesterSummaries<T extends Prisma.AcademicPeriod$semesterSummariesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AcademicPeriod$semesterSummariesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SemesterSummaryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  pointTransactions<T extends Prisma.AcademicPeriod$pointTransactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AcademicPeriod$pointTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PointTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1623,6 +1871,30 @@ export type AcademicPeriod$materialsArgs<ExtArgs extends runtime.Types.Extension
 }
 
 /**
+ * AcademicPeriod.quizCampaigns
+ */
+export type AcademicPeriod$quizCampaignsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the QuizCampaign
+   */
+  select?: Prisma.QuizCampaignSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the QuizCampaign
+   */
+  omit?: Prisma.QuizCampaignOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.QuizCampaignInclude<ExtArgs> | null
+  where?: Prisma.QuizCampaignWhereInput
+  orderBy?: Prisma.QuizCampaignOrderByWithRelationInput | Prisma.QuizCampaignOrderByWithRelationInput[]
+  cursor?: Prisma.QuizCampaignWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.QuizCampaignScalarFieldEnum | Prisma.QuizCampaignScalarFieldEnum[]
+}
+
+/**
  * AcademicPeriod.questionBanks
  */
 export type AcademicPeriod$questionBanksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1668,6 +1940,30 @@ export type AcademicPeriod$semesterSummariesArgs<ExtArgs extends runtime.Types.E
   take?: number
   skip?: number
   distinct?: Prisma.SemesterSummaryScalarFieldEnum | Prisma.SemesterSummaryScalarFieldEnum[]
+}
+
+/**
+ * AcademicPeriod.pointTransactions
+ */
+export type AcademicPeriod$pointTransactionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PointTransaction
+   */
+  select?: Prisma.PointTransactionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PointTransaction
+   */
+  omit?: Prisma.PointTransactionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PointTransactionInclude<ExtArgs> | null
+  where?: Prisma.PointTransactionWhereInput
+  orderBy?: Prisma.PointTransactionOrderByWithRelationInput | Prisma.PointTransactionOrderByWithRelationInput[]
+  cursor?: Prisma.PointTransactionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PointTransactionScalarFieldEnum | Prisma.PointTransactionScalarFieldEnum[]
 }
 
 /**

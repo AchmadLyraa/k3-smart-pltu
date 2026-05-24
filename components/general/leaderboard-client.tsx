@@ -58,7 +58,7 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
   };
 
   return (
-    <div className="w-full flex flex-col justify-start space-y-6 px-1 pt-4 pb-20 animate-in fade-in duration-300">
+    <div className="w-full flex flex-col justify-start space-y-5 px-1 pt-0 pb-20 animate-in fade-in duration-300">
       
       {/* JUDUL UTAMA HALAMAN */}
       <h1 className="text-2xl font-black text-center text-zinc-900 tracking-tight">

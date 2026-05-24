@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
 	getWorkerRewardDashboard,
 	redeemReward,
@@ -20,7 +21,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { Award, Coins, History, RefreshCw, Sparkles, Gift } from "lucide-react";
+import { ChevronLeft, Award, Coins, History, RefreshCw, Sparkles, Gift } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type RewardItem = {
@@ -48,6 +49,7 @@ type RedemptionItem = {
 };
 
 export default function RewardUsersPage() {
+	const router = useRouter();
 	const { toast } = useToast();
 	const [mounted, setMounted] = useState(false);
 	const [loading, setLoading] = useState(true);
@@ -142,9 +144,17 @@ export default function RewardUsersPage() {
 	};
 
 	return (
-		<div className="space-y-8 animate-in fade-in duration-500 pb-16">
+		<div className="space-y-6 animate-in fade-in duration-500 pb-16 px-2">
+			{/* Back Button */}
+			<button
+				onClick={() => router.push("/worker/home")}
+				className="w-10 h-10 rounded-full bg-white border border-zinc-200/60 flex items-center justify-center text-zinc-900 active:scale-95 transition-all shrink-0 shadow-sm"
+			>
+				<ChevronLeft className="w-6 h-6 stroke-[2.5]" />
+			</button>
+
 			{/* Top Header Banner */}
-			<div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-zinc-950 via-red-950 to-red-600 p-6 md:p-8 text-white shadow-xl border border-red-900/30">
+			<div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-zinc-950 via-red-950 to-red-600 p-6 md:p-7 text-white shadow-xl border border-red-900/30">
 				<div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(239,68,68,0.25),transparent_45%)] pointer-events-none" />
 				<div className="absolute -right-10 -bottom-10 w-48 h-48 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
 				<div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">

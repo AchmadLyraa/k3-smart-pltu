@@ -78,6 +78,16 @@ export type MaterialAssignment = Prisma.MaterialAssignmentModel
  */
 export type MediaFile = Prisma.MediaFileModel
 /**
+ * Model QuizCampaign
+ * 
+ */
+export type QuizCampaign = Prisma.QuizCampaignModel
+/**
+ * Model QuizCampaignQuestion
+ * 
+ */
+export type QuizCampaignQuestion = Prisma.QuizCampaignQuestionModel
+/**
  * Model QuestionBank
  * 
  */

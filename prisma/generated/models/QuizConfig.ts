@@ -591,9 +591,9 @@ export type QuizConfigSumOrderByAggregateInput = {
   maxRetries?: Prisma.SortOrder
 }
 
-export type QuizConfigScalarRelationFilter = {
-  is?: Prisma.QuizConfigWhereInput
-  isNot?: Prisma.QuizConfigWhereInput
+export type QuizConfigNullableScalarRelationFilter = {
+  is?: Prisma.QuizConfigWhereInput | null
+  isNot?: Prisma.QuizConfigWhereInput | null
 }
 
 export type QuizConfigCreateNestedManyWithoutMaterialInput = {
@@ -682,10 +682,12 @@ export type QuizConfigCreateNestedOneWithoutQuizSessionsInput = {
   connect?: Prisma.QuizConfigWhereUniqueInput
 }
 
-export type QuizConfigUpdateOneRequiredWithoutQuizSessionsNestedInput = {
+export type QuizConfigUpdateOneWithoutQuizSessionsNestedInput = {
   create?: Prisma.XOR<Prisma.QuizConfigCreateWithoutQuizSessionsInput, Prisma.QuizConfigUncheckedCreateWithoutQuizSessionsInput>
   connectOrCreate?: Prisma.QuizConfigCreateOrConnectWithoutQuizSessionsInput
   upsert?: Prisma.QuizConfigUpsertWithoutQuizSessionsInput
+  disconnect?: Prisma.QuizConfigWhereInput | boolean
+  delete?: Prisma.QuizConfigWhereInput | boolean
   connect?: Prisma.QuizConfigWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.QuizConfigUpdateToOneWithWhereWithoutQuizSessionsInput, Prisma.QuizConfigUpdateWithoutQuizSessionsInput>, Prisma.QuizConfigUncheckedUpdateWithoutQuizSessionsInput>
 }

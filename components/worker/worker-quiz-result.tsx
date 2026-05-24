@@ -2,7 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, XCircle, Trophy, RotateCcw } from "lucide-react";
+import { CheckCircle2, XCircle, Trophy, RotateCcw, ChevronLeft, Sparkles, Clock } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface QuizResultProps {
   result: {
@@ -32,116 +33,157 @@ export default function WorkerQuizResult({
   onBack,
 }: QuizResultProps) {
   return (
-    <div className="space-y-6">
-      {/* Score Card */}
-      <Card
-        className={
+    <div className="h-[100dvh] px-2 w-full bg-zinc-50/40 flex flex-col overflow-hidden pt-0 pb-6 animate-in fade-in duration-300">
+      
+      {/* AREA KONTEN ATAS */}
+      <div className="flex-1 flex flex-col justify-start space-y-4 min-h-0 overflow-y-auto no-scrollbar">
+        
+        {/* TOMBOL BACK (STANDALONE) */}
+        <button 
+          onClick={onBack}
+          className="w-10 h-10 rounded-full bg-white border border-zinc-200/60 flex items-center justify-center text-zinc-900 active:scale-95 transition-all shrink-0 shadow-sm"
+        >
+          <ChevronLeft className="w-6 h-6 stroke-[2.5]" />
+        </button>
+
+        {/* SCORE CARD */}
+        <div className={cn(
+          "rounded-[28px] border p-6 shadow-[0_2px_12px_rgba(0,0,0,0.015)] shrink-0 text-center",
           result.passed
-            ? "border-green-300 bg-green-50"
-            : "border-red-300 bg-red-50"
-        }
-      >
-        <CardContent className="pt-6 text-center">
+            ? "bg-emerald-50/80 border-emerald-200/60"
+            : "bg-red-50/80 border-red-200/60"
+        )}>
           {result.passed ? (
-            <Trophy className="w-12 h-12 text-yellow-500 mx-auto mb-3" />
+            <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
+              <Trophy className="w-8 h-8 text-emerald-600" />
+            </div>
           ) : (
-            <XCircle className="w-12 h-12 text-red-500 mx-auto mb-3" />
+            <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+              <XCircle className="w-8 h-8 text-red-500" />
+            </div>
           )}
-          <h2 className="text-2xl font-bold mb-1">
-            {result.passed ? "Selamat! Kamu Lulus!" : "Belum Lulus"}
+          
+          <h2 className="text-xl font-black text-zinc-900 mb-1">
+            {result.passed ? "Selamat! Kamu Lulus! 🎉" : "Belum Lulus"}
           </h2>
-          <p className="text-4xl font-bold my-3">{result.percentage}%</p>
-          <p className="text-muted-foreground">
+          
+          <div className={cn(
+            "text-5xl font-black my-4",
+            result.passed ? "text-emerald-600" : "text-[#FF3B30]"
+          )}>
+            {result.percentage}%
+          </div>
+          
+          <p className="text-sm font-medium text-zinc-500">
             {result.correctCount} dari {result.totalQuestions} soal benar
           </p>
+
           {result.passed && (
-            <div className="mt-3 space-y-1">
-              <div className="inline-flex items-center gap-2 bg-yellow-100 text-yellow-700 px-4 py-2 rounded-full text-sm font-medium">
-                <Trophy className="w-4 h-4" />+{result.totalPoints} poin jawaban
-                benar
+            <div className="mt-5 space-y-2">
+              <div className="inline-flex items-center gap-2 bg-white/80 text-emerald-700 px-4 py-2 rounded-full text-sm font-bold shadow-sm border border-emerald-200/60">
+                <Trophy className="w-4 h-4" /> +{result.totalPoints} poin jawaban benar
               </div>
 
-              {/* Penalty kalau telat */}
               {result.penaltyPercent > 0 && (
-                <div className="inline-flex items-center gap-2 bg-red-100 text-red-700 px-4 py-2 rounded-full text-sm font-medium ml-2">
-                  ⚠️ -{result.penaltyPoints} penalti ({result.daysLate} hari
-                  terlambat, -{result.penaltyPercent}%)
+                <div className="inline-flex items-center gap-2 bg-red-100 text-red-700 px-4 py-2 rounded-full text-sm font-bold ml-2">
+                  ⚠️ -{result.penaltyPoints} penalti ({result.daysLate} hari terlambat, -{result.penaltyPercent}%)
                 </div>
               )}
 
               {result.timeBonus > 0 && (
-                <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-medium ml-2">
-                  ⚡ +{result.timeBonus} time bonus
+                <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-bold ml-2 shadow-sm">
+                  <Clock className="w-4 h-4" /> +{result.timeBonus} time bonus
                 </div>
               )}
 
-              <p className="text-sm font-bold text-green-600 mt-1">
-                Total: +{result.totalPointsWithBonus} poin
-              </p>
+              <div className="pt-2">
+                <span className="inline-flex items-center gap-1.5 bg-emerald-600 text-white px-5 py-2.5 rounded-full text-sm font-black shadow-sm">
+                  <Sparkles className="w-4 h-4" /> Total: +{result.totalPointsWithBonus} poin
+                </span>
+              </div>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Answer Review */}
-      {result.showCorrectAns && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Review Jawaban</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {questions.map((q, idx) => {
-              const userAnswer = result.answers.find(
-                (a) => a.questionId === q.question.id,
-              );
-              const isCorrect = userAnswer?.isCorrect;
-              return (
-                <div key={q.id} className="border rounded-lg p-3">
-                  <div className="flex gap-2 items-start mb-2">
-                    {isCorrect ? (
-                      <CheckCircle2 className="w-4 h-4 text-green-600 shrink-0 mt-0.5" />
-                    ) : (
-                      <XCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+        {/* ANSWER REVIEW */}
+        {result.showCorrectAns && (
+          <div className="shrink-0">
+            <h3 className="text-xs font-black text-zinc-400 uppercase tracking-wider mb-3 px-1">
+              Review Jawaban
+            </h3>
+            <div className="space-y-2">
+              {questions.map((q, idx) => {
+                const userAnswer = result.answers.find(
+                  (a: any) => a.questionId === q.question.id,
+                );
+                const isCorrect = userAnswer?.isCorrect;
+                return (
+                  <div
+                    key={q.id}
+                    className={cn(
+                      "rounded-[20px] border p-4 bg-white shadow-[0_1px_4px_rgba(0,0,0,0.02)]",
+                      isCorrect
+                        ? "border-emerald-200/60"
+                        : "border-red-200/60"
                     )}
-                    <p className="text-sm font-medium">{q.question.text}</p>
-                  </div>
-                  <div className="ml-6 space-y-1 text-xs">
-                    <p className="text-muted-foreground">
-                      Jawaban kamu:{" "}
-                      <span
-                        className={
-                          isCorrect
-                            ? "text-green-600 font-medium"
-                            : "text-red-500 font-medium"
-                        }
-                      >
-                        {userAnswer?.answer ?? "-"}
-                      </span>
-                    </p>
-                    {!isCorrect && (
-                      <p className="text-muted-foreground">
-                        Jawaban benar:{" "}
-                        <span className="text-green-600 font-medium">
-                          {q.question.correctAnswer}
+                  >
+                    <div className="flex gap-2.5 items-start mb-2">
+                      {isCorrect ? (
+                        <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                      ) : (
+                        <XCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+                      )}
+                      <div>
+                        <p className="text-sm font-bold text-zinc-800">
+                          {idx + 1}. {q.question.text}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="ml-7.5 space-y-1 text-xs pl-0.5">
+                      <p className="text-zinc-400 font-medium">
+                        Jawaban kamu:{" "}
+                        <span
+                          className={
+                            isCorrect
+                              ? "text-emerald-600 font-bold"
+                              : "text-red-500 font-bold"
+                          }
+                        >
+                          {userAnswer?.answer ?? "-"}
                         </span>
                       </p>
-                    )}
+                      {!isCorrect && (
+                        <p className="text-zinc-400 font-medium">
+                          Jawaban benar:{" "}
+                          <span className="text-emerald-600 font-bold">
+                            {q.question.correctAnswer}
+                          </span>
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </CardContent>
-        </Card>
-      )}
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
 
-      <div className="flex gap-3">
-        <Button variant="outline" className="flex-1" onClick={onBack}>
+      {/* BOTTOM ACTION BUTTONS */}
+      <div className="w-full shrink-0 pt-4 flex items-center gap-3">
+        <button
+          onClick={onBack}
+          className="flex-1 h-12 rounded-2xl font-black text-sm bg-white text-zinc-700 border border-zinc-200/60 hover:bg-zinc-50 active:scale-[0.98] transition-all shadow-sm"
+        >
           Kembali ke Materi
-        </Button>
+        </button>
         {!result.passed && (
-          <Button className="flex-1" onClick={onRetry}>
-            <RotateCcw className="w-4 h-4 mr-2" /> Coba Lagi
-          </Button>
+          <button
+            onClick={onRetry}
+            className="flex-1 h-12 rounded-2xl font-black text-sm bg-[#FF3B30] hover:bg-red-600 text-white active:scale-[0.98] transition-all shadow-sm flex items-center justify-center gap-2"
+          >
+            <RotateCcw className="w-4 h-4 stroke-[2.5]" /> Coba Lagi
+          </button>
         )}
       </div>
     </div>

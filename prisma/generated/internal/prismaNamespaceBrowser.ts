@@ -63,6 +63,8 @@ export const ModelName = {
   Material: 'Material',
   MaterialAssignment: 'MaterialAssignment',
   MediaFile: 'MediaFile',
+  QuizCampaign: 'QuizCampaign',
+  QuizCampaignQuestion: 'QuizCampaignQuestion',
   QuestionBank: 'QuestionBank',
   AnswerOption: 'AnswerOption',
   QuizConfig: 'QuizConfig',
@@ -277,6 +279,39 @@ export const MediaFileScalarFieldEnum = {
 export type MediaFileScalarFieldEnum = (typeof MediaFileScalarFieldEnum)[keyof typeof MediaFileScalarFieldEnum]
 
 
+export const QuizCampaignScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  periodId: 'periodId',
+  basePoints: 'basePoints',
+  deadline: 'deadline',
+  timeLimit: 'timeLimit',
+  totalQuestions: 'totalQuestions',
+  passingScore: 'passingScore',
+  status: 'status',
+  allowRetake: 'allowRetake',
+  maxRetries: 'maxRetries',
+  shuffleQuestions: 'shuffleQuestions',
+  showCorrectAns: 'showCorrectAns',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type QuizCampaignScalarFieldEnum = (typeof QuizCampaignScalarFieldEnum)[keyof typeof QuizCampaignScalarFieldEnum]
+
+
+export const QuizCampaignQuestionScalarFieldEnum = {
+  id: 'id',
+  campaignId: 'campaignId',
+  questionId: 'questionId',
+  orderIndex: 'orderIndex',
+  createdAt: 'createdAt'
+} as const
+
+export type QuizCampaignQuestionScalarFieldEnum = (typeof QuizCampaignQuestionScalarFieldEnum)[keyof typeof QuizCampaignQuestionScalarFieldEnum]
+
+
 export const QuestionBankScalarFieldEnum = {
   id: 'id',
   periodId: 'periodId',
@@ -327,6 +362,7 @@ export const QuizSessionScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   quizConfigId: 'quizConfigId',
+  quizCampaignId: 'quizCampaignId',
   status: 'status',
   startedAt: 'startedAt',
   submittedAt: 'submittedAt',
@@ -396,6 +432,7 @@ export type DailyCheckinScalarFieldEnum = (typeof DailyCheckinScalarFieldEnum)[k
 export const PointTransactionScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
+  periodId: 'periodId',
   points: 'points',
   transactionType: 'transactionType',
   reference: 'reference',

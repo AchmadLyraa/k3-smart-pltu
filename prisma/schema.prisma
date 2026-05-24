@@ -177,8 +177,10 @@ model AcademicPeriod {
   updatedAt   DateTime  @updatedAt
 
   materials         Material[]
+  quizCampaigns     QuizCampaign[]
   questionBanks     QuestionBank[]
   semesterSummaries SemesterSummary[]
+  pointTransactions PointTransaction[]
 
   @@index([isActive])
   @@map("academic_periods")
@@ -280,10 +282,64 @@ model MediaFile {
 }
 
 // ============================================================================
+// QUIZ CAMPAIGN (Quiz Khusus Bulanan)
+// ============================================================================
+
+enum CampaignStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model QuizCampaign {
+  id               String         @id @default(cuid())
+  title            String
+  description      String?
+  periodId         String?
+  basePoints       Int            @default(500)
+  deadline         DateTime?
+  timeLimit        Int            @default(1800)
+  totalQuestions   Int            @default(20)
+  passingScore     Int            @default(70)
+  status           CampaignStatus @default(DRAFT)
+  allowRetake      Boolean        @default(true)
+  maxRetries       Int            @default(3)
+  shuffleQuestions Boolean        @default(true)
+  showCorrectAns   Boolean        @default(true)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  period    AcademicPeriod?  @relation(fields: [periodId], references: [id], onDelete: SetNull)
+  questions QuizCampaignQuestion[]
+  sessions  QuizSession[]
+
+  @@index([periodId])
+  @@index([status])
+  @@map("quiz_campaigns")
+}
+
+model QuizCampaignQuestion {
+  id              String       @id @default(cuid())
+  campaignId      String
+  questionId      String
+  orderIndex      Int          @default(0)
+  createdAt       DateTime     @default(now())
+
+  campaign QuizCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  question QuestionBank @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([campaignId, questionId])
+  @@index([campaignId])
+  @@index([questionId])
+  @@map("quiz_campaign_questions")
+}
+
+// ============================================================================
 // QUIZ SYSTEM
 // ============================================================================
 
 enum QuestionType {
+REPLACE
   MULTIPLE_CHOICE
   TRUE_FALSE
   MULTIPLE_SELECT
@@ -302,6 +358,7 @@ model QuestionBank {
 
   period                AcademicPeriod?         @relation(fields: [periodId], references: [id], onDelete: SetNull)
   answerOptions         AnswerOption[]
+  quizCampaignQuestions  QuizCampaignQuestion[]
   quizConfigs           QuizConfig[]
   quizSessionQuestions  QuizSessionQuestion[]
   userAnswers           UserAnswer[]  // ← tambah ni
@@ -357,7 +414,8 @@ enum QuizStatus {
 model QuizSession {
   id              String      @id @default(cuid())
   userId          String
-  quizConfigId    String
+  quizConfigId    String?
+  quizCampaignId  String?
   status          QuizStatus  @default(IN_PROGRESS)
   startedAt       DateTime    @default(now())
   submittedAt     DateTime?
@@ -370,7 +428,8 @@ model QuizSession {
   updatedAt       DateTime    @updatedAt
 
   user              User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  quizConfig        QuizConfig               @relation(fields: [quizConfigId], references: [id], onDelete: Cascade)
+  quizConfig        QuizConfig?               @relation(fields: [quizConfigId], references: [id], onDelete: SetNull)
+  quizCampaign      QuizCampaign?            @relation(fields: [quizCampaignId], references: [id], onDelete: SetNull)
   questions         QuizSessionQuestion[]
   userAnswers       UserAnswer[]
 
@@ -478,15 +537,18 @@ enum TransactionType {
 model PointTransaction {
   id            String          @id @default(cuid())
   userId        String
+  periodId      String?
   points        Int
   transactionType TransactionType
   reference     String?
   description   String?
   createdAt     DateTime        @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  period AcademicPeriod? @relation(fields: [periodId], references: [id], onDelete: SetNull)
 
   @@index([userId])
+  @@index([periodId])
   @@index([transactionType])
   @@index([createdAt])
   @@map("point_transactions")

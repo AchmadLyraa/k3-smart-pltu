@@ -501,10 +501,16 @@ export async function rejectRedemption(redemptionId: string, rejectionNotes: str
       });
 
       // 2. Refund points
+      const activePeriod = await tx.academicPeriod.findFirst({
+        where: { isActive: true },
+        select: { id: true },
+      });
+
       await tx.pointTransaction.create({
         data: {
           userId: redemption.userId,
           points: redemption.pointsUsed,
+          periodId: activePeriod?.id ?? null,
           transactionType: "MANUAL_ADJUSTMENT",
           reference: redemption.id,
           description: `Refund: Redemption rejected for ${redemption.reward.name}`,

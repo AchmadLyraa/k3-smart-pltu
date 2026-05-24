@@ -49,7 +49,7 @@ export default function WorkerMaterialView({ material }: WorkerMaterialViewProps
   const thumbnailUtama = material.thumbnail || "https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=600&auto=format&fit=crop";
 
   return (
-    <div className="h-[100dvh] px-4 w-full bg-zinc-50/40 flex flex-col justify-between overflow-hidden pt-5 pb-6 animate-in fade-in duration-300">
+    <div className="h-[100dvh] px-2 w-full bg-zinc-50/40 flex flex-col justify-between overflow-hidden pt-0 pb-6 animate-in fade-in duration-300">
       
       {/* AREA KONTEN ATAS */}
       <div className="flex-1 flex flex-col justify-start space-y-5 min-h-0 overflow-y-auto no-scrollbar">

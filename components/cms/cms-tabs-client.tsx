@@ -10,6 +10,7 @@ import CMSMaterialsTab from "@/components/cms/cms-materials-tab";
 import CMSQuestionsTab from "@/components/cms/cms-questions-tab";
 import CMSTopicsTab from "@/components/cms/cms-topics-tab";
 import CMSPeriodicTab from "@/components/cms/cms-academic-periodic-tab";
+import CMSQuizCampaignTab from "@/components/cms/cms-quiz-campaign-tab";
 
 export default function CMSTabsClient({
   topics,
@@ -29,11 +30,12 @@ export default function CMSTabsClient({
       onValueChange={(v) => router.push(`?tab=${v}`)}
       className="space-y-4"
     >
-      <TabsList className="grid w-full grid-cols-4 gap-2">
+      <TabsList className="grid w-full grid-cols-5 gap-2">
         <TabsTrigger value="materials" className={tabTriggerClass}>Materials</TabsTrigger>
         <TabsTrigger value="questions" className={tabTriggerClass}>Questions</TabsTrigger>
+        <TabsTrigger value="campaigns" className={tabTriggerClass}>Quiz Campaign</TabsTrigger>
         <TabsTrigger value="topics" className={tabTriggerClass}>Topics</TabsTrigger>
-        <TabsTrigger value="periods" className={tabTriggerClass}>Academic Periods</TabsTrigger>
+        <TabsTrigger value="periods" className={tabTriggerClass}>Periods</TabsTrigger>
       </TabsList>
 
       <TabsContent value="materials" className="mt-2">
@@ -46,6 +48,10 @@ export default function CMSTabsClient({
 
       <TabsContent value="questions" className="mt-2">
         <CMSQuestionsTab questions={questions} />
+      </TabsContent>
+
+      <TabsContent value="campaigns" className="mt-2">
+        <CMSQuizCampaignTab periods={periods} />
       </TabsContent>
 
       <TabsContent value="topics" className="mt-2">

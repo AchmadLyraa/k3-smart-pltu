@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import WorkerQuizCampaignSection from "./worker-quiz-campaign-section";
 import Link from "next/link";
 import {
   Clock3,
@@ -229,184 +230,216 @@ export default function WorkerMaterialList({
           </div>
         )}
 
-        {/* TAB MATERI (DENGAN GARIS VERTIKAL TIMELINE) */}
+        {/* TAB MATERI — TIMELINE DENGAN MEKANISME 2 KLIK (compact → preview → lihat full) */}
         {activeTab === "Materi" && (
-          <div className="relative pl-8 space-y-6 pt-2 pb-2 border-l-2 border-zinc-100 ml-4 animate-in fade-in duration-300">
-            {currentPeriod.materials.length === 0 ? (
-              <div className="rounded-[28px] border border-dashed border-zinc-200 bg-white py-12 text-center text-xs font-bold text-zinc-400 uppercase tracking-wider -ml-8">
-                Belum ada data pembelajaran pada semester ini.
-              </div>
-            ) : (
-              currentPeriod.materials.map((material, idx) => {
-                const isCompleted = completedIds.includes(material.id);
-                const firstUncompletedIdx = currentPeriod.materials.findIndex((m) => !completedIds.includes(m.id));
-                const isLocked = firstUncompletedIdx !== -1 && idx > firstUncompletedIdx;
-                const isCurrentlyOpened = openedMaterialId === material.id;
+          <div className="relative pl-8 pt-2 pb-2 border-l-2 border-zinc-100 ml-4 animate-in fade-in duration-300">
+            {(() => {
+              const sortedMaterials = [...(currentPeriod.materials || [])].sort(
+                (a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+              );
 
+              if (sortedMaterials.length === 0) {
                 return (
-                  <div key={material.id} className="relative w-full">
-                    {/* INDIKATOR BULAT TIMELINE */}
-                    <div 
-                      className={cn(
-                        "absolute -left-[43px] top-4 w-6 h-6 rounded-full flex items-center justify-center z-10 border-2 transition-all shadow-sm cursor-pointer",
-                        isCompleted && "bg-[#FF3B30] border-[#FF3B30] text-white",
-                        isCurrentlyOpened && "bg-white border-[#FF3B30] text-[#FF3B30] scale-105",
-                        (!isCompleted && !isCurrentlyOpened && !isLocked) && "bg-white border-zinc-400 text-zinc-600",
-                        isLocked && "bg-zinc-100 border-zinc-200 text-zinc-400 cursor-not-allowed"
-                      )}
-                      onClick={() => handleMaterialClick(material.id, isLocked)}
-                    >
-                      {isCompleted ? (
-                        <CheckCircle2 className="w-3.5 h-3.5 stroke-[3]" />
-                      ) : isLocked ? (
-                        <Lock className="w-2.5 h-2.5" />
-                      ) : (
-                        <Compass className="w-3.5 h-3.5 stroke-[2.5]" />
-                      )}
-                    </div>
+                  <div className="rounded-[28px] border border-dashed border-zinc-200 bg-white py-12 text-center text-xs font-bold text-zinc-400 uppercase tracking-wider -ml-8">
+                    Belum ada data pembelajaran pada semester ini.
+                  </div>
+                );
+              }
 
-                    {/* OPEN PREVIEW CARD */}
-                    {isCurrentlyOpened && !isLocked && (
-                      <div className="bg-white rounded-[32px] overflow-hidden shadow-[0_10px_25px_rgba(0,0,0,0.03)] border border-zinc-100/50 transition-all duration-300 animate-in slide-in-from-top-2">
+              // Find first incomplete material index
+              let firstIncompleteIdx = sortedMaterials.findIndex(
+                (m) => !completedIds.includes(m.id)
+              );
+              if (firstIncompleteIdx === -1) firstIncompleteIdx = sortedMaterials.length;
+
+              return (
+                <>
+                  {sortedMaterials.map((material, idx) => {
+                    const isCompleted = idx < firstIncompleteIdx;
+                    const isActive = idx === firstIncompleteIdx;
+                    const isLocked = idx > firstIncompleteIdx;
+                    const isCurrentlyOpened = openedMaterialId === material.id;
+
+                    return (
+                      <div key={material.id} className="relative w-full mb-6">
+                        {/* INDIKATOR BULAT TIMELINE */}
                         <div 
+                          className={cn(
+                            "absolute -left-[43px] top-4 w-6 h-6 rounded-full flex items-center justify-center z-10 border-2 transition-all shadow-sm cursor-pointer",
+                            isCompleted && "bg-emerald-500 border-emerald-500 text-white",
+                            isCurrentlyOpened && "bg-white border-[#FF3B30] text-[#FF3B30] scale-105",
+                            (isActive && !isCurrentlyOpened) && "bg-[#FF3B30] border-[#FF3B30] text-white",
+                            isLocked && "bg-zinc-100 border-zinc-200 text-zinc-400 cursor-not-allowed"
+                          )}
                           onClick={() => handleMaterialClick(material.id, isLocked)}
-                          className="relative h-40 w-full bg-zinc-900 overflow-hidden cursor-pointer"
                         >
-                          <img 
-                            src={material.thumbnail || "https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=600&auto=format&fit=crop"} 
-                            alt={material.title}
-                            className="w-full h-full object-cover opacity-80"
-                          />
+                          {isCompleted ? (
+                            <CheckCircle2 className="w-3.5 h-3.5 stroke-[3]" />
+                          ) : isLocked ? (
+                            <Lock className="w-2.5 h-2.5" />
+                          ) : (
+                            <span className="text-[11px] font-extrabold">{idx + 1}</span>
+                          )}
                         </div>
-                        
-                        <div className="p-5 space-y-3">
-                          <h3 
-                            onClick={() => handleMaterialClick(material.id, isLocked)}
-                            className="font-extrabold text-base text-zinc-900 leading-snug cursor-pointer hover:text-[#FF3B30]"
-                          >
-                            {material.title}
-                          </h3>
-                          <p className="text-xs text-zinc-500 font-normal leading-relaxed line-clamp-2">
-                            {material.description || "Materi pembelajaran penting terkait K3 keselamatan kerja operasional."}
-                          </p>
 
-                          <div className="pt-2 flex items-center justify-between border-t border-zinc-50">
-                            <div className="flex items-center gap-3 text-[11px] text-zinc-500 font-bold">
-                              <span className="flex items-center gap-1"><PlayCircle className="w-3.5 h-3.5 text-zinc-400" /> 1</span>
-                              <span className="flex items-center gap-1"><Clock3 className="w-3.5 h-3.5 text-zinc-400" /> {material.duration ? Math.ceil(material.duration / 60) : 5} menit</span>
+                        {/* LOCKED ROW */}
+                        {isLocked && (
+                          <div className="bg-white/60 opacity-60 rounded-[24px] p-4 border border-zinc-100 flex items-center justify-between select-none cursor-not-allowed">
+                            <div className="space-y-1">
+                              <h4 className="text-sm font-bold text-zinc-400 truncate">{material.title}</h4>
+                              <div className="flex items-center gap-3 text-[11px] text-zinc-300 font-medium">
+                                <span className="flex items-center gap-1"><PlayCircle className="w-3.5 h-3.5" /> 1</span>
+                                <span className="flex items-center gap-1"><Clock3 className="w-3.5 h-3.5" /> {material.duration ? Math.ceil(material.duration / 60) : 5} menit</span>
+                              </div>
+                            </div>
+                            <div className="bg-zinc-100 text-zinc-500 font-black text-xs px-3 py-1.5 rounded-full">
+                              + 20 Poin
+                            </div>
+                          </div>
+                        )}
+
+                        {/* PREVIEW CARD (saat dibuka) — untuk non-locked */}
+                        {isCurrentlyOpened && !isLocked && (
+                          <div className="bg-white rounded-[32px] overflow-hidden shadow-[0_10px_25px_rgba(0,0,0,0.03)] border border-zinc-100/50 transition-all duration-300 animate-in slide-in-from-top-2">
+                            <div 
+                              onClick={() => handleMaterialClick(material.id, isLocked)}
+                              className="relative h-40 w-full bg-zinc-900 overflow-hidden cursor-pointer"
+                            >
+                              <img 
+                                src={material.thumbnail || "https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=600&auto=format&fit=crop"} 
+                                alt={material.title}
+                                className="w-full h-full object-cover opacity-80"
+                              />
                             </div>
                             
-                            <Link 
-                              href={`/worker/materials/${material.id}`}
-                              className="bg-[#FF3B30] text-white text-xs font-black px-5 py-2.5 rounded-full shadow-md hover:opacity-90 active:scale-95 transition-all flex items-center gap-1.5"
-                            >
-                              <BookOpen className="w-3.5 h-3.5" />
-                              Lihat full
-                            </Link>
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                            <div className="p-5 space-y-3">
+                              <h3 
+                                onClick={() => handleMaterialClick(material.id, isLocked)}
+                                className="font-extrabold text-base text-zinc-900 leading-snug cursor-pointer hover:text-[#FF3B30]"
+                              >
+                                {material.title}
+                              </h3>
+                              <p className="text-xs text-zinc-500 font-normal leading-relaxed line-clamp-2">
+                                {material.description || "Materi pembelajaran penting terkait K3 keselamatan kerja operasional."}
+                              </p>
 
-                    {/* CLOSE COMPACT ROW */}
-                    {!isCurrentlyOpened && !isLocked && (
-                      <div 
-                        onClick={() => handleMaterialClick(material.id, isLocked)}
-                        className="bg-white rounded-[24px] p-4 shadow-[0_4px_15px_rgba(0,0,0,0.01)] border border-zinc-100/80 flex items-center justify-between cursor-pointer hover:border-zinc-200 transition-all"
-                      >
-                        <div className="space-y-1 min-w-0 flex-1 pr-2">
-                          <h4 className="text-sm font-bold text-zinc-800 truncate">{material.title}</h4>
-                          <div className="flex items-center gap-3 text-[11px] text-zinc-400 font-medium">
-                            <span className="flex items-center gap-1"><PlayCircle className="w-3.5 h-3.5 text-zinc-300" /> 1</span>
-                            <span className="flex items-center gap-1"><Clock3 className="w-3.5 h-3.3 text-zinc-300" /> {material.duration ? Math.ceil(material.duration / 60) : 5} menit</span>
+                              <div className="pt-2 flex items-center justify-between border-t border-zinc-50">
+                                <div className="flex items-center gap-3 text-[11px] text-zinc-500 font-bold">
+                                  <span className="flex items-center gap-1"><PlayCircle className="w-3.5 h-3.5 text-zinc-400" /> 1</span>
+                                  <span className="flex items-center gap-1"><Clock3 className="w-3.5 h-3.5 text-zinc-400" /> {material.duration ? Math.ceil(material.duration / 60) : 5} menit</span>
+                                </div>
+                                
+                                <Link 
+                                  href={`/worker/materials/${material.id}`}
+                                  className="bg-[#FF3B30] text-white text-xs font-black px-5 py-2.5 rounded-full shadow-md hover:opacity-90 active:scale-95 transition-all flex items-center gap-1.5"
+                                >
+                                  <BookOpen className="w-3.5 h-3.5" />
+                                  Lihat full
+                                </Link>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                        
-                        {isCompleted ? (
-                          <div className="bg-red-50 text-[#FF3B30] font-black text-xs px-4 py-2 rounded-full border border-red-100 shrink-0">
-                            Selesai ✓
-                          </div>
-                        ) : (
-                          <div className="bg-zinc-50 text-zinc-600 font-bold text-xs px-4 py-2 rounded-full border border-zinc-100 shrink-0">
-                            Buka
+                        )}
+
+                        {/* COMPACT ROW (saat tidak dibuka) — untuk non-locked */}
+                        {!isCurrentlyOpened && !isLocked && (
+                          <div 
+                            onClick={() => handleMaterialClick(material.id, isLocked)}
+                            className="bg-white rounded-[24px] p-4 shadow-[0_4px_15px_rgba(0,0,0,0.01)] border border-zinc-100/80 flex items-center justify-between cursor-pointer hover:border-zinc-200 transition-all"
+                          >
+                            <div className="space-y-1 min-w-0 flex-1 pr-2">
+                              <h4 className="text-sm font-bold text-zinc-800 truncate">{material.title}</h4>
+                              <div className="flex items-center gap-3 text-[11px] text-zinc-400 font-medium">
+                                <span className="flex items-center gap-1"><PlayCircle className="w-3.5 h-3.5 text-zinc-300" /> 1</span>
+                                <span className="flex items-center gap-1"><Clock3 className="w-3.5 h-3.3 text-zinc-300" /> {material.duration ? Math.ceil(material.duration / 60) : 5} menit</span>
+                              </div>
+                            </div>
+                            
+                            {isCompleted ? (
+                              <div className="bg-red-50 text-[#FF3B30] font-black text-xs px-4 py-2 rounded-full border border-red-100 shrink-0">
+                                Selesai ✓
+                              </div>
+                            ) : (
+                              <div className="bg-zinc-50 text-zinc-600 font-bold text-xs px-4 py-2 rounded-full border border-zinc-100 shrink-0">
+                                Buka
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
-                    )}
+                    );
+                  })}
 
-                    {/* LOCKED ROW */}
-                    {isLocked && (
-                      <div className="bg-white/60 opacity-60 rounded-[24px] p-4 border border-zinc-100 flex items-center justify-between select-none cursor-not-allowed">
-                        <div className="space-y-1">
-                          <h4 className="text-sm font-bold text-zinc-400">Materi lainnya</h4>
-                          <div className="flex items-center gap-3 text-[11px] text-zinc-300 font-medium">
-                            <span className="flex items-center gap-1"><PlayCircle className="w-3.5 h-3.5" /> 1</span>
-                            <span className="flex items-center gap-1"><Clock3 className="w-3.5 h-3.5" /> 5 menit</span>
-                          </div>
-                        </div>
-                        <div className="bg-zinc-100 text-zinc-500 font-black text-xs px-3 py-1.5 rounded-full">
-                          + 20 Poin
+                  {/* MENDATANG — always locked at bottom */}
+                  <div className="relative w-full mb-6">
+                    <div className="absolute -left-[43px] top-4 w-6 h-6 rounded-full bg-zinc-100 border-2 border-zinc-200 flex items-center justify-center z-10 text-zinc-400">
+                      <Lock className="w-2.5 h-2.5" />
+                    </div>
+                    <div className="bg-white/60 opacity-60 rounded-[24px] p-4 border border-zinc-100 select-none cursor-not-allowed">
+                      <div className="space-y-1">
+                        <h4 className="text-sm font-bold text-zinc-400">Mendatang</h4>
+                        <div className="flex items-center gap-3 text-[11px] text-zinc-300 font-medium">
+                          <span className="flex items-center gap-1"><PlayCircle className="w-3.5 h-3.5" /> -</span>
+                          <span className="flex items-center gap-1"><Clock3 className="w-3.5 h-3.5" /> - menit</span>
                         </div>
                       </div>
-                    )}
+                    </div>
                   </div>
-                );
-              })
-            )}
+                </>
+              );
+            })()}
           </div>
         )}
 
-        {/* TAB QUIZ (SUPER MINIMALIS BERSIH - TANPA TIMELINE & BERDIRI SENDIRI SESUAI DESAIN) */}
+        {/* TAB QUIZ — QUIZ CAMPAIGN + QUIZ MATERI */}
         {activeTab === "Quiz" && (
-          <div className="w-full flex flex-col items-center justify-center pt-2 px-1 animate-in zoom-in-95 duration-200">
-            <div className="w-full bg-white rounded-[40px] border border-zinc-200/50 shadow-[0_8px_32px_rgba(0,0,0,0.02)] p-8 flex flex-col items-center text-center space-y-6">
-              
-              {/* 1. ILUSTRASI UTAMA TAB QUIZ */}
-              <div className="w-full max-w-[200px] aspect-square relative flex items-center justify-center">
-                <img 
-                  src="https://illustrations.popsy.co/blue/test-passing.svg" 
-                  alt="Quiz Illustration"
-                  className="w-full h-full object-contain"
-                />
-              </div>
+          <div className="space-y-5 animate-in fade-in duration-300">
+            {/* QUIZ CAMPAIGN SECTION — QUIZ KHUSUS BULANAN */}
+            <WorkerQuizCampaignSection />
 
-              {/* 2. AREA JUDUL STATUS DAN ACTION BUTTON */}
-              <div className="space-y-4 w-full">
-                <h3 className="text-sm font-black text-zinc-500 uppercase tracking-wider">
-                  Quiz Telah Dibuka
+            {/* QUIZ MATERI — LINK KE QUIZ TIAP MATERI */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 px-1">
+                <CheckSquare className="w-4 h-4 text-zinc-500" />
+                <h3 className="text-sm font-black text-zinc-800 uppercase tracking-wider">
+                  Quiz Pemahaman Materi
                 </h3>
-                
-                {/* Tombol Besar Utama Eksekusi Kuis */}
-                <div className="w-full">
-                  <Link 
-                    href={currentPeriod?.materials?.[0] ? `/worker/materials/${currentPeriod.materials[0].id}/quiz` : "#"} 
-                    className="block w-full"
-                  >
-                    <button className="w-full bg-[#FF3B30] text-white font-black text-base py-3.5 rounded-3xl shadow-md active:scale-[0.98] transition-all">
-                      Kerjakan Sekarang!
-                    </button>
-                  </Link>
-                </div>
               </div>
-
-              {/* 3. BLOK INFORMASI WAKTU OPERASIONAL (ADMIN SETTING) */}
-              <div className="pt-4 border-t border-zinc-100 w-full">
-                <p className="text-xs font-bold text-zinc-800 leading-relaxed tracking-tight">
-                  {periodTime.date}
-                </p>
-                <p className="text-[11px] font-semibold text-zinc-400 mt-0.5">
-                  {periodTime.time}
-                </p>
+              <div className="bg-white rounded-[28px] border border-zinc-200/50 p-5 shadow-[0_2px_12px_rgba(0,0,0,0.015)] space-y-3">
+                {currentPeriod?.materials?.length > 0 ? (
+                  <div className="space-y-2">
+                    {currentPeriod.materials.map((material) => (
+                      <Link
+                        key={material.id}
+                        href={`/worker/materials/${material.id}/quiz`}
+                        className="flex items-center justify-between p-3 rounded-2xl bg-zinc-50/50 border border-zinc-100 hover:bg-zinc-100 transition-all active:scale-[0.99]"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-bold text-zinc-800 truncate">
+                            {material.title}
+                          </p>
+                          <p className="text-[10px] text-zinc-400 font-medium mt-0.5">
+                            {material.quizMeta?.count || 0} quiz tersedia
+                          </p>
+                        </div>
+                        <div className="text-xs font-bold text-[#FF3B30] shrink-0 ml-2 flex items-center gap-1">
+                          {material.quizMeta?.allDone ? (
+                            <span className="text-emerald-600 flex items-center gap-1">
+                              <CheckCircle2 className="w-3.5 h-3.5" /> Selesai
+                            </span>
+                          ) : (
+                            <span>Kerjakan →</span>
+                          )}
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-zinc-400 font-medium text-center py-4">
+                    Belum ada materi dengan quiz tersedia.
+                  </p>
+                )}
               </div>
-
-            </div>
-
-            {/* SYARAT KETENTUAN BONUS SKOR PENGERJAAN CEPAT */}
-            <div className="mt-5 px-6 text-center">
-              <p className="text-[10px] text-zinc-400 font-semibold leading-relaxed">
-                *Semakin cepat Anda menyelesaikan evaluasi kuis ini dengan benar,<br /> 
-                kesempatan akumulasi bonus poin tambahan akan semakin tinggi.
-              </p>
             </div>
           </div>
         )}

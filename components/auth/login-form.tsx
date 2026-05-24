@@ -62,7 +62,7 @@ export default function LoginForm() {
           {/* Worker background image */}
           <div className="login-worker-image">
             <Image
-              src="/images/login-bg-worker.png"
+              src="/images/hero-login.png"
               alt="K3 Safety Worker"
               fill
               style={{ objectFit: "cover", objectPosition: "center" }}
@@ -201,7 +201,7 @@ export default function LoginForm() {
 
         .login-worker-image {
           position: absolute;
-          inset: -200;
+          inset: -20;
           z-index: 1;
         }
 

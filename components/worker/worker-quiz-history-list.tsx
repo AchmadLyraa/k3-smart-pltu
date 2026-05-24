@@ -48,7 +48,18 @@ interface QuizHistory {
         name: string;
       } | null;
     };
-  };
+  } | null;
+
+  quizCampaign?: {
+    id: string;
+    title: string;
+    passingScore: number;
+
+    period?: {
+      id: string;
+      name: string;
+    } | null;
+  } | null;
 }
 
 interface WorkerQuizHistoryListProps {
@@ -81,10 +92,11 @@ export default function WorkerQuizHistoryList({
     const map = new Map();
 
     histories.forEach((h) => {
-      const period = h.quizConfig.material.period;
-
-      if (period) {
-        map.set(period.id, period.name);
+      if (h.quizConfig?.material?.period) {
+        map.set(h.quizConfig.material.period.id, h.quizConfig.material.period.name);
+      }
+      if (h.quizCampaign?.period) {
+        map.set(h.quizCampaign.period.id, h.quizCampaign.period.name);
       }
     });
 
@@ -99,9 +111,10 @@ export default function WorkerQuizHistoryList({
       return histories;
     }
 
-    return histories.filter(
-      (h) => h.quizConfig.material.period?.id === selectedSemester,
-    );
+    return histories.filter((h) => {
+      const periodId = h.quizConfig?.material?.period?.id ?? h.quizCampaign?.period?.id;
+      return periodId === selectedSemester;
+    });
   }, [histories, selectedSemester]);
 
   const totalPages = Math.ceil(filteredHistories.length / Number(rowsPerPage));
@@ -214,7 +227,7 @@ export default function WorkerQuizHistoryList({
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <h3 className="font-semibold text-sm">
-                        {history.quizConfig.material.title}
+                        {history.quizConfig?.material?.title ?? history.quizCampaign?.title ?? "Quiz Campaign"}
                       </h3>
 
                       <Badge
@@ -229,14 +242,18 @@ export default function WorkerQuizHistoryList({
                     </div>
 
                     <p className="text-xs text-muted-foreground">
-                      {history.quizConfig.name}
+                      {history.quizConfig?.name ?? "Quiz Khusus Bulanan"}
                     </p>
 
                     <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                      <span>{history.quizConfig.material.topic.name}</span>
-
-                      {history.quizConfig.material.period && (
-                        <span>• {history.quizConfig.material.period.name}</span>
+                      {history.quizConfig?.material?.topic?.name && (
+                        <span>{history.quizConfig.material.topic.name}</span>
+                      )}
+                      {history.quizCampaign?.title && (
+                        <span>Quiz Campaign</span>
+                      )}
+                      {(history.quizConfig?.material?.period ?? history.quizCampaign?.period) && (
+                        <span>• {history.quizConfig?.material?.period?.name ?? history.quizCampaign?.period?.name}</span>
                       )}
                     </div>
                   </div>

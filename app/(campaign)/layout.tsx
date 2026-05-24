@@ -1,11 +1,7 @@
-// app/(worker)/layout.tsx
-
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 
-import WorkerMobileNavbar from "@/components/general/worker-mobile-navbar";
-
-export default async function WorkerLayout({
+export default async function CampaignLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -18,11 +14,7 @@ export default async function WorkerLayout({
 
   return (
     <div className="min-h-screen bg-zinc-100">
-      <WorkerMobileNavbar session={session} />
-
-      <main className="mx-auto w-full max-w-7xl px-4 pb-28 pt-5 md:px-6 lg:px-8">
-        {children}
-      </main>
+      {children}
     </div>
   );
 }

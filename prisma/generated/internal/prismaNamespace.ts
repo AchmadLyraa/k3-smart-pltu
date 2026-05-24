@@ -396,6 +396,8 @@ export const ModelName = {
   Material: 'Material',
   MaterialAssignment: 'MaterialAssignment',
   MediaFile: 'MediaFile',
+  QuizCampaign: 'QuizCampaign',
+  QuizCampaignQuestion: 'QuizCampaignQuestion',
   QuestionBank: 'QuestionBank',
   AnswerOption: 'AnswerOption',
   QuizConfig: 'QuizConfig',
@@ -431,7 +433,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "unit" | "division" | "shift" | "user" | "account" | "session" | "verificationToken" | "academicPeriod" | "topic" | "material" | "materialAssignment" | "mediaFile" | "questionBank" | "answerOption" | "quizConfig" | "quizSession" | "quizSessionQuestion" | "userAnswer" | "materialProgress" | "dailyCheckin" | "pointTransaction" | "monthlyPointSummary" | "semesterSummary" | "userStreak" | "badgeDefinition" | "userBadge" | "reward" | "redemption" | "notificationTemplate" | "notificationLog" | "auditLog" | "systemConfig"
+    modelProps: "unit" | "division" | "shift" | "user" | "account" | "session" | "verificationToken" | "academicPeriod" | "topic" | "material" | "materialAssignment" | "mediaFile" | "quizCampaign" | "quizCampaignQuestion" | "questionBank" | "answerOption" | "quizConfig" | "quizSession" | "quizSessionQuestion" | "userAnswer" | "materialProgress" | "dailyCheckin" | "pointTransaction" | "monthlyPointSummary" | "semesterSummary" | "userStreak" | "badgeDefinition" | "userBadge" | "reward" | "redemption" | "notificationTemplate" | "notificationLog" | "auditLog" | "systemConfig"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1320,6 +1322,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.MediaFileCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.MediaFileCountAggregateOutputType> | number
+        }
+      }
+    }
+    QuizCampaign: {
+      payload: Prisma.$QuizCampaignPayload<ExtArgs>
+      fields: Prisma.QuizCampaignFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.QuizCampaignFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuizCampaignPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.QuizCampaignFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuizCampaignPayload>
+        }
+        findFirst: {
+          args: Prisma.QuizCampaignFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuizCampaignPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.QuizCampaignFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuizCampaignPayload>
+        }
+        findMany: {
+          args: Prisma.QuizCampaignFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuizCampaignPayload>[]
+        }
+        create: {
+          args: Prisma.QuizCampaignCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuizCampaignPayload>
+        }
+        createMany: {
+          args: Prisma.QuizCampaignCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.QuizCampaignCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuizCampaignPayload>[]
+        }
+        delete: {
+          args: Prisma.QuizCampaignDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuizCampaignPayload>
+        }
+        update: {
+          args: Prisma.QuizCampaignUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuizCampaignPayload>
+        }
+        deleteMany: {
+          args: Prisma.QuizCampaignDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.QuizCampaignUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.QuizCampaignUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuizCampaignPayload>[]
+        }
+        upsert: {
+          args: Prisma.QuizCampaignUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuizCampaignPayload>
+        }
+        aggregate: {
+          args: Prisma.QuizCampaignAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateQuizCampaign>
+        }
+        groupBy: {
+          args: Prisma.QuizCampaignGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.QuizCampaignGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.QuizCampaignCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.QuizCampaignCountAggregateOutputType> | number
+        }
+      }
+    }
+    QuizCampaignQuestion: {
+      payload: Prisma.$QuizCampaignQuestionPayload<ExtArgs>
+      fields: Prisma.QuizCampaignQuestionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.QuizCampaignQuestionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuizCampaignQuestionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.QuizCampaignQuestionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuizCampaignQuestionPayload>
+        }
+        findFirst: {
+          args: Prisma.QuizCampaignQuestionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuizCampaignQuestionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.QuizCampaignQuestionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuizCampaignQuestionPayload>
+        }
+        findMany: {
+          args: Prisma.QuizCampaignQuestionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuizCampaignQuestionPayload>[]
+        }
+        create: {
+          args: Prisma.QuizCampaignQuestionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuizCampaignQuestionPayload>
+        }
+        createMany: {
+          args: Prisma.QuizCampaignQuestionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.QuizCampaignQuestionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuizCampaignQuestionPayload>[]
+        }
+        delete: {
+          args: Prisma.QuizCampaignQuestionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuizCampaignQuestionPayload>
+        }
+        update: {
+          args: Prisma.QuizCampaignQuestionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuizCampaignQuestionPayload>
+        }
+        deleteMany: {
+          args: Prisma.QuizCampaignQuestionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.QuizCampaignQuestionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.QuizCampaignQuestionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuizCampaignQuestionPayload>[]
+        }
+        upsert: {
+          args: Prisma.QuizCampaignQuestionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuizCampaignQuestionPayload>
+        }
+        aggregate: {
+          args: Prisma.QuizCampaignQuestionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateQuizCampaignQuestion>
+        }
+        groupBy: {
+          args: Prisma.QuizCampaignQuestionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.QuizCampaignQuestionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.QuizCampaignQuestionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.QuizCampaignQuestionCountAggregateOutputType> | number
         }
       }
     }
@@ -3018,6 +3168,39 @@ export const MediaFileScalarFieldEnum = {
 export type MediaFileScalarFieldEnum = (typeof MediaFileScalarFieldEnum)[keyof typeof MediaFileScalarFieldEnum]
 
 
+export const QuizCampaignScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  periodId: 'periodId',
+  basePoints: 'basePoints',
+  deadline: 'deadline',
+  timeLimit: 'timeLimit',
+  totalQuestions: 'totalQuestions',
+  passingScore: 'passingScore',
+  status: 'status',
+  allowRetake: 'allowRetake',
+  maxRetries: 'maxRetries',
+  shuffleQuestions: 'shuffleQuestions',
+  showCorrectAns: 'showCorrectAns',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type QuizCampaignScalarFieldEnum = (typeof QuizCampaignScalarFieldEnum)[keyof typeof QuizCampaignScalarFieldEnum]
+
+
+export const QuizCampaignQuestionScalarFieldEnum = {
+  id: 'id',
+  campaignId: 'campaignId',
+  questionId: 'questionId',
+  orderIndex: 'orderIndex',
+  createdAt: 'createdAt'
+} as const
+
+export type QuizCampaignQuestionScalarFieldEnum = (typeof QuizCampaignQuestionScalarFieldEnum)[keyof typeof QuizCampaignQuestionScalarFieldEnum]
+
+
 export const QuestionBankScalarFieldEnum = {
   id: 'id',
   periodId: 'periodId',
@@ -3068,6 +3251,7 @@ export const QuizSessionScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   quizConfigId: 'quizConfigId',
+  quizCampaignId: 'quizCampaignId',
   status: 'status',
   startedAt: 'startedAt',
   submittedAt: 'submittedAt',
@@ -3137,6 +3321,7 @@ export type DailyCheckinScalarFieldEnum = (typeof DailyCheckinScalarFieldEnum)[k
 export const PointTransactionScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
+  periodId: 'periodId',
   points: 'points',
   transactionType: 'transactionType',
   reference: 'reference',
@@ -3438,6 +3623,20 @@ export type ListEnumMaterialStatusFieldRefInput<$PrismaModel> = FieldRefInputTyp
 
 
 /**
+ * Reference to a field of type 'CampaignStatus'
+ */
+export type EnumCampaignStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CampaignStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'CampaignStatus[]'
+ */
+export type ListEnumCampaignStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CampaignStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'QuestionType'
  */
 export type EnumQuestionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QuestionType'>
@@ -3684,6 +3883,8 @@ export type GlobalOmitConfig = {
   material?: Prisma.MaterialOmit
   materialAssignment?: Prisma.MaterialAssignmentOmit
   mediaFile?: Prisma.MediaFileOmit
+  quizCampaign?: Prisma.QuizCampaignOmit
+  quizCampaignQuestion?: Prisma.QuizCampaignQuestionOmit
   questionBank?: Prisma.QuestionBankOmit
   answerOption?: Prisma.AnswerOptionOmit
   quizConfig?: Prisma.QuizConfigOmit

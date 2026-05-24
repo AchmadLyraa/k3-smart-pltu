@@ -172,10 +172,17 @@ export async function redeemReward(rewardId: string) {
         },
       });
 
+      // Ambil periode aktif untuk diisi di periodId
+      const activePeriod = await tx.academicPeriod.findFirst({
+        where: { isActive: true },
+        select: { id: true },
+      });
+
       await tx.pointTransaction.create({
         data: {
           userId,
           points: -reward.pointCost,
+          periodId: activePeriod?.id ?? null,
           transactionType: "MANUAL_ADJUSTMENT",
           reference: redemption.id,
           description: `Redeemed reward: ${reward.name}`,

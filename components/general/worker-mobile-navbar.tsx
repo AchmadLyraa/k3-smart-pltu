@@ -37,6 +37,13 @@ const MENUS = [
   },
 ];
 
+// Halaman yang tidak menampilkan bottom navbar
+const HIDDEN_PATHS = [
+  "/worker/materials/",
+  "/worker/reward-users",
+  "/worker/quiz-history",
+];
+
 interface Props {
   session: Session;
 }
@@ -44,6 +51,10 @@ interface Props {
 export default function WorkerMobileNavbar({ session }: Props) {
   const pathname = usePathname();
   const isHome = pathname === "/worker/home";
+
+  // Sembunyikan navbar di halaman detail/full
+  const shouldHide = HIDDEN_PATHS.some((path) => pathname.startsWith(path));
+  if (shouldHide) return null;
 
   return (
     <>
@@ -68,7 +79,7 @@ export default function WorkerMobileNavbar({ session }: Props) {
               </div>
             </Link>
 
-            {/* RIGHT - MEMPERBESAR DAN MENGUBAH WARNA NOTIFIKASI MENJADI MERAH */}
+            {/* RIGHT - NOTIFIKASI */}
             <div className="flex items-center justify-center text-[#FF3B30] stroke-red-500">
               <NotificationBell />
             </div>

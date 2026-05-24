@@ -55,6 +55,8 @@ export async function checkAndSubmitExpiredSessions() {
     });
 
     for (const session of expiredSessions) {
+      if (!session.quizConfig) continue; // skip campaign sessions
+
       const elapsed = Math.floor(
         (Date.now() - new Date(session.startedAt).getTime()) / 1000,
       );
@@ -293,7 +295,7 @@ export async function completeQuiz(sessionId: string) {
     if (!session) return { success: false, error: "Session not found" };
 
     // Filter null — soal mungkin sudah dihapus
-    const validAnswers = userAnswers.filter((a) => a.question !== null);
+    const validAnswers = userAnswers.filter((a): a is typeof a & { question: NonNullable<typeof a.question> } => a.question !== null);
 
     let totalPoints = 0;
     let correctCount = 0;
@@ -307,8 +309,8 @@ export async function completeQuiz(sessionId: string) {
     });
 
     // maxPossiblePoints dari SEMUA soal di session, bukan cuma yang dijawab
-    const maxPossiblePoints = sessionQuestions
-      .filter((sq) => sq.question !== null)
+    const nonNullSessionQuestions = sessionQuestions.filter((sq): sq is typeof sq & { question: NonNullable<typeof sq.question> } => sq.question !== null);
+    const maxPossiblePoints = nonNullSessionQuestions
       .reduce((sum, sq) => sum + sq.question.points, 0);
 
     const updatedAnswers = await Promise.all(
@@ -405,9 +407,16 @@ export async function completeQuiz(sessionId: string) {
           description += ` (+${timeBonus} time bonus)`;
         }
 
+        // Get the periodId from the material associated with this quiz
+        const quizConfigWithMaterial = await prisma.quizConfig.findUnique({
+          where: { id: session.quizConfigId },
+          select: { material: { select: { periodId: true } } },
+        });
+
         await prisma.pointTransaction.create({
           data: {
             userId: user.id,
+            periodId: quizConfigWithMaterial?.material?.periodId ?? undefined,
             points: totalPointsWithBonus,
             transactionType: "QUIZ_COMPLETION",
             description,
@@ -481,17 +490,32 @@ export async function getQuizByMaterial(materialId: string) {
   }
 }
 
-export async function getWorkerStats() {
+export async function getWorkerStatsByPeriod(periodId: string) {
+  "use server";
+  return getWorkerStats(periodId);
+}
+
+export async function getWorkerStats(periodId?: string) {
   const user = await getCurrentUser();
   if (!user) return { success: false, error: "Not authenticated" };
 
   try {
+    const pointTransactionWhere: any = { userId: user.id };
+    if (periodId) {
+      pointTransactionWhere.periodId = periodId;
+    }
+
     const [
-      pointTransactions,
+      pointTransactions,       // transaksi per filter period (untuk totalPoints periode ini)
+      allPointTransactions,     // semua transaksi user (untuk availablePoints all-time)
       materialsCompleted,
       quizPassed,
       semesterSummaries,
     ] = await Promise.all([
+      prisma.pointTransaction.findMany({
+        where: pointTransactionWhere,
+        orderBy: { createdAt: "desc" },
+      }),
       prisma.pointTransaction.findMany({
         where: { userId: user.id },
         orderBy: { createdAt: "desc" },
@@ -508,15 +532,21 @@ export async function getWorkerStats() {
       }),
     ]);
 
+    // Poin earned per periode yg dipilih (totalPoints)
     const totalEarned = pointTransactions
       .filter((t) => t.points > 0)
       .reduce((sum, t) => sum + t.points, 0);
 
-    const totalSpent = pointTransactions
+    // Saldo poin dari SEMUA transaksi all-time (availablePoints)
+    const totalEarnedAll = allPointTransactions
+      .filter((t) => t.points > 0)
+      .reduce((sum, t) => sum + t.points, 0);
+
+    const totalSpentAll = allPointTransactions
       .filter((t) => t.points < 0)
       .reduce((sum, t) => sum + Math.abs(t.points), 0);
 
-    const availablePoints = totalEarned - totalSpent;
+    const availablePoints = totalEarnedAll - totalSpentAll;
 
     // Akumulasi dari semester-semester lalu + aktif sekarang
     const historicalPoints = semesterSummaries.reduce(
@@ -529,8 +559,8 @@ export async function getWorkerStats() {
       success: true,
       data: {
         allTimePoints, // total dari awal sampai sekarang
-        totalPoints: totalEarned, // poin semester berjalan
-        availablePoints, // bisa ditukar (earned - spent semester ini)
+        totalPoints: totalEarned, // poin per periode yang dipilih
+        availablePoints, // bisa ditukar (earned - spent all-time)
         materialsCompleted,
         quizPassed,
         recentTransactions: pointTransactions.slice(0, 5),
@@ -586,6 +616,21 @@ export async function getWorkerQuizHistory() {
                     name: true,
                   },
                 },
+              },
+            },
+          },
+        },
+
+        quizCampaign: {
+          select: {
+            id: true,
+            title: true,
+            passingScore: true,
+
+            period: {
+              select: {
+                id: true,
+                name: true,
               },
             },
           },

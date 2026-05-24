@@ -37,6 +37,7 @@ export type PointTransactionSumAggregateOutputType = {
 export type PointTransactionMinAggregateOutputType = {
   id: string | null
   userId: string | null
+  periodId: string | null
   points: number | null
   transactionType: $Enums.TransactionType | null
   reference: string | null
@@ -47,6 +48,7 @@ export type PointTransactionMinAggregateOutputType = {
 export type PointTransactionMaxAggregateOutputType = {
   id: string | null
   userId: string | null
+  periodId: string | null
   points: number | null
   transactionType: $Enums.TransactionType | null
   reference: string | null
@@ -57,6 +59,7 @@ export type PointTransactionMaxAggregateOutputType = {
 export type PointTransactionCountAggregateOutputType = {
   id: number
   userId: number
+  periodId: number
   points: number
   transactionType: number
   reference: number
@@ -77,6 +80,7 @@ export type PointTransactionSumAggregateInputType = {
 export type PointTransactionMinAggregateInputType = {
   id?: true
   userId?: true
+  periodId?: true
   points?: true
   transactionType?: true
   reference?: true
@@ -87,6 +91,7 @@ export type PointTransactionMinAggregateInputType = {
 export type PointTransactionMaxAggregateInputType = {
   id?: true
   userId?: true
+  periodId?: true
   points?: true
   transactionType?: true
   reference?: true
@@ -97,6 +102,7 @@ export type PointTransactionMaxAggregateInputType = {
 export type PointTransactionCountAggregateInputType = {
   id?: true
   userId?: true
+  periodId?: true
   points?: true
   transactionType?: true
   reference?: true
@@ -194,6 +200,7 @@ export type PointTransactionGroupByArgs<ExtArgs extends runtime.Types.Extensions
 export type PointTransactionGroupByOutputType = {
   id: string
   userId: string
+  periodId: string | null
   points: number
   transactionType: $Enums.TransactionType
   reference: string | null
@@ -227,23 +234,27 @@ export type PointTransactionWhereInput = {
   NOT?: Prisma.PointTransactionWhereInput | Prisma.PointTransactionWhereInput[]
   id?: Prisma.StringFilter<"PointTransaction"> | string
   userId?: Prisma.StringFilter<"PointTransaction"> | string
+  periodId?: Prisma.StringNullableFilter<"PointTransaction"> | string | null
   points?: Prisma.IntFilter<"PointTransaction"> | number
   transactionType?: Prisma.EnumTransactionTypeFilter<"PointTransaction"> | $Enums.TransactionType
   reference?: Prisma.StringNullableFilter<"PointTransaction"> | string | null
   description?: Prisma.StringNullableFilter<"PointTransaction"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PointTransaction"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  period?: Prisma.XOR<Prisma.AcademicPeriodNullableScalarRelationFilter, Prisma.AcademicPeriodWhereInput> | null
 }
 
 export type PointTransactionOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  periodId?: Prisma.SortOrderInput | Prisma.SortOrder
   points?: Prisma.SortOrder
   transactionType?: Prisma.SortOrder
   reference?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
+  period?: Prisma.AcademicPeriodOrderByWithRelationInput
 }
 
 export type PointTransactionWhereUniqueInput = Prisma.AtLeast<{
@@ -252,17 +263,20 @@ export type PointTransactionWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.PointTransactionWhereInput[]
   NOT?: Prisma.PointTransactionWhereInput | Prisma.PointTransactionWhereInput[]
   userId?: Prisma.StringFilter<"PointTransaction"> | string
+  periodId?: Prisma.StringNullableFilter<"PointTransaction"> | string | null
   points?: Prisma.IntFilter<"PointTransaction"> | number
   transactionType?: Prisma.EnumTransactionTypeFilter<"PointTransaction"> | $Enums.TransactionType
   reference?: Prisma.StringNullableFilter<"PointTransaction"> | string | null
   description?: Prisma.StringNullableFilter<"PointTransaction"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PointTransaction"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  period?: Prisma.XOR<Prisma.AcademicPeriodNullableScalarRelationFilter, Prisma.AcademicPeriodWhereInput> | null
 }, "id">
 
 export type PointTransactionOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  periodId?: Prisma.SortOrderInput | Prisma.SortOrder
   points?: Prisma.SortOrder
   transactionType?: Prisma.SortOrder
   reference?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -281,6 +295,7 @@ export type PointTransactionScalarWhereWithAggregatesInput = {
   NOT?: Prisma.PointTransactionScalarWhereWithAggregatesInput | Prisma.PointTransactionScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"PointTransaction"> | string
   userId?: Prisma.StringWithAggregatesFilter<"PointTransaction"> | string
+  periodId?: Prisma.StringNullableWithAggregatesFilter<"PointTransaction"> | string | null
   points?: Prisma.IntWithAggregatesFilter<"PointTransaction"> | number
   transactionType?: Prisma.EnumTransactionTypeWithAggregatesFilter<"PointTransaction"> | $Enums.TransactionType
   reference?: Prisma.StringNullableWithAggregatesFilter<"PointTransaction"> | string | null
@@ -296,11 +311,13 @@ export type PointTransactionCreateInput = {
   description?: string | null
   createdAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutPointTransactionsInput
+  period?: Prisma.AcademicPeriodCreateNestedOneWithoutPointTransactionsInput
 }
 
 export type PointTransactionUncheckedCreateInput = {
   id?: string
   userId: string
+  periodId?: string | null
   points: number
   transactionType: $Enums.TransactionType
   reference?: string | null
@@ -316,11 +333,13 @@ export type PointTransactionUpdateInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutPointTransactionsNestedInput
+  period?: Prisma.AcademicPeriodUpdateOneWithoutPointTransactionsNestedInput
 }
 
 export type PointTransactionUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  periodId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   points?: Prisma.IntFieldUpdateOperationsInput | number
   transactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -331,6 +350,7 @@ export type PointTransactionUncheckedUpdateInput = {
 export type PointTransactionCreateManyInput = {
   id?: string
   userId: string
+  periodId?: string | null
   points: number
   transactionType: $Enums.TransactionType
   reference?: string | null
@@ -350,6 +370,7 @@ export type PointTransactionUpdateManyMutationInput = {
 export type PointTransactionUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  periodId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   points?: Prisma.IntFieldUpdateOperationsInput | number
   transactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -370,6 +391,7 @@ export type PointTransactionOrderByRelationAggregateInput = {
 export type PointTransactionCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  periodId?: Prisma.SortOrder
   points?: Prisma.SortOrder
   transactionType?: Prisma.SortOrder
   reference?: Prisma.SortOrder
@@ -384,6 +406,7 @@ export type PointTransactionAvgOrderByAggregateInput = {
 export type PointTransactionMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  periodId?: Prisma.SortOrder
   points?: Prisma.SortOrder
   transactionType?: Prisma.SortOrder
   reference?: Prisma.SortOrder
@@ -394,6 +417,7 @@ export type PointTransactionMaxOrderByAggregateInput = {
 export type PointTransactionMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  periodId?: Prisma.SortOrder
   points?: Prisma.SortOrder
   transactionType?: Prisma.SortOrder
   reference?: Prisma.SortOrder
@@ -447,6 +471,48 @@ export type PointTransactionUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.PointTransactionScalarWhereInput | Prisma.PointTransactionScalarWhereInput[]
 }
 
+export type PointTransactionCreateNestedManyWithoutPeriodInput = {
+  create?: Prisma.XOR<Prisma.PointTransactionCreateWithoutPeriodInput, Prisma.PointTransactionUncheckedCreateWithoutPeriodInput> | Prisma.PointTransactionCreateWithoutPeriodInput[] | Prisma.PointTransactionUncheckedCreateWithoutPeriodInput[]
+  connectOrCreate?: Prisma.PointTransactionCreateOrConnectWithoutPeriodInput | Prisma.PointTransactionCreateOrConnectWithoutPeriodInput[]
+  createMany?: Prisma.PointTransactionCreateManyPeriodInputEnvelope
+  connect?: Prisma.PointTransactionWhereUniqueInput | Prisma.PointTransactionWhereUniqueInput[]
+}
+
+export type PointTransactionUncheckedCreateNestedManyWithoutPeriodInput = {
+  create?: Prisma.XOR<Prisma.PointTransactionCreateWithoutPeriodInput, Prisma.PointTransactionUncheckedCreateWithoutPeriodInput> | Prisma.PointTransactionCreateWithoutPeriodInput[] | Prisma.PointTransactionUncheckedCreateWithoutPeriodInput[]
+  connectOrCreate?: Prisma.PointTransactionCreateOrConnectWithoutPeriodInput | Prisma.PointTransactionCreateOrConnectWithoutPeriodInput[]
+  createMany?: Prisma.PointTransactionCreateManyPeriodInputEnvelope
+  connect?: Prisma.PointTransactionWhereUniqueInput | Prisma.PointTransactionWhereUniqueInput[]
+}
+
+export type PointTransactionUpdateManyWithoutPeriodNestedInput = {
+  create?: Prisma.XOR<Prisma.PointTransactionCreateWithoutPeriodInput, Prisma.PointTransactionUncheckedCreateWithoutPeriodInput> | Prisma.PointTransactionCreateWithoutPeriodInput[] | Prisma.PointTransactionUncheckedCreateWithoutPeriodInput[]
+  connectOrCreate?: Prisma.PointTransactionCreateOrConnectWithoutPeriodInput | Prisma.PointTransactionCreateOrConnectWithoutPeriodInput[]
+  upsert?: Prisma.PointTransactionUpsertWithWhereUniqueWithoutPeriodInput | Prisma.PointTransactionUpsertWithWhereUniqueWithoutPeriodInput[]
+  createMany?: Prisma.PointTransactionCreateManyPeriodInputEnvelope
+  set?: Prisma.PointTransactionWhereUniqueInput | Prisma.PointTransactionWhereUniqueInput[]
+  disconnect?: Prisma.PointTransactionWhereUniqueInput | Prisma.PointTransactionWhereUniqueInput[]
+  delete?: Prisma.PointTransactionWhereUniqueInput | Prisma.PointTransactionWhereUniqueInput[]
+  connect?: Prisma.PointTransactionWhereUniqueInput | Prisma.PointTransactionWhereUniqueInput[]
+  update?: Prisma.PointTransactionUpdateWithWhereUniqueWithoutPeriodInput | Prisma.PointTransactionUpdateWithWhereUniqueWithoutPeriodInput[]
+  updateMany?: Prisma.PointTransactionUpdateManyWithWhereWithoutPeriodInput | Prisma.PointTransactionUpdateManyWithWhereWithoutPeriodInput[]
+  deleteMany?: Prisma.PointTransactionScalarWhereInput | Prisma.PointTransactionScalarWhereInput[]
+}
+
+export type PointTransactionUncheckedUpdateManyWithoutPeriodNestedInput = {
+  create?: Prisma.XOR<Prisma.PointTransactionCreateWithoutPeriodInput, Prisma.PointTransactionUncheckedCreateWithoutPeriodInput> | Prisma.PointTransactionCreateWithoutPeriodInput[] | Prisma.PointTransactionUncheckedCreateWithoutPeriodInput[]
+  connectOrCreate?: Prisma.PointTransactionCreateOrConnectWithoutPeriodInput | Prisma.PointTransactionCreateOrConnectWithoutPeriodInput[]
+  upsert?: Prisma.PointTransactionUpsertWithWhereUniqueWithoutPeriodInput | Prisma.PointTransactionUpsertWithWhereUniqueWithoutPeriodInput[]
+  createMany?: Prisma.PointTransactionCreateManyPeriodInputEnvelope
+  set?: Prisma.PointTransactionWhereUniqueInput | Prisma.PointTransactionWhereUniqueInput[]
+  disconnect?: Prisma.PointTransactionWhereUniqueInput | Prisma.PointTransactionWhereUniqueInput[]
+  delete?: Prisma.PointTransactionWhereUniqueInput | Prisma.PointTransactionWhereUniqueInput[]
+  connect?: Prisma.PointTransactionWhereUniqueInput | Prisma.PointTransactionWhereUniqueInput[]
+  update?: Prisma.PointTransactionUpdateWithWhereUniqueWithoutPeriodInput | Prisma.PointTransactionUpdateWithWhereUniqueWithoutPeriodInput[]
+  updateMany?: Prisma.PointTransactionUpdateManyWithWhereWithoutPeriodInput | Prisma.PointTransactionUpdateManyWithWhereWithoutPeriodInput[]
+  deleteMany?: Prisma.PointTransactionScalarWhereInput | Prisma.PointTransactionScalarWhereInput[]
+}
+
 export type EnumTransactionTypeFieldUpdateOperationsInput = {
   set?: $Enums.TransactionType
 }
@@ -458,10 +524,12 @@ export type PointTransactionCreateWithoutUserInput = {
   reference?: string | null
   description?: string | null
   createdAt?: Date | string
+  period?: Prisma.AcademicPeriodCreateNestedOneWithoutPointTransactionsInput
 }
 
 export type PointTransactionUncheckedCreateWithoutUserInput = {
   id?: string
+  periodId?: string | null
   points: number
   transactionType: $Enums.TransactionType
   reference?: string | null
@@ -501,6 +569,7 @@ export type PointTransactionScalarWhereInput = {
   NOT?: Prisma.PointTransactionScalarWhereInput | Prisma.PointTransactionScalarWhereInput[]
   id?: Prisma.StringFilter<"PointTransaction"> | string
   userId?: Prisma.StringFilter<"PointTransaction"> | string
+  periodId?: Prisma.StringNullableFilter<"PointTransaction"> | string | null
   points?: Prisma.IntFilter<"PointTransaction"> | number
   transactionType?: Prisma.EnumTransactionTypeFilter<"PointTransaction"> | $Enums.TransactionType
   reference?: Prisma.StringNullableFilter<"PointTransaction"> | string | null
@@ -508,8 +577,55 @@ export type PointTransactionScalarWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"PointTransaction"> | Date | string
 }
 
+export type PointTransactionCreateWithoutPeriodInput = {
+  id?: string
+  points: number
+  transactionType: $Enums.TransactionType
+  reference?: string | null
+  description?: string | null
+  createdAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutPointTransactionsInput
+}
+
+export type PointTransactionUncheckedCreateWithoutPeriodInput = {
+  id?: string
+  userId: string
+  points: number
+  transactionType: $Enums.TransactionType
+  reference?: string | null
+  description?: string | null
+  createdAt?: Date | string
+}
+
+export type PointTransactionCreateOrConnectWithoutPeriodInput = {
+  where: Prisma.PointTransactionWhereUniqueInput
+  create: Prisma.XOR<Prisma.PointTransactionCreateWithoutPeriodInput, Prisma.PointTransactionUncheckedCreateWithoutPeriodInput>
+}
+
+export type PointTransactionCreateManyPeriodInputEnvelope = {
+  data: Prisma.PointTransactionCreateManyPeriodInput | Prisma.PointTransactionCreateManyPeriodInput[]
+  skipDuplicates?: boolean
+}
+
+export type PointTransactionUpsertWithWhereUniqueWithoutPeriodInput = {
+  where: Prisma.PointTransactionWhereUniqueInput
+  update: Prisma.XOR<Prisma.PointTransactionUpdateWithoutPeriodInput, Prisma.PointTransactionUncheckedUpdateWithoutPeriodInput>
+  create: Prisma.XOR<Prisma.PointTransactionCreateWithoutPeriodInput, Prisma.PointTransactionUncheckedCreateWithoutPeriodInput>
+}
+
+export type PointTransactionUpdateWithWhereUniqueWithoutPeriodInput = {
+  where: Prisma.PointTransactionWhereUniqueInput
+  data: Prisma.XOR<Prisma.PointTransactionUpdateWithoutPeriodInput, Prisma.PointTransactionUncheckedUpdateWithoutPeriodInput>
+}
+
+export type PointTransactionUpdateManyWithWhereWithoutPeriodInput = {
+  where: Prisma.PointTransactionScalarWhereInput
+  data: Prisma.XOR<Prisma.PointTransactionUpdateManyMutationInput, Prisma.PointTransactionUncheckedUpdateManyWithoutPeriodInput>
+}
+
 export type PointTransactionCreateManyUserInput = {
   id?: string
+  periodId?: string | null
   points: number
   transactionType: $Enums.TransactionType
   reference?: string | null
@@ -524,10 +640,12 @@ export type PointTransactionUpdateWithoutUserInput = {
   reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  period?: Prisma.AcademicPeriodUpdateOneWithoutPointTransactionsNestedInput
 }
 
 export type PointTransactionUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  periodId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   points?: Prisma.IntFieldUpdateOperationsInput | number
   transactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -537,6 +655,47 @@ export type PointTransactionUncheckedUpdateWithoutUserInput = {
 
 export type PointTransactionUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  periodId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  points?: Prisma.IntFieldUpdateOperationsInput | number
+  transactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type PointTransactionCreateManyPeriodInput = {
+  id?: string
+  userId: string
+  points: number
+  transactionType: $Enums.TransactionType
+  reference?: string | null
+  description?: string | null
+  createdAt?: Date | string
+}
+
+export type PointTransactionUpdateWithoutPeriodInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  points?: Prisma.IntFieldUpdateOperationsInput | number
+  transactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutPointTransactionsNestedInput
+}
+
+export type PointTransactionUncheckedUpdateWithoutPeriodInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  points?: Prisma.IntFieldUpdateOperationsInput | number
+  transactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type PointTransactionUncheckedUpdateManyWithoutPeriodInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
   points?: Prisma.IntFieldUpdateOperationsInput | number
   transactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   reference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -549,39 +708,46 @@ export type PointTransactionUncheckedUpdateManyWithoutUserInput = {
 export type PointTransactionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
+  periodId?: boolean
   points?: boolean
   transactionType?: boolean
   reference?: boolean
   description?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  period?: boolean | Prisma.PointTransaction$periodArgs<ExtArgs>
 }, ExtArgs["result"]["pointTransaction"]>
 
 export type PointTransactionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
+  periodId?: boolean
   points?: boolean
   transactionType?: boolean
   reference?: boolean
   description?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  period?: boolean | Prisma.PointTransaction$periodArgs<ExtArgs>
 }, ExtArgs["result"]["pointTransaction"]>
 
 export type PointTransactionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   userId?: boolean
+  periodId?: boolean
   points?: boolean
   transactionType?: boolean
   reference?: boolean
   description?: boolean
   createdAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  period?: boolean | Prisma.PointTransaction$periodArgs<ExtArgs>
 }, ExtArgs["result"]["pointTransaction"]>
 
 export type PointTransactionSelectScalar = {
   id?: boolean
   userId?: boolean
+  periodId?: boolean
   points?: boolean
   transactionType?: boolean
   reference?: boolean
@@ -589,25 +755,30 @@ export type PointTransactionSelectScalar = {
   createdAt?: boolean
 }
 
-export type PointTransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "points" | "transactionType" | "reference" | "description" | "createdAt", ExtArgs["result"]["pointTransaction"]>
+export type PointTransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "periodId" | "points" | "transactionType" | "reference" | "description" | "createdAt", ExtArgs["result"]["pointTransaction"]>
 export type PointTransactionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  period?: boolean | Prisma.PointTransaction$periodArgs<ExtArgs>
 }
 export type PointTransactionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  period?: boolean | Prisma.PointTransaction$periodArgs<ExtArgs>
 }
 export type PointTransactionIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  period?: boolean | Prisma.PointTransaction$periodArgs<ExtArgs>
 }
 
 export type $PointTransactionPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PointTransaction"
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
+    period: Prisma.$AcademicPeriodPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     userId: string
+    periodId: string | null
     points: number
     transactionType: $Enums.TransactionType
     reference: string | null
@@ -1008,6 +1179,7 @@ readonly fields: PointTransactionFieldRefs;
 export interface Prisma__PointTransactionClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  period<T extends Prisma.PointTransaction$periodArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PointTransaction$periodArgs<ExtArgs>>): Prisma.Prisma__AcademicPeriodClient<runtime.Types.Result.GetResult<Prisma.$AcademicPeriodPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1039,6 +1211,7 @@ export interface Prisma__PointTransactionClient<T, Null = never, ExtArgs extends
 export interface PointTransactionFieldRefs {
   readonly id: Prisma.FieldRef<"PointTransaction", 'String'>
   readonly userId: Prisma.FieldRef<"PointTransaction", 'String'>
+  readonly periodId: Prisma.FieldRef<"PointTransaction", 'String'>
   readonly points: Prisma.FieldRef<"PointTransaction", 'Int'>
   readonly transactionType: Prisma.FieldRef<"PointTransaction", 'TransactionType'>
   readonly reference: Prisma.FieldRef<"PointTransaction", 'String'>
@@ -1442,6 +1615,25 @@ export type PointTransactionDeleteManyArgs<ExtArgs extends runtime.Types.Extensi
    * Limit how many PointTransactions to delete.
    */
   limit?: number
+}
+
+/**
+ * PointTransaction.period
+ */
+export type PointTransaction$periodArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AcademicPeriod
+   */
+  select?: Prisma.AcademicPeriodSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AcademicPeriod
+   */
+  omit?: Prisma.AcademicPeriodOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AcademicPeriodInclude<ExtArgs> | null
+  where?: Prisma.AcademicPeriodWhereInput
 }
 
 /**
