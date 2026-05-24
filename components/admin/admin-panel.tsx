@@ -627,7 +627,7 @@ export default function AdminDashboard({
                           <div className="flex justify-between items-start mb-2">
                             <div>
                               <p className="text-sm font-medium">
-                                {session.quizConfig.name}
+                                {session.quizConfig?.name ?? "Kuis tidak tersedia"}
                               </p>
                               <p className="text-xs text-muted-foreground">
                                 {new Date(session.submittedAt).toLocaleString(
