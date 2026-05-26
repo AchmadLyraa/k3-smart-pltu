@@ -14,6 +14,8 @@ export async function createUser(data: {
   password: string;
   nip?: string;
   role?: string;
+  unitId?: string;
+  divisionId?: string;
 }) {
   await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
@@ -71,6 +73,32 @@ export async function createUser(data: {
     // Hash password
     const hashedPassword = await hashPassword(data.password);
 
+    if (data.unitId) {
+      const unit = await prisma.unit.findUnique({
+        where: { id: data.unitId },
+      });
+
+      if (!unit) {
+        return {
+          success: false,
+          error: "Unit tidak ditemukan",
+        };
+      }
+    }
+
+    if (data.divisionId) {
+      const division = await prisma.division.findUnique({
+        where: { id: data.divisionId },
+      });
+
+      if (!division) {
+        return {
+          success: false,
+          error: "Divisi tidak ditemukan",
+        };
+      }
+    }
+
     // Create user
     const user = await prisma.user.create({
       data: {
@@ -80,6 +108,9 @@ export async function createUser(data: {
         nip: data.nip,
         role: (data.role || "WORKER") as any,
         status: "ACTIVE",
+
+        unitId: data.unitId || null,
+        divisionId: data.divisionId || null,
       },
       select: {
         id: true,
@@ -124,16 +155,19 @@ export async function getAllUsers(page = 1, limit = 10) {
           status: true,
           lastLogin: true,
           createdAt: true,
+
+          unitId: true,
+          divisionId: true,
+
           unit: {
             select: { id: true, name: true },
           },
+
           division: {
             select: { id: true, name: true },
           },
-          shift: {
-            select: { id: true, name: true },
-          },
         },
+
         orderBy: { createdAt: "desc" },
       }),
       prisma.user.count(),
@@ -178,14 +212,10 @@ export async function getUser(userId: string) {
         createdAt: true,
         unitId: true,
         divisionId: true,
-        shiftId: true,
         unit: {
           select: { id: true, name: true },
         },
         division: {
-          select: { id: true, name: true },
-        },
-        shift: {
           select: { id: true, name: true },
         },
       },
@@ -222,13 +252,15 @@ export async function updateUserProfile(
     nip?: string;
     unitId?: string;
     divisionId?: string;
-    shiftId?: string;
+    role?: "SUPER_ADMIN" | "HSE_ADMIN" | "REWARD_ADMIN" | "WORKER";
+    status?: "ACTIVE" | "INACTIVE" | "SUSPENDED";
   },
 ) {
   const session = await requireAuth();
+
   const currentUser = session.user as any;
 
-  // Users can only update their own profile unless admin
+  // hanya super admin boleh edit user lain
   if (currentUser.id !== userId && currentUser.role !== "SUPER_ADMIN") {
     return {
       success: false,
@@ -245,12 +277,14 @@ export async function updateUserProfile(
   }
 
   try {
-    // Check if email is already taken
+    // cek email duplicate
     if (validated.data.email) {
       const existing = await prisma.user.findFirst({
         where: {
           email: validated.data.email,
-          id: { not: userId },
+          id: {
+            not: userId,
+          },
         },
       });
 
@@ -262,16 +296,39 @@ export async function updateUserProfile(
       }
     }
 
+    // ambil division buat sinkron unit otomatis
+    let finalUnitId = validated.data.unitId;
+
+    if (validated.data.divisionId) {
+      const division = await prisma.division.findUnique({
+        where: {
+          id: validated.data.divisionId,
+        },
+      });
+
+      if (division) {
+        finalUnitId = division.unitId;
+      }
+    }
+
     const user = await prisma.user.update({
-      where: { id: userId },
+      where: {
+        id: userId,
+      },
+
       data: {
         name: validated.data.name,
         email: validated.data.email,
         nip: validated.data.nip,
-        unitId: validated.data.unitId,
-        divisionId: validated.data.divisionId,
-        shiftId: validated.data.shiftId,
+        unitId: finalUnitId || null,
+        divisionId: validated.data.divisionId || null,
+
+        ...(currentUser.role === "SUPER_ADMIN" && {
+          role: validated.data.role,
+          status: validated.data.status,
+        }),
       },
+
       select: {
         id: true,
         email: true,
@@ -279,6 +336,8 @@ export async function updateUserProfile(
         nip: true,
         role: true,
         status: true,
+        unitId: true,
+        divisionId: true,
       },
     });
 
@@ -288,6 +347,7 @@ export async function updateUserProfile(
     };
   } catch (error) {
     console.error("[updateUserProfile error]", error);
+
     return {
       success: false,
       error: "Failed to update profile",
@@ -417,7 +477,10 @@ function generateRandomPassword(length: number = 12): string {
     password += all[Math.floor(Math.random() * all.length)];
   }
 
-  return password.split("").sort(() => Math.random() - 0.5).join("");
+  return password
+    .split("")
+    .sort(() => Math.random() - 0.5)
+    .join("");
 }
 
 /**
@@ -442,14 +505,10 @@ export async function getUserProfile(userId: string) {
         updatedAt: true,
         unitId: true,
         divisionId: true,
-        shiftId: true,
         unit: {
           select: { id: true, name: true },
         },
         division: {
-          select: { id: true, name: true },
-        },
-        shift: {
           select: { id: true, name: true },
         },
       },

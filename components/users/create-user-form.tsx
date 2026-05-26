@@ -1,7 +1,10 @@
 "use client";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createUser } from "@/app/actions/users";
+import {
+  getUnitsForRegister,
+  getDivisionsForRegister,
+} from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -17,6 +20,18 @@ interface CreateUserFormProps {
   onSuccess?: () => void;
 }
 
+interface Unit {
+  id: string;
+  name: string;
+  code: string;
+}
+
+interface Division {
+  id: string;
+  name: string;
+  code: string;
+}
+
 const inputStyleClass =
   "w-full rounded-[24px] h-11 px-5 border-[#E2E8F0] focus-visible:border-[#FF4B4B] focus-visible:ring-[#FF4B4B]/20 focus-visible:ring-[3px] focus-visible:outline-none transition-all shadow-sm";
 
@@ -26,8 +41,38 @@ export default function CreateUserForm({ onSuccess }: CreateUserFormProps) {
   const [nip, setNip] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("WORKER");
+  const [unitId, setUnitId] = useState("");
+  const [divisionId, setDivisionId] = useState("");
+
+  const [units, setUnits] = useState<Unit[]>([]);
+  const [divisions, setDivisions] = useState<Division[]>([]);
+
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    getUnitsForRegister().then((res) => {
+      if (res.success) {
+        setUnits(res.data);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!unitId) {
+      setDivisions([]);
+      setDivisionId("");
+      return;
+    }
+
+    getDivisionsForRegister(unitId).then((res) => {
+      if (res.success) {
+        setDivisions(res.data);
+      }
+    });
+
+    setDivisionId("");
+  }, [unitId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,6 +85,9 @@ export default function CreateUserForm({ onSuccess }: CreateUserFormProps) {
         password,
         nip: nip || undefined,
         role: role as any,
+
+        unitId: unitId || undefined,
+        divisionId: divisionId || undefined,
       });
 
       if (result.success) {
@@ -52,6 +100,8 @@ export default function CreateUserForm({ onSuccess }: CreateUserFormProps) {
         setPassword("");
         setNip("");
         setRole("WORKER");
+        setUnitId("");
+        setDivisionId("");
         onSuccess?.();
       } else {
         toast({
@@ -74,7 +124,9 @@ export default function CreateUserForm({ onSuccess }: CreateUserFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4 pt-2">
       <div>
-        <label className="block text-sm font-medium mb-1.5 text-slate-700">Nama lengkap</label>
+        <label className="block text-sm font-medium mb-1.5 text-slate-700">
+          Nama lengkap
+        </label>
         <Input
           placeholder="John Doe"
           value={name}
@@ -85,7 +137,9 @@ export default function CreateUserForm({ onSuccess }: CreateUserFormProps) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1.5 text-slate-700">Email</label>
+        <label className="block text-sm font-medium mb-1.5 text-slate-700">
+          Email
+        </label>
         <Input
           type="email"
           placeholder="john@example.com"
@@ -97,7 +151,9 @@ export default function CreateUserForm({ onSuccess }: CreateUserFormProps) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1.5 text-slate-700">NIP (Opsional)</label>
+        <label className="block text-sm font-medium mb-1.5 text-slate-700">
+          NIP (Opsional)
+        </label>
         <Input
           placeholder="Employee ID"
           value={nip}
@@ -107,7 +163,55 @@ export default function CreateUserForm({ onSuccess }: CreateUserFormProps) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1.5 text-slate-700">Password</label>
+        <label className="block text-sm font-medium mb-1.5 text-slate-700">
+          Unit
+        </label>
+
+        <Select value={unitId} onValueChange={setUnitId}>
+          <SelectTrigger className="w-full rounded-[24px] h-11 px-5 border-[#E2E8F0] shadow-sm">
+            <SelectValue placeholder="Pilih Unit" />
+          </SelectTrigger>
+
+          <SelectContent>
+            {units.map((unit) => (
+              <SelectItem key={unit.id} value={unit.id}>
+                {unit.name} ({unit.code})
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1.5 text-slate-700">
+          Division
+        </label>
+
+        <Select
+          value={divisionId}
+          onValueChange={setDivisionId}
+          disabled={!unitId}
+        >
+          <SelectTrigger className="w-full rounded-[24px] h-11 px-5 border-[#E2E8F0] shadow-sm">
+            <SelectValue
+              placeholder={!unitId ? "Pilih unit dulu" : "Pilih Division"}
+            />
+          </SelectTrigger>
+
+          <SelectContent>
+            {divisions.map((division) => (
+              <SelectItem key={division.id} value={division.id}>
+                {division.name} ({division.code})
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1.5 text-slate-700">
+          Password
+        </label>
         <Input
           type="password"
           placeholder="Enter password"
@@ -122,7 +226,9 @@ export default function CreateUserForm({ onSuccess }: CreateUserFormProps) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1.5 text-slate-700">Role</label>
+        <label className="block text-sm font-medium mb-1.5 text-slate-700">
+          Role
+        </label>
         <Select value={role} onValueChange={setRole}>
           <SelectTrigger className="w-full rounded-[24px] h-11 px-5 border-[#E2E8F0] shadow-sm">
             <SelectValue />
@@ -130,8 +236,12 @@ export default function CreateUserForm({ onSuccess }: CreateUserFormProps) {
           <SelectContent>
             <SelectItem value="WORKER">Worker (Peserta Belajar)</SelectItem>
             <SelectItem value="HSE_ADMIN">HSE Admin (Materi & Quiz)</SelectItem>
-            <SelectItem value="REWARD_ADMIN">Reward Admin (Reward & Redeem)</SelectItem>
-            <SelectItem value="SUPER_ADMIN">Super Admin (Full Access)</SelectItem>
+            <SelectItem value="REWARD_ADMIN">
+              Reward Admin (Reward & Redeem)
+            </SelectItem>
+            <SelectItem value="SUPER_ADMIN">
+              Super Admin (Full Access)
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>

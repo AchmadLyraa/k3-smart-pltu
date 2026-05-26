@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -13,157 +13,324 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { registerUser } from "@/app/actions/auth";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  registerUser,
+  getUnitsForRegister,
+  getDivisionsForRegister,
+} from "@/app/actions/auth";
+
+interface Unit {
+  id: string;
+  name: string;
+  code: string;
+}
+interface Division {
+  id: string;
+  name: string;
+  code: string;
+}
 
 export default function RegisterForm() {
   const router = useRouter();
+
   const [formData, setFormData] = useState({
-    email: "",
     name: "",
+    email: "",
+    nip: "",
     password: "",
     confirmPassword: "",
+    unitId: "",
+    divisionId: "",
   });
+
+  const [units, setUnits] = useState<Unit[]>([]);
+  const [divisions, setDivisions] = useState<Division[]>([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  // Load units saat mount
+  useEffect(() => {
+    getUnitsForRegister().then((res) => {
+      if (res.success) setUnits(res.data);
+    });
+  }, []);
+
+  // Load divisions saat unit dipilih
+  useEffect(() => {
+    if (!formData.unitId) {
+      setDivisions([]);
+      setFormData((prev) => ({ ...prev, divisionId: "" }));
+      return;
+    }
+    getDivisionsForRegister(formData.unitId).then((res) => {
+      if (res.success) setDivisions(res.data);
+      setFormData((prev) => ({ ...prev, divisionId: "" }));
+    });
+  }, [formData.unitId]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setIsLoading(true);
 
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      setIsLoading(false);
+      setError("Password tidak cocok");
       return;
     }
 
+    if (formData.password.length < 8) {
+      setError("Password minimal 8 karakter");
+      return;
+    }
+
+    setIsLoading(true);
     try {
       const result = await registerUser({
         email: formData.email,
         name: formData.name,
         password: formData.password,
+        nip: formData.nip || undefined,
+        unitId: formData.unitId || undefined,
+        divisionId: formData.divisionId || undefined,
       });
 
       if (!result.success) {
-        setError(result.error || "Registration failed");
+        setError(result.error || "Registrasi gagal");
         return;
       }
 
       router.push("/login?registered=true");
-    } catch (err) {
-      setError("An error occurred during registration");
-      console.error(err);
+    } catch {
+      setError("Terjadi kesalahan. Coba lagi.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader className="space-y-2">
-        <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
-        <CardDescription>
-          K3-SMART: Keselamatan Kerja Learning Platform
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-
-          <div className="space-y-2">
-            <label htmlFor="name" className="text-sm font-medium">
-              Full Name
-            </label>
-            <Input
-              id="name"
-              name="name"
-              type="text"
-              placeholder="John Doe"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              disabled={isLoading}
-            />
+    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-red-100 flex items-center justify-center px-4 py-10">
+      <Card className="w-full max-w-2xl border-0 shadow-2xl rounded-3xl overflow-hidden">
+        <CardHeader className="space-y-2 text-center pb-2 pt-8">
+          <div className="mx-auto w-16 h-16 rounded-2xl bg-red-500 flex items-center justify-center shadow-lg shadow-red-500/20">
+            <span className="text-white text-2xl font-bold">K3</span>
           </div>
 
-          <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium">
-              Email
-            </label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="you@example.com"
-              value={formData.email}
-              onChange={handleChange}
-              required
+          <CardTitle className="text-3xl font-bold tracking-tight text-gray-900">
+            Daftar Akun
+          </CardTitle>
+
+          <CardDescription className="text-base text-gray-500">
+            Bergabung ke platform pembelajaran keselamatan kerja
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent className="pt-6 px-8 pb-8">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {error && (
+              <Alert variant="destructive" className="rounded-xl">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            {/* Nama */}
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-gray-700">
+                Nama Lengkap <span className="text-red-500">*</span>
+              </label>
+
+              <Input
+                name="name"
+                placeholder="Nama lengkap"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                disabled={isLoading}
+                className="h-12 rounded-xl border-gray-200 focus-visible:ring-red-500"
+              />
+            </div>
+
+            {/* NIP */}
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-gray-700">
+                NIP{" "}
+                <span className="text-xs text-muted-foreground">
+                  (opsional)
+                </span>
+              </label>
+
+              <Input
+                name="nip"
+                placeholder="Nomor Induk Pegawai"
+                value={formData.nip}
+                onChange={handleChange}
+                disabled={isLoading}
+                className="h-12 rounded-xl border-gray-200 focus-visible:ring-red-500"
+              />
+            </div>
+
+            {/* Email */}
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-gray-700">
+                Email <span className="text-red-500">*</span>
+              </label>
+
+              <Input
+                name="email"
+                type="email"
+                placeholder="email@perusahaan.com"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                disabled={isLoading}
+                className="h-12 rounded-xl border-gray-200 focus-visible:ring-red-500"
+              />
+            </div>
+
+            {/* Unit */}
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-gray-700">
+                Unit{" "}
+                <span className="text-xs text-muted-foreground">
+                  (opsional)
+                </span>
+              </label>
+
+              <Select
+                value={formData.unitId}
+                onValueChange={(val) =>
+                  setFormData((prev) => ({ ...prev, unitId: val }))
+                }
+                disabled={isLoading || units.length === 0}
+              >
+                <SelectTrigger className="h-12 rounded-xl border-gray-200">
+                  <SelectValue
+                    placeholder={
+                      units.length === 0 ? "Memuat..." : "Pilih unit"
+                    }
+                  />
+                </SelectTrigger>
+
+                <SelectContent>
+                  {units.map((u) => (
+                    <SelectItem key={u.id} value={u.id}>
+                      {u.name} ({u.code})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Divisi */}
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-gray-700">
+                Divisi{" "}
+                <span className="text-xs text-muted-foreground">
+                  (opsional)
+                </span>
+              </label>
+
+              <Select
+                value={formData.divisionId}
+                onValueChange={(val) =>
+                  setFormData((prev) => ({ ...prev, divisionId: val }))
+                }
+                disabled={
+                  isLoading || !formData.unitId || divisions.length === 0
+                }
+              >
+                <SelectTrigger className="h-12 rounded-xl border-gray-200">
+                  <SelectValue
+                    placeholder={
+                      !formData.unitId
+                        ? "Pilih unit dulu"
+                        : divisions.length === 0
+                          ? "Tidak ada divisi"
+                          : "Pilih divisi"
+                    }
+                  />
+                </SelectTrigger>
+
+                <SelectContent>
+                  {divisions.map((d) => (
+                    <SelectItem key={d.id} value={d.id}>
+                      {d.name} ({d.code})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Password */}
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-gray-700">
+                Password <span className="text-red-500">*</span>
+              </label>
+
+              <Input
+                name="password"
+                type="password"
+                placeholder="••••••••"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                disabled={isLoading}
+                className="h-12 rounded-xl border-gray-200 focus-visible:ring-red-500"
+              />
+
+              <p className="text-xs text-muted-foreground">
+                Min 8 karakter, 1 huruf besar, 1 huruf kecil, 1 angka
+              </p>
+            </div>
+
+            {/* Confirm Password */}
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-gray-700">
+                Konfirmasi Password <span className="text-red-500">*</span>
+              </label>
+
+              <Input
+                name="confirmPassword"
+                type="password"
+                placeholder="••••••••"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
+                disabled={isLoading}
+                className="h-12 rounded-xl border-gray-200 focus-visible:ring-red-500"
+              />
+            </div>
+
+            <Button
+              type="submit"
               disabled={isLoading}
-            />
+              className="w-full h-12 rounded-xl bg-red-500 hover:bg-red-600 text-base font-semibold shadow-lg shadow-red-500/20"
+            >
+              {isLoading ? "Mendaftarkan..." : "Daftar Sekarang"}
+            </Button>
+          </form>
+
+          <div className="mt-6 text-center text-sm text-gray-500">
+            Sudah punya akun?{" "}
+            <Link
+              href="/login"
+              className="font-semibold text-red-600 transition-colors hover:text-red-700 hover:underline"
+            >
+              Masuk sekarang
+            </Link>
           </div>
-
-          <div className="space-y-2">
-            <label htmlFor="password" className="text-sm font-medium">
-              Password
-            </label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="••••••••"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              disabled={isLoading}
-            />
-            <p className="text-xs text-muted-foreground">
-              Min 8 chars, 1 uppercase, 1 lowercase, 1 number
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="confirmPassword" className="text-sm font-medium">
-              Confirm Password
-            </label>
-            <Input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              placeholder="••••••••"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              required
-              disabled={isLoading}
-            />
-          </div>
-
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Creating account..." : "Create Account"}
-          </Button>
-        </form>
-
-        <div className="mt-4 text-center text-sm">
-          Already have an account?{" "}
-          <Link
-            href="/login"
-            className="text-primary hover:underline font-medium"
-          >
-            Sign in
-          </Link>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

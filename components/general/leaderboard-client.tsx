@@ -11,9 +11,14 @@ interface LeaderboardClientProps {
   currentUserId: string;
 }
 
-export default function LeaderboardClient({ initialData, currentUserId }: LeaderboardClientProps) {
+export default function LeaderboardClient({
+  initialData,
+  currentUserId,
+}: LeaderboardClientProps) {
   // Mengubah default active tab menjadi "semester" sesuai opsi kanan di gambar referensi
-  const [activeTab, setActiveTab] = useState<"bulanan" | "semester">("semester");
+  const [activeTab, setActiveTab] = useState<"bulanan" | "semester">(
+    "semester",
+  );
 
   // Pemetaan nilai poin berdasarkan tab yang dipilih
   const getSortValue = (user: LeaderboardUser) => {
@@ -33,15 +38,19 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
   // Pagination Setup (Sesuai mockup bawah: ikon panah, angka halaman aktif, dan sisa angka abu-abu)
   const pageSize = 5; // Ukuran baris diperkecil agar pas dalam layar mockup handphone
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.ceil(Math.max(sortedData.length - 3, 0) / pageSize) || 1;
+  const totalPages =
+    Math.ceil(Math.max(sortedData.length - 3, 0) / pageSize) || 1;
 
   // Memisahkan Top 3 utama untuk komponen Podium
   const top3 = useMemo(() => sortedData.slice(0, 3), [sortedData]);
-  
+
   // Data list sisa peringkat setelah dipotong Top 3
   const remainingData = useMemo(() => sortedData.slice(3), [sortedData]);
   const paginatedData = useMemo(() => {
-    return remainingData.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+    return remainingData.slice(
+      (currentPage - 1) * pageSize,
+      currentPage * pageSize,
+    );
   }, [remainingData, currentPage]);
 
   // Penyusunan struktur visual urutan Podium dari kiri ke kanan: Rank 2, Rank 1, Rank 3
@@ -54,12 +63,16 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
   }, [top3]);
 
   const getInitials = (name: string) => {
-    return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   return (
     <div className="w-full flex flex-col justify-start space-y-5 px-1 pt-0 pb-20 animate-in fade-in duration-300">
-      
       {/* JUDUL UTAMA HALAMAN */}
       <h1 className="text-2xl font-black text-center text-zinc-900 tracking-tight">
         Papan Peringkat
@@ -68,19 +81,29 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
       {/* TABS SELECTOR (Pill minimalis putih & merah terang) */}
       <div className="w-full flex items-center justify-between bg-white p-1.5 rounded-full border border-zinc-100 shadow-[0_4px_12px_rgba(0,0,0,0.02)]">
         <button
-          onClick={() => { setActiveTab("bulanan"); setCurrentPage(1); }}
+          onClick={() => {
+            setActiveTab("bulanan");
+            setCurrentPage(1);
+          }}
           className={cn(
             "flex-1 text-center text-xs font-bold py-2.5 rounded-full transition-all duration-200",
-            activeTab === "bulanan" ? "bg-[#FF3B30] text-white font-black" : "text-zinc-800"
+            activeTab === "bulanan"
+              ? "bg-[#FF3B30] text-white font-black"
+              : "text-zinc-800",
           )}
         >
           All-time
         </button>
         <button
-          onClick={() => { setActiveTab("semester"); setCurrentPage(1); }}
+          onClick={() => {
+            setActiveTab("semester");
+            setCurrentPage(1);
+          }}
           className={cn(
             "flex-1 text-center text-xs font-bold py-2.5 rounded-full transition-all duration-200",
-            activeTab === "semester" ? "bg-[#FF3B30] text-white font-black" : "text-zinc-800"
+            activeTab === "semester"
+              ? "bg-[#FF3B30] text-white font-black"
+              : "text-zinc-800",
           )}
         >
           Semester
@@ -133,10 +156,19 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
             }
 
             return (
-              <div key={user.id} className="flex-1 flex flex-col items-center relative min-w-0">
+              <div
+                key={user.id}
+                className="flex-1 flex flex-col items-center relative min-w-0"
+              >
                 {/* Lingkaran Avatar User */}
                 <div className="relative mb-2">
-                  <Avatar className={cn(config.avatarSize, config.avatarRing, "bg-white shadow-md transition-transform")}>
+                  <Avatar
+                    className={cn(
+                      config.avatarSize,
+                      config.avatarRing,
+                      "bg-white shadow-md transition-transform",
+                    )}
+                  >
                     <AvatarFallback className="text-xs font-black bg-zinc-100 text-zinc-700">
                       {getInitials(user.name)}
                     </AvatarFallback>
@@ -158,11 +190,18 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
                   className={cn(
                     "w-full rounded-t-[24px] bg-gradient-to-b text-white flex flex-col items-center justify-center p-2 shadow-md border-t border-white/20",
                     config.height,
-                    config.gradient
+                    config.gradient,
                   )}
                 >
-                  <span className="text-base font-black leading-none drop-shadow-sm">{user.rank}</span>
-                  <span className={cn("font-bold tracking-tighter opacity-90 font-mono mt-0.5", config.fontSize)}>
+                  <span className="text-base font-black leading-none drop-shadow-sm">
+                    {user.rank}
+                  </span>
+                  <span
+                    className={cn(
+                      "font-bold tracking-tighter opacity-90 font-mono mt-0.5",
+                      config.fontSize,
+                    )}
+                  >
                     {points}
                   </span>
                 </div>
@@ -189,9 +228,9 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
                 key={user.id}
                 className={cn(
                   "w-full bg-white rounded-[32px] p-4 flex items-center justify-between border transition-all shadow-[0_4px_15px_rgba(0,0,0,0.015)]",
-                  isCurrentUser 
-                    ? "border-[#FF3B30] bg-red-50/[0.02] shadow-sm" 
-                    : "border-zinc-100/80 hover:border-zinc-200"
+                  isCurrentUser
+                    ? "border-[#FF3B30] bg-red-50/[0.02] shadow-sm"
+                    : "border-zinc-100/80 hover:border-zinc-200",
                 )}
               >
                 {/* Sisi Kiri: Angka Posisi, Avatar Bulat, Detail Teks */}
@@ -211,13 +250,15 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
                   {/* Nama Pekerja & Unit Kerja */}
                   <div className="min-w-0 space-y-0.5">
                     <p className="text-xs font-extrabold text-zinc-900 truncate tracking-tight flex items-center gap-1.5">
-                      {user.name.toLowerCase().includes("@") ? user.name : `${user.name.toLowerCase().replace(/\s+/g, "")}@payroll.com`}
+                      {user.email}
                       {isCurrentUser && (
-                        <span className="text-[8px] bg-[#FF3B30] text-white px-1.5 py-0.5 rounded-full font-black uppercase">Anda</span>
+                        <span className="text-[8px] bg-[#FF3B30] text-white px-1.5 py-0.5 rounded-full font-black uppercase">
+                          Anda
+                        </span>
                       )}
                     </p>
                     <p className="text-[10px] font-bold text-zinc-400 truncate">
-                      {user.unit || "IT Support"}
+                      {user.division || "-"}
                     </p>
                   </div>
                 </div>
@@ -242,7 +283,7 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
             disabled={currentPage === 1}
             className={cn(
               "w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-800 active:scale-90 transition-all",
-              currentPage === 1 && "opacity-30 cursor-not-allowed"
+              currentPage === 1 && "opacity-30 cursor-not-allowed",
             )}
           >
             <ChevronLeft className="w-4 h-4 stroke-[2.5]" />
@@ -250,20 +291,22 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
 
           {/* Deretan Indikator Angka Halaman */}
           <div className="flex items-center space-x-2 text-xs font-mono font-bold">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-              <button
-                key={pageNum}
-                onClick={() => setCurrentPage(pageNum)}
-                className={cn(
-                  "w-5 text-center transition-all",
-                  currentPage === pageNum 
-                    ? "text-[#FF3B30] font-black scale-110" 
-                    : "text-zinc-300 hover:text-zinc-400"
-                )}
-              >
-                {pageNum}
-              </button>
-            ))}
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+              (pageNum) => (
+                <button
+                  key={pageNum}
+                  onClick={() => setCurrentPage(pageNum)}
+                  className={cn(
+                    "w-5 text-center transition-all",
+                    currentPage === pageNum
+                      ? "text-[#FF3B30] font-black scale-110"
+                      : "text-zinc-300 hover:text-zinc-400",
+                  )}
+                >
+                  {pageNum}
+                </button>
+              ),
+            )}
           </div>
 
           <button
@@ -271,14 +314,13 @@ export default function LeaderboardClient({ initialData, currentUserId }: Leader
             disabled={currentPage === totalPages}
             className={cn(
               "w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-800 active:scale-90 transition-all",
-              currentPage === totalPages && "opacity-30 cursor-not-allowed"
+              currentPage === totalPages && "opacity-30 cursor-not-allowed",
             )}
           >
             <ChevronRight className="w-4 h-4 stroke-[2.5]" />
           </button>
         </div>
       )}
-
     </div>
   );
 }

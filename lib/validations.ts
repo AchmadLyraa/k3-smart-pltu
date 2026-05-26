@@ -74,13 +74,13 @@ export const divisionSchema = z.object({
   unitId: z.string().min(1, "Unit is required"),
 });
 
-export const shiftSchema = z.object({
-  name: z.string().min(1, "Shift name is required").max(100),
-  code: z.string().min(1, "Shift code is required").max(20),
-  startTime: z.string().regex(/^\d{2}:\d{2}$/, "Invalid time format"),
-  endTime: z.string().regex(/^\d{2}:\d{2}$/, "Invalid time format"),
-  divisionId: z.string().min(1, "Division is required"),
-});
+// export const shiftSchema = z.object({
+//   name: z.string().min(1, "Shift name is required").max(100),
+//   code: z.string().min(1, "Shift code is required").max(20),
+//   startTime: z.string().regex(/^\d{2}:\d{2}$/, "Invalid time format"),
+//   endTime: z.string().regex(/^\d{2}:\d{2}$/, "Invalid time format"),
+//   divisionId: z.string().min(1, "Division is required"),
+// });
 
 // ============================================================================
 // CONTENT VALIDATION
@@ -141,7 +141,9 @@ export const rewardSchema = z.object({
   description: z.string().optional(),
   pointCost: z.number().int().positive("Point cost must be a positive number"),
   quantity: z.number().int().nonnegative("Quantity cannot be negative"),
-  status: z.enum(["PENDING", "AVAILABLE", "REJECTED", "DISCONTINUED"]).optional(),
+  status: z
+    .enum(["PENDING", "AVAILABLE", "REJECTED", "DISCONTINUED"])
+    .optional(),
 });
 
 export const redeemRewardSchema = z.object({

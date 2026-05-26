@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
+import Link from "next/link";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -27,12 +28,13 @@ export default function LoginForm() {
         redirect: false,
       });
 
-      if (!result?.ok) {
-        setError(result?.error || "Invalid email or password");
+      // console.log("result:", result);
+
+      if (result?.error) {
+        setError("Email atau password salah");
         return;
       }
 
-      // Fetch session untuk dapat role
       const { getSession } = await import("next-auth/react");
       const session = await getSession();
       const role = (session?.user as any)?.role;
@@ -47,7 +49,7 @@ export default function LoginForm() {
       router.push(roleRoutes[role] ?? "/");
       router.refresh();
     } catch (err) {
-      setError("An error occurred during login");
+      setError("Terjadi kesalahan. Coba lagi.");
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -56,10 +58,9 @@ export default function LoginForm() {
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen w-full bg-white overflow-hidden">
-      {/* ─── Left Panel — Red circle with worker image ─── */}
+      {/* ─── Left Panel ─── */}
       <div className="relative w-[48%] min-h-screen shrink-0 max-lg:w-full max-lg:min-h-[320px] max-lg:h-[35vh] max-sm:min-h-[240px] max-sm:h-[28vh]">
         <div className="absolute top-[30px] left-[30px] bottom-[30px] w-[calc(100%+2vw)] rounded-[20%] overflow-hidden bg-red-500 max-lg:w-[120%] max-lg:left-[-10%] max-lg:rounded-[0_0_50%_50%]">
-          {/* Worker background image */}
           <div className="absolute inset-[-20px] z-[1]">
             <Image
               src="/images/hero-login.png"
@@ -69,9 +70,7 @@ export default function LoginForm() {
               priority
             />
           </div>
-          {/* Red overlay */}
           <div className="absolute inset-0 z-[2] bg-gradient-to-br from-red-500/55 via-red-600/70 to-red-700/82" />
-          {/* Logo & Tagline */}
           <div className="absolute z-[3] flex flex-col items-start left-[10%] bottom-[32%] max-lg:left-1/2 max-lg:bottom-[20%] max-lg:-translate-x-1/2 max-lg:items-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -86,7 +85,7 @@ export default function LoginForm() {
         </div>
       </div>
 
-      {/* ─── Right Panel — Login form ─── */}
+      {/* ─── Right Panel ─── */}
       <div className="flex-1 flex items-center justify-center p-[48px_60px] max-lg:p-[32px_24px_48px] max-sm:p-[24px_20px_40px]">
         <div className="w-full max-w-[460px]">
           <h1 className="text-[42px] font-bold text-[#1a1a1a] mb-11 text-center tracking-tight max-lg:text-[34px] max-lg:mb-7 max-sm:text-[28px] max-sm:mb-6">
@@ -95,14 +94,23 @@ export default function LoginForm() {
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-6">
             {error && (
-              <Alert variant="destructive" className="rounded-2xl">
-                <AlertDescription>{error}</AlertDescription>
+              <Alert
+                variant="destructive"
+                className="rounded-2xl flex items-start gap-3 border-red-200 bg-red-50"
+              >
+                <AlertCircle className="w-4 h-4 mt-0.5 shrink-0 text-red-500" />
+                <AlertDescription className="text-sm font-semibold text-red-700">
+                  {error}
+                </AlertDescription>
               </Alert>
             )}
 
-            {/* ── Email Field ── */}
+            {/* ── Email ── */}
             <div className="flex flex-col gap-2">
-              <label htmlFor="email" className="text-[17px] font-bold text-gray-500 pl-2">
+              <label
+                htmlFor="email"
+                className="text-[17px] font-bold text-gray-500 pl-2"
+              >
                 Email
               </label>
               <div className="relative flex items-center w-full">
@@ -120,9 +128,12 @@ export default function LoginForm() {
               </div>
             </div>
 
-            {/* ── Password Field ── */}
+            {/* ── Password ── */}
             <div className="flex flex-col gap-2">
-              <label htmlFor="password" className="text-[17px] font-bold text-gray-500 pl-2">
+              <label
+                htmlFor="password"
+                className="text-[17px] font-bold text-gray-500 pl-2"
+              >
                 Password
               </label>
               <div className="relative flex items-center w-full">
@@ -143,7 +154,9 @@ export default function LoginForm() {
                   onClick={() => setShowPassword(!showPassword)}
                   tabIndex={-1}
                   disabled={isLoading}
-                  aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
+                  aria-label={
+                    showPassword ? "Sembunyikan password" : "Tampilkan password"
+                  }
                 >
                   {showPassword ? (
                     <EyeOff className="w-5 h-5 max-sm:w-[18px] max-sm:h-[18px]" />
@@ -154,7 +167,7 @@ export default function LoginForm() {
               </div>
             </div>
 
-            {/* ── Submit Button ── */}
+            {/* ── Submit ── */}
             <button
               type="submit"
               className="w-full h-[58px] mt-4 border-none rounded-[32px] bg-gradient-to-r from-red-500 to-red-600 text-white text-[22px] font-bold cursor-pointer shadow-[0_4px_16px_rgba(239,68,68,0.3)] tracking-[0.3px] transition-all duration-300 hover:from-red-600 hover:to-red-700 hover:shadow-[0_6px_24px_rgba(239,68,68,0.4)] hover:-translate-y-px active:translate-y-0 active:shadow-[0_2px_8px_rgba(239,68,68,0.3)] disabled:opacity-70 disabled:cursor-not-allowed max-sm:h-[52px] max-sm:text-[18px]"
@@ -162,9 +175,27 @@ export default function LoginForm() {
             >
               {isLoading ? (
                 <span className="flex items-center justify-center gap-[10px]">
-                  <svg className="w-[22px] h-[22px] animate-spin" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeDasharray="32" strokeDashoffset="32">
-                      <animate attributeName="stroke-dashoffset" values="32;0;32" dur="1.2s" repeatCount="indefinite"/>
+                  <svg
+                    className="w-[22px] h-[22px] animate-spin"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeDasharray="32"
+                      strokeDashoffset="32"
+                    >
+                      <animate
+                        attributeName="stroke-dashoffset"
+                        values="32;0;32"
+                        dur="1.2s"
+                        repeatCount="indefinite"
+                      />
                     </circle>
                   </svg>
                   Memproses...
@@ -174,6 +205,16 @@ export default function LoginForm() {
               )}
             </button>
           </form>
+
+          <div className="mt-6 text-center text-sm text-gray-500">
+            Belum punya akun?{" "}
+            <Link
+              href="/register"
+              className="font-semibold text-red-600 transition-colors hover:text-red-700 hover:underline"
+            >
+              Daftar sekarang
+            </Link>
+          </div>
         </div>
       </div>
     </div>

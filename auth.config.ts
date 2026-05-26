@@ -4,7 +4,6 @@ const authConfig: NextAuthConfig = {
   providers: [],
   pages: {
     signIn: "/login",
-    error: "/login",
   },
   callbacks: {
     authorized({ auth, request }) {

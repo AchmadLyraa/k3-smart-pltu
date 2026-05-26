@@ -1,15 +1,28 @@
 "use client";
 
 import { useState, useEffect } from "react";
+
 import { updateUserProfile } from "@/app/actions/users";
+import { getUnits, getDivisions } from "@/app/actions/master-data";
+
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 import { useToast } from "@/hooks/use-toast";
 
 interface UserEditDialogProps {
@@ -31,20 +44,56 @@ export default function UserEditDialog({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [nip, setNip] = useState("");
+
+  const [role, setRole] = useState("WORKER");
+  const [status, setStatus] = useState("ACTIVE");
+
+  const [unitId, setUnitId] = useState("");
+  const [divisionId, setDivisionId] = useState("");
+
+  const [units, setUnits] = useState<any[]>([]);
+  const [divisions, setDivisions] = useState<any[]>([]);
+
   const [loading, setLoading] = useState(false);
+
   const { toast } = useToast();
 
-  // Sync state when user prop changes
+  useEffect(() => {
+    const loadMasterData = async () => {
+      const [unitsRes, divisionsRes] = await Promise.all([
+        getUnits(),
+        getDivisions(),
+      ]);
+
+      if (unitsRes.success) {
+        setUnits(unitsRes.data || []);
+      }
+
+      if (divisionsRes.success) {
+        setDivisions(divisionsRes.data || []);
+      }
+    };
+
+    loadMasterData();
+  }, []);
+
   useEffect(() => {
     if (user && open) {
       setName(user.name || "");
       setEmail(user.email || "");
       setNip(user.nip || "");
+
+      setRole(user.role || "WORKER");
+      setStatus(user.status || "ACTIVE");
+
+      setUnitId(user.unitId || "");
+      setDivisionId(user.divisionId || "");
     }
   }, [user, open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     setLoading(true);
 
     try {
@@ -52,6 +101,10 @@ export default function UserEditDialog({
         name: name || undefined,
         email: email || undefined,
         nip: nip || undefined,
+        unitId: unitId || undefined,
+        divisionId: divisionId || undefined,
+        role,
+        status,
       });
 
       if (result.success) {
@@ -59,6 +112,7 @@ export default function UserEditDialog({
           title: "Berhasil",
           description: "Data pengguna berhasil diperbarui",
         });
+
         onSuccess();
       } else {
         toast({
@@ -84,14 +138,19 @@ export default function UserEditDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg w-full max-h-screen overflow-y-auto rounded-[24px] p-6">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">Edit User</DialogTitle>
+          <DialogTitle className="text-xl font-bold text-slate-900">
+            Edit User
+          </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-2">
           <div>
-            <label className="block text-sm font-medium mb-1.5 text-slate-700">Name</label>
+            <label className="block text-sm font-medium mb-1.5 text-slate-700">
+              Nama
+            </label>
+
             <Input
-              placeholder="Full name"
+              placeholder="Nama lengkap"
               value={name}
               onChange={(e) => setName(e.target.value)}
               className={inputStyleClass}
@@ -99,10 +158,13 @@ export default function UserEditDialog({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1.5 text-slate-700">Email</label>
+            <label className="block text-sm font-medium mb-1.5 text-slate-700">
+              Email
+            </label>
+
             <Input
               type="email"
-              placeholder="Email address"
+              placeholder="Alamat email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className={inputStyleClass}
@@ -110,13 +172,109 @@ export default function UserEditDialog({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1.5 text-slate-700">NIP</label>
+            <label className="block text-sm font-medium mb-1.5 text-slate-700">
+              NIP
+            </label>
+
             <Input
-              placeholder="Employee ID"
+              placeholder="Nomor induk pegawai"
               value={nip}
               onChange={(e) => setNip(e.target.value)}
               className={inputStyleClass}
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1.5 text-slate-700">
+              Role
+            </label>
+
+            <Select value={role} onValueChange={setRole}>
+              <SelectTrigger className={inputStyleClass}>
+                <SelectValue placeholder="Pilih role" />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectItem value="SUPER_ADMIN">SUPER_ADMIN</SelectItem>
+
+                <SelectItem value="HSE_ADMIN">HSE_ADMIN</SelectItem>
+
+                <SelectItem value="REWARD_ADMIN">REWARD_ADMIN</SelectItem>
+
+                <SelectItem value="WORKER">WORKER</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1.5 text-slate-700">
+              Status
+            </label>
+
+            <Select value={status} onValueChange={setStatus}>
+              <SelectTrigger className={inputStyleClass}>
+                <SelectValue placeholder="Pilih status" />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectItem value="ACTIVE">ACTIVE</SelectItem>
+
+                <SelectItem value="INACTIVE">INACTIVE</SelectItem>
+
+                <SelectItem value="SUSPENDED">SUSPENDED</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1.5 text-slate-700">
+              Unit
+            </label>
+
+            <Select
+              value={unitId || undefined}
+              onValueChange={(value) => {
+                setUnitId(value);
+                setDivisionId("");
+              }}
+            >
+              <SelectTrigger className={inputStyleClass}>
+                <SelectValue placeholder="Pilih unit" />
+              </SelectTrigger>
+
+              <SelectContent>
+                {units.map((unit) => (
+                  <SelectItem key={unit.id} value={unit.id}>
+                    {unit.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1.5 text-slate-700">
+              Divisi
+            </label>
+
+            <Select
+              value={divisionId || undefined}
+              onValueChange={setDivisionId}
+            >
+              <SelectTrigger className={inputStyleClass}>
+                <SelectValue placeholder="Pilih divisi" />
+              </SelectTrigger>
+
+              <SelectContent>
+                {divisions
+                  .filter((division) => division.unitId === unitId)
+                  .map((division) => (
+                    <SelectItem key={division.id} value={division.id}>
+                      {division.name}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="flex gap-2 pt-2">
@@ -129,6 +287,7 @@ export default function UserEditDialog({
             >
               Batal
             </Button>
+
             <Button
               type="submit"
               disabled={loading}
