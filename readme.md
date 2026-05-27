@@ -1,6 +1,8 @@
 # K3-SMART
 
-<img src="public/images/Login page k3smart.png" alt="Login Page" width="100%" />
+<img src="public/manifest/login-desktop-ss.png" alt="Login Page" width="100%" />
+
+---
 
 Platform pembelajaran keselamatan kerja berbasis web menggunakan:
 
