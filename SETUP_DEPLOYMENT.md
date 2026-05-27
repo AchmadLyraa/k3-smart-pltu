@@ -5,7 +5,7 @@
 pnpm build
 ```
 
-### 2. Upload ke server
+### 2. Upload ke server (File Manager di cpanel)
 Yang perlu di-upload ke server:
 - `.next/` (hasil build)
 - `public/` (gambar, font, dll)
@@ -17,6 +17,7 @@ Yang perlu di-upload ke server:
 
 Yang **tidak perlu** di-upload:
 - `node_modules/`
+Atau kalau mau lebih simpel, zip dulu satu repo lalu upload via File Manager Domainesia.
 
 ### 3. Di server, install dependencies
 ```bash
@@ -47,5 +48,3 @@ rsync -avz --exclude='node_modules' --exclude='.git' \
   -e "ssh -p 64000" \
   ./ ksmartnp@flanders.id.rapidplex.com:~/k3-smart/
 ```
-
-Atau kalau mau lebih simpel, zip dulu lalu upload via File Manager Domainesia.

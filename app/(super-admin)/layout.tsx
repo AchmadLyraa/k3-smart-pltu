@@ -27,7 +27,7 @@ export default async function AdminLayout({
         background: "var(--sa-body-bg, #F5F6FA)",
       }}
     >
-      <SuperAdminSidebar />
+      <SuperAdminSidebar role={userRole} />
       <main
         className="sa-main-content"
         style={{
@@ -42,7 +42,11 @@ export default async function AdminLayout({
         }}
       >
         <div className="sa-content-container">
-          <SuperAdminHeader userName={userName} userEmail={userEmail} />
+          <SuperAdminHeader
+            userName={userName}
+            userEmail={userEmail}
+            role={userRole}
+          />
           <div className="sa-content-body">{children}</div>
         </div>
       </main>

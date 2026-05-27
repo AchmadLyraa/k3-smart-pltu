@@ -8,7 +8,7 @@ export async function createTopic(data: {
   slug: string;
   description?: string;
 }) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
   try {
     // Check if slug already exists
@@ -48,7 +48,7 @@ export async function getAllTopics() {
 }
 
 export async function deleteTopic(id: string) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
   try {
     await prisma.topic.delete({
@@ -67,9 +67,9 @@ export async function updateTopic(
     name: string;
     slug: string;
     description?: string | null;
-  }
+  },
 ) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
   try {
     // Check if slug already exists for another topic
@@ -99,4 +99,3 @@ export async function updateTopic(
     return { success: false, error: "Failed to update topic" };
   }
 }
-

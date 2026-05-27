@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/role-guard";
 
 export async function getAcademicPeriodsForFilter() {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN", "REWARD_ADMIN"]);
 
   try {
     const periods = await prisma.academicPeriod.findMany({
@@ -24,7 +24,7 @@ export async function getAcademicPeriodsForFilter() {
 }
 
 export async function getAdminDashboardStats(periodId?: string) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN", "REWARD_ADMIN"]);
 
   try {
     const materialWhere = periodId
@@ -39,9 +39,7 @@ export async function getAdminDashboardStats(periodId?: string) {
     ] = await Promise.all([
       prisma.material.count({ where: materialWhere } as any),
       prisma.quizConfig.count({
-        where: periodId
-          ? { material: { periodId } }
-          : undefined,
+        where: periodId ? { material: { periodId } } : undefined,
       }),
       prisma.user.count({ where: { role: "WORKER" } }),
       periodId
@@ -83,10 +81,7 @@ export async function getAdminDashboardStats(periodId?: string) {
             reference: { in: sessionIds },
           },
         });
-        totalPointsAwarded = periodPoints.reduce(
-          (sum, t) => sum + t.points,
-          0,
-        );
+        totalPointsAwarded = periodPoints.reduce((sum, t) => sum + t.points, 0);
       }
     } else {
       totalPointsAwarded = totalPointTransactions.reduce(
@@ -111,7 +106,7 @@ export async function getAdminDashboardStats(periodId?: string) {
 }
 
 export async function getWorkerPerformanceList(periodId?: string) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN", "REWARD_ADMIN"]);
 
   try {
     const workers = await prisma.user.findMany({
@@ -167,9 +162,7 @@ export async function getWorkerPerformanceList(periodId?: string) {
         : { status: "PUBLISHED" },
     });
     const totalQuizConfigs = await prisma.quizConfig.count({
-      where: periodId
-        ? { material: { periodId } }
-        : undefined,
+      where: periodId ? { material: { periodId } } : undefined,
     });
 
     const result = workers.map((w) => {
@@ -207,7 +200,7 @@ export async function getWorkerPerformanceList(periodId?: string) {
 }
 
 export async function getActiveUsersReport(periodId?: string) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN", "REWARD_ADMIN"]);
 
   try {
     const materialWhere = periodId ? { material: { periodId } } : {};
@@ -285,8 +278,12 @@ export async function getActiveUsersReport(periodId?: string) {
         unit: data.unit,
         division: data.division,
         totalMateriDiakses: data.materialsAccessed.size,
-        materiDiproses: data.materialsProgress.filter((m) => m.status === "IN_PROGRESS").length,
-        materiSelesai: data.materialsProgress.filter((m) => m.status === "COMPLETED").length,
+        materiDiproses: data.materialsProgress.filter(
+          (m) => m.status === "IN_PROGRESS",
+        ).length,
+        materiSelesai: data.materialsProgress.filter(
+          (m) => m.status === "COMPLETED",
+        ).length,
         lastAccessed: data.lastAccessed
           ? data.lastAccessed.toLocaleDateString("id-ID", {
               day: "numeric",
@@ -296,7 +293,7 @@ export async function getActiveUsersReport(periodId?: string) {
               minute: "2-digit",
             })
           : "-",
-      })
+      }),
     );
 
     return { success: true, data: report };
@@ -307,12 +304,22 @@ export async function getActiveUsersReport(periodId?: string) {
 }
 
 export async function getPeriodMonthlyActivity(periodId?: string) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN", "REWARD_ADMIN"]);
 
   try {
     const monthNames = [
-      "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-      "Juli", "Agustus", "September", "Oktober", "November", "Desember",
+      "Januari",
+      "Februari",
+      "Maret",
+      "April",
+      "Mei",
+      "Juni",
+      "Juli",
+      "Agustus",
+      "September",
+      "Oktober",
+      "November",
+      "Desember",
     ];
 
     // Determine month range based on period
@@ -340,9 +347,7 @@ export async function getPeriodMonthlyActivity(periodId?: string) {
       const endYear = endDate.getFullYear();
 
       const totalMonths =
-        (endYear - startYear) * 12 +
-        (endMonthIndex - startMonthIndex) +
-        1;
+        (endYear - startYear) * 12 + (endMonthIndex - startMonthIndex) + 1;
 
       if (totalMonths > 12) {
         return {
@@ -392,7 +397,8 @@ export async function getPeriodMonthlyActivity(periodId?: string) {
 
       if (periodId && startDate && endDate) {
         // Period mode: filter by actual date range
-        if (session.submittedAt < startDate || session.submittedAt > endDate) continue;
+        if (session.submittedAt < startDate || session.submittedAt > endDate)
+          continue;
       }
 
       const monthName = monthNames[session.submittedAt.getMonth()];
@@ -406,7 +412,7 @@ export async function getPeriodMonthlyActivity(periodId?: string) {
       ([name, workers]) => ({
         name,
         akses: workers.size,
-      })
+      }),
     );
 
     return { success: true, data: monthlyData };
@@ -417,7 +423,7 @@ export async function getPeriodMonthlyActivity(periodId?: string) {
 }
 
 export async function getWorkerDetail(userId: string, page = 1, limit = 10) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN", "REWARD_ADMIN"]);
 
   try {
     const skip = (page - 1) * limit;

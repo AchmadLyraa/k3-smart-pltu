@@ -16,7 +16,7 @@ export async function createMaterial(data: {
   duration?: number;
   thumbnail?: string;
 }) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
   try {
     const material = await prisma.material.create({
@@ -49,7 +49,7 @@ export async function updateMaterial(
     thumbnail?: string;
   },
 ) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
   try {
     const material = await prisma.material.update({
@@ -65,7 +65,7 @@ export async function updateMaterial(
 }
 
 export async function publishMaterial(id: string) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
   try {
     const material = await prisma.material.update({
@@ -81,10 +81,7 @@ export async function publishMaterial(id: string) {
 
     // Ambil semua worker yang ACTIVE
     const workers = await prisma.user.findMany({
-      where: {
-        role: "WORKER",
-        status: "ACTIVE",
-      },
+      where: { role: "WORKER", status: "ACTIVE" },
       select: { id: true },
     });
 
@@ -111,7 +108,7 @@ export async function publishMaterial(id: string) {
 }
 
 export async function archiveMaterial(id: string) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
   try {
     const material = await prisma.material.update({
@@ -127,7 +124,7 @@ export async function archiveMaterial(id: string) {
 }
 
 export async function deleteMaterial(id: string) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
   try {
     await prisma.material.delete({ where: { id } });
@@ -145,16 +142,14 @@ export async function getMaterials(
   limit: number = 10,
   search: string = "",
 ) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
   try {
     const skip = (page - 1) * limit;
     const where: any = {};
     if (status) where.status = status;
     if (topicId) where.topicId = topicId;
-    if (search) {
-      where.title = { contains: search, mode: "insensitive" };
-    }
+    if (search) where.title = { contains: search, mode: "insensitive" };
 
     const [materials, total] = await Promise.all([
       prisma.material.findMany({
@@ -188,7 +183,7 @@ export async function getMaterials(
 }
 
 export async function getMaterialDetail(id: string) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
   try {
     const material = await prisma.material.findUnique({
@@ -204,9 +199,7 @@ export async function getMaterialDetail(id: string) {
       },
     });
 
-    if (!material) {
-      return { success: false, error: "Material not found" };
-    }
+    if (!material) return { success: false, error: "Material not found" };
 
     return { success: true, data: material };
   } catch (error) {
@@ -226,7 +219,7 @@ export async function addMediaFile(data: {
   fileName: string;
   duration?: number;
 }) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
   try {
     const mediaFile = await prisma.mediaFile.create({
@@ -247,7 +240,7 @@ export async function addMediaFile(data: {
 }
 
 export async function removeMediaFile(id: string) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
   try {
     await prisma.mediaFile.delete({ where: { id } });
@@ -279,12 +272,10 @@ export async function createTopic(data: {
   slug: string;
   icon?: string;
 }) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
   try {
-    const topic = await prisma.topic.create({
-      data,
-    });
+    const topic = await prisma.topic.create({ data });
     return { success: true, data: topic };
   } catch (error) {
     console.error("[createTopic error]", error);

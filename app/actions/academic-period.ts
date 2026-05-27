@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/role-guard";
 
 export async function getAcademicPeriods() {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
   try {
     const periods = await prisma.academicPeriod.findMany({
@@ -48,7 +48,7 @@ export async function createAcademicPeriod(data: {
   startDate: Date;
   endDate: Date;
 }) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
   try {
     const period = await prisma.academicPeriod.create({ data });
     return { success: true, data: period };
@@ -61,7 +61,7 @@ export async function updateAcademicPeriod(
   id: string,
   data: { name?: string; startDate?: Date; endDate?: Date },
 ) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
   try {
     const period = await prisma.academicPeriod.update({ where: { id }, data });
     return { success: true, data: period };
@@ -71,7 +71,7 @@ export async function updateAcademicPeriod(
 }
 
 export async function deleteAcademicPeriod(id: string) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
   try {
     await prisma.academicPeriod.delete({ where: { id } });
     return { success: true };
@@ -81,7 +81,7 @@ export async function deleteAcademicPeriod(id: string) {
 }
 
 export async function setActivePeriod(id: string) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
   try {
     const period = await prisma.academicPeriod.findUnique({
@@ -118,7 +118,7 @@ export async function assignMaterialToPeriod(
   materialId: string,
   periodId: string | null,
 ) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
   try {
     await prisma.material.update({
       where: { id: materialId },
@@ -146,12 +146,12 @@ export async function getWorkerMaterialsByPeriod() {
       quizConfigs: {
         include: {
           quizSessions: {
-              where: { 
-                userId, 
-                status: { in: ["SUBMITTED", "GRADED"] },
-              },
-              select: { id: true, passed: true },
+            where: {
+              userId,
+              status: { in: ["SUBMITTED", "GRADED"] },
             },
+            select: { id: true, passed: true },
+          },
         },
       },
       progress: {
@@ -179,22 +179,23 @@ export async function getWorkerMaterialsByPeriod() {
 
     // Transform: hitung quiz count dan status per material
     const transformMaterial = (m: any) => {
-  const quizCount = m.quizConfigs.length;
-  const completedCount = m.quizConfigs.filter((qc: any) =>
-    qc.quizSessions.length > 0  // ← sudah dikerjakan, apapun hasilnya
-  ).length;
+      const quizCount = m.quizConfigs.length;
+      const completedCount = m.quizConfigs.filter(
+        (qc: any) => qc.quizSessions.length > 0, // ← sudah dikerjakan, apapun hasilnya
+      ).length;
 
-  return {
-    ...m,
-    quizMeta: quizCount === 0
-      ? null
-      : {
-          count: quizCount,
-          completedCount,
-          allDone: completedCount === quizCount,
-        },
-  };
-};
+      return {
+        ...m,
+        quizMeta:
+          quizCount === 0
+            ? null
+            : {
+                count: quizCount,
+                completedCount,
+                allDone: completedCount === quizCount,
+              },
+      };
+    };
 
     return {
       success: true,

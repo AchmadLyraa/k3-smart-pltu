@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -16,51 +15,46 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const SIDEBAR_ITEMS = [
-  {
-    label: "Dashboard",
-    href: "/admin/dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    label: "Kelola Pengguna",
-    href: "/admin/users",
-    icon: Users,
-  },
-  {
-    label: "Kelola Hadiah",
-    href: "/admin/reward-admin",
-    icon: Gift,
-  },
-  {
-    label: "CMS",
-    href: "/admin/cms",
-    icon: FileText,
-  },
-  {
-    label: "Leaderboard",
-    href: "/admin/leaderboard",
-    icon: Trophy,
-  },
-  {
-    label: "Semester",
-    href: "/admin/semester",
-    icon: CalendarClock,
-  },
-];
+const SIDEBAR_ITEMS_BY_ROLE: Record<
+  string,
+  { label: string; href: string; icon: any }[]
+> = {
+  SUPER_ADMIN: [
+    { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+    { label: "Kelola Pengguna", href: "/admin/users", icon: Users },
+    { label: "Kelola Hadiah", href: "/admin/reward-admin", icon: Gift },
+    { label: "CMS", href: "/admin/cms", icon: FileText },
+    { label: "Leaderboard", href: "/admin/leaderboard", icon: Trophy },
+    { label: "Semester", href: "/admin/semester", icon: CalendarClock },
+  ],
+  HSE_ADMIN: [
+    { label: "Dashboard", href: "/hse/dashboard", icon: LayoutDashboard },
+    { label: "CMS", href: "/hse/cms", icon: FileText },
+    { label: "Leaderboard", href: "/hse/leaderboard", icon: Trophy },
+  ],
+  REWARD_ADMIN: [
+    { label: "Dashboard", href: "/reward/dashboard", icon: LayoutDashboard },
+    { label: "Kelola Hadiah", href: "/reward/reward-admin", icon: Gift },
+    { label: "Leaderboard", href: "/reward/leaderboard", icon: Trophy },
+  ],
+};
 
-export default function SuperAdminSidebar() {
+interface SuperAdminSidebarProps {
+  role: string;
+}
+
+export default function SuperAdminSidebar({ role }: SuperAdminSidebarProps) {
   const pathname = usePathname();
   const [isMinimized, setIsMinimized] = useState(false);
 
+  const items =
+    SIDEBAR_ITEMS_BY_ROLE[role] ?? SIDEBAR_ITEMS_BY_ROLE.SUPER_ADMIN;
+
   useEffect(() => {
-    // Check local storage preference
     const saved = localStorage.getItem("sa-sidebar-minimized") === "true";
     setIsMinimized(saved);
     const layout = document.querySelector(".super-admin-layout");
-    if (saved && layout) {
-      layout.classList.add("super-admin-layout--minimized");
-    }
+    if (saved && layout) layout.classList.add("super-admin-layout--minimized");
   }, []);
 
   const toggleMinimize = () => {
@@ -69,24 +63,18 @@ export default function SuperAdminSidebar() {
     localStorage.setItem("sa-sidebar-minimized", String(nextState));
     const layout = document.querySelector(".super-admin-layout");
     if (layout) {
-      if (nextState) {
-        layout.classList.add("super-admin-layout--minimized");
-      } else {
-        layout.classList.remove("super-admin-layout--minimized");
-      }
+      if (nextState) layout.classList.add("super-admin-layout--minimized");
+      else layout.classList.remove("super-admin-layout--minimized");
     }
   };
 
   const handleItemClick = () => {
     const sidebar = document.querySelector(".sa-sidebar");
-    if (sidebar) {
-      sidebar.classList.remove("open");
-    }
+    if (sidebar) sidebar.classList.remove("open");
   };
 
   return (
     <aside className={cn("sa-sidebar", isMinimized && "sa-sidebar--minimized")}>
-      {/* Minimize / Toggle Button */}
       <button
         onClick={toggleMinimize}
         className="sa-sidebar__toggle"
@@ -94,8 +82,6 @@ export default function SuperAdminSidebar() {
       >
         {isMinimized ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
       </button>
-
-      {/* Logo Section */}
       <div className="sa-sidebar__logo">
         <div className="sa-logo-expanded">
           <Image
@@ -119,14 +105,11 @@ export default function SuperAdminSidebar() {
           />
         </div>
       </div>
-
-      {/* Navigation */}
       <nav className="sa-sidebar__nav">
-        {SIDEBAR_ITEMS.map((item) => {
+        {items.map((item) => {
           const isActive =
             pathname === item.href || pathname.startsWith(item.href + "/");
           const Icon = item.icon;
-
           return (
             <Link
               key={item.href}
@@ -134,7 +117,7 @@ export default function SuperAdminSidebar() {
               onClick={handleItemClick}
               className={cn(
                 "sa-sidebar__item",
-                isActive && "sa-sidebar__item--active"
+                isActive && "sa-sidebar__item--active",
               )}
               title={isMinimized ? item.label : undefined}
             >

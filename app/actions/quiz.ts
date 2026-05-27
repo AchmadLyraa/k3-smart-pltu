@@ -15,7 +15,7 @@ export async function createQuestion(data: {
   explanation?: string;
   answers: Array<{ text: string; isCorrect: boolean }>;
 }) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
   try {
     const correctAnswers = data.answers
@@ -68,7 +68,7 @@ export async function updateQuestion(
     answers?: Array<{ text: string; isCorrect: boolean }>;
   },
 ) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
   try {
     let correctAnswer: string | undefined;
@@ -114,7 +114,7 @@ export async function updateQuestion(
 }
 
 export async function deleteQuestion(id: string) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
   try {
     await prisma.questionBank.delete({ where: { id } });
@@ -130,7 +130,7 @@ export async function getQuestions(
   limit: number = 20,
   search: string = "",
 ) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
   try {
     const where: any = {};
@@ -178,7 +178,7 @@ export async function createQuizConfig(data: {
   questionIds: string[];
   deadline?: Date; // ← tambah
 }) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
   try {
     const quizConfig = await prisma.quizConfig.create({
@@ -208,7 +208,7 @@ export async function createQuizConfig(data: {
 }
 
 export async function getQuizByMaterial(materialId: string) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
   try {
     const quizConfigs = await prisma.quizConfig.findMany({
@@ -237,13 +237,13 @@ export async function getQuizConfigs(
   limit: number = 10,
   search: string = "",
 ) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
   try {
     const where: any = {
       materialId,
     };
-    
+
     if (search) {
       where.name = { contains: search, mode: "insensitive" };
     }

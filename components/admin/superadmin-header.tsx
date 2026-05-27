@@ -1,43 +1,61 @@
 "use client";
-
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { Moon, LogOut, User, Menu } from "lucide-react";
+import { LogOut, User, Menu } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
-import { SuperAdminNotificationBell } from "@/components/admin/superadmin-notification-bell";
-
 import { useEffect, useState } from "react";
 
 interface SuperAdminHeaderProps {
   userName: string;
   userEmail: string;
+  role: string;
 }
 
-const BREADCRUMB_MAP: Record<string, string> = {
-  "/admin/dashboard": "Dashboard / Dashboard",
-  "/admin/users": "Dashboard / Kelola Pengguna",
-  "/admin/reward-admin": "Dashboard / Kelola Hadiah",
-  "/admin/cms": "Dashboard / CMS",
-  "/admin/leaderboard": "Dashboard / Leaderboard",
-  "/admin/semester": "Dashboard / Riwayat Semester",
-  "/admin/profile": "Dashboard / Profile",
+const BREADCRUMB_MAP: Record<string, Record<string, string>> = {
+  SUPER_ADMIN: {
+    "/admin/dashboard": "Dashboard / Dashboard",
+    "/admin/users": "Dashboard / Kelola Pengguna",
+    "/admin/reward-admin": "Dashboard / Kelola Hadiah",
+    "/admin/cms": "Dashboard / CMS",
+    "/admin/leaderboard": "Dashboard / Leaderboard",
+    "/admin/semester": "Dashboard / Riwayat Semester",
+    "/admin/profile": "Dashboard / Profile",
+  },
+  HSE_ADMIN: {
+    "/hse/dashboard": "Dashboard / Dashboard",
+    "/hse/cms": "Dashboard / CMS",
+    "/hse/leaderboard": "Dashboard / Leaderboard",
+    "/hse/profile": "Dashboard / Profile",
+  },
+  REWARD_ADMIN: {
+    "/reward/dashboard": "Dashboard / Dashboard",
+    "/reward/reward-admin": "Dashboard / Kelola Hadiah",
+    "/reward/leaderboard": "Dashboard / Leaderboard",
+    "/reward/profile": "Dashboard / Profile",
+  },
+};
+
+const PROFILE_LINK: Record<string, string> = {
+  SUPER_ADMIN: "/admin/profile",
+  HSE_ADMIN: "/hse/profile",
+  REWARD_ADMIN: "/reward/profile",
 };
 
 export default function SuperAdminHeader({
   userName,
   userEmail,
+  role,
 }: SuperAdminHeaderProps) {
   const pathname = usePathname();
-  const breadcrumb = BREADCRUMB_MAP[pathname] || "Dashboard / Admin";
+  const breadcrumb = BREADCRUMB_MAP[role]?.[pathname] || "Dashboard / Admin";
   const parts = breadcrumb.split(" / ");
   const [scrolled, setScrolled] = useState(false);
 
@@ -51,22 +69,12 @@ export default function SuperAdminHeader({
   useEffect(() => {
     const handleToggle = () => {
       const sidebar = document.querySelector(".sa-sidebar");
-      if (sidebar) {
-        sidebar.classList.toggle("open");
-      }
+      if (sidebar) sidebar.classList.toggle("open");
     };
     const button = document.getElementById("sa-mobile-toggle");
     button?.addEventListener("click", handleToggle);
-
-    const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
-
     return () => {
       button?.removeEventListener("click", handleToggle);
       window.removeEventListener("scroll", handleScroll);
@@ -80,13 +88,15 @@ export default function SuperAdminHeader({
           <Menu className="sa-header__mobile-icon" />
         </button>
         <span className="sa-header__breadcrumb">
-          {parts[0]} / <span style={{ color: "var(--sa-primary, #E74C3C)", fontWeight: 700 }}>{parts[1]}</span>
+          {parts[0]} /{" "}
+          <span
+            style={{ color: "var(--sa-primary, #E74C3C)", fontWeight: 700 }}
+          >
+            {parts[1]}
+          </span>
         </span>
       </div>
-
       <div className="sa-header__right">
-
-        {/* User Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="sa-header__user">
@@ -109,7 +119,10 @@ export default function SuperAdminHeader({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuItem asChild>
-              <Link href="/admin/profile" className="cursor-pointer">
+              <Link
+                href={PROFILE_LINK[role] ?? "/admin/profile"}
+                className="cursor-pointer"
+              >
                 <User className="w-4 h-4 mr-2" />
                 My Profile
               </Link>

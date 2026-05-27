@@ -22,7 +22,7 @@ export async function createQuizCampaign(data: {
   showCorrectAns: boolean;
   questionIds: string[];
 }) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
   try {
     const campaign = await prisma.quizCampaign.create({
@@ -79,7 +79,7 @@ export async function updateQuizCampaign(
     questionIds?: string[];
   },
 ) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
   try {
     const updateData: any = { ...data };
@@ -117,7 +117,7 @@ export async function updateQuizCampaign(
 }
 
 export async function deleteQuizCampaign(id: string) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
   try {
     await prisma.quizCampaign.delete({ where: { id } });
@@ -129,7 +129,7 @@ export async function deleteQuizCampaign(id: string) {
 }
 
 export async function getQuizCampaigns() {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
   try {
     const campaigns = await prisma.quizCampaign.findMany({
@@ -147,7 +147,7 @@ export async function getQuizCampaigns() {
 }
 
 export async function getQuizCampaign(id: string) {
-  await requireAuth(["SUPER_ADMIN"]);
+  await requireAuth(["SUPER_ADMIN", "HSE_ADMIN"]);
 
   try {
     const campaign = await prisma.quizCampaign.findUnique({
@@ -186,7 +186,13 @@ export async function getActiveCampaigns() {
         _count: { select: { questions: true } },
         sessions: {
           where: { userId: user.id },
-          select: { id: true, passed: true, score: true, status: true, submittedAt: true },
+          select: {
+            id: true,
+            passed: true,
+            score: true,
+            status: true,
+            submittedAt: true,
+          },
           orderBy: { createdAt: "desc" },
           take: 1,
         },
@@ -238,7 +244,8 @@ export async function startCampaignQuiz(campaignId: string) {
       },
     });
 
-    if (!campaign) return { success: false, error: "Campaign not found or not published" };
+    if (!campaign)
+      return { success: false, error: "Campaign not found or not published" };
 
     // Check if there's already an IN_PROGRESS session
     const existingSession = await prisma.quizSession.findFirst({
@@ -257,7 +264,9 @@ export async function startCampaignQuiz(campaignId: string) {
 
     if (existingSession) {
       const timeLimit = campaign.timeLimit;
-      const elapsed = Math.floor((Date.now() - new Date(existingSession.startedAt).getTime()) / 1000);
+      const elapsed = Math.floor(
+        (Date.now() - new Date(existingSession.startedAt).getTime()) / 1000,
+      );
       const timeLeft = timeLimit - elapsed;
 
       if (timeLeft > 0) {
@@ -297,10 +306,15 @@ export async function startCampaignQuiz(campaignId: string) {
     // Select & shuffle questions
     let selectedQuestions = campaign.questions;
     if (campaign.shuffleQuestions) {
-      selectedQuestions = [...selectedQuestions].sort(() => Math.random() - 0.5);
+      selectedQuestions = [...selectedQuestions].sort(
+        () => Math.random() - 0.5,
+      );
     }
 
-    const limitedQuestions = selectedQuestions.slice(0, campaign.totalQuestions);
+    const limitedQuestions = selectedQuestions.slice(
+      0,
+      campaign.totalQuestions,
+    );
 
     const session = await prisma.quizSession.create({
       data: {
@@ -353,7 +367,8 @@ export async function completeCampaignQuiz(sessionId: string) {
       },
     });
 
-    if (!session?.quizCampaign) return { success: false, error: "Session or campaign not found" };
+    if (!session?.quizCampaign)
+      return { success: false, error: "Session or campaign not found" };
 
     const campaign = session.quizCampaign;
 
@@ -365,25 +380,40 @@ export async function completeCampaignQuiz(sessionId: string) {
       },
     });
 
-    const validAnswers = userAnswers.filter((a): a is typeof a & { question: NonNullable<typeof a.question> } => a.question !== null);
+    const validAnswers = userAnswers.filter(
+      (a): a is typeof a & { question: NonNullable<typeof a.question> } =>
+        a.question !== null,
+    );
 
     // Calculate score based on basePoints
     const correctCount = validAnswers.filter((a) => {
-      const correctAnswers = a.question.correctAnswer.split(",").map((s) => s.trim()).sort();
-      const userAnswerList = a.answer.split(",").map((s) => s.trim()).sort();
+      const correctAnswers = a.question.correctAnswer
+        .split(",")
+        .map((s) => s.trim())
+        .sort();
+      const userAnswerList = a.answer
+        .split(",")
+        .map((s) => s.trim())
+        .sort();
       return JSON.stringify(correctAnswers) === JSON.stringify(userAnswerList);
     }).length;
 
-    const percentage = Math.round((correctCount / session.totalQuestions) * 100);
+    const percentage = Math.round(
+      (correctCount / session.totalQuestions) * 100,
+    );
     const passed = percentage >= campaign.passingScore;
 
     // Calculate points: (correct / total) * basePoints
-    const rawPoints = Math.round((correctCount / session.totalQuestions) * campaign.basePoints);
+    const rawPoints = Math.round(
+      (correctCount / session.totalQuestions) * campaign.basePoints,
+    );
 
     // Time bonus & penalty (same as quiz material logic)
     const startedAt = session.startedAt;
     const submittedAt = new Date();
-    const timeUsed = Math.round((submittedAt.getTime() - startedAt.getTime()) / 1000);
+    const timeUsed = Math.round(
+      (submittedAt.getTime() - startedAt.getTime()) / 1000,
+    );
     const unusedTime = Math.max(0, campaign.timeLimit - timeUsed);
     const unusedPercentage = unusedTime / campaign.timeLimit;
     const timeBonus = Math.floor(unusedPercentage * 100);
@@ -397,12 +427,24 @@ export async function completeCampaignQuiz(sessionId: string) {
     // Update answers with isCorrect
     await Promise.all(
       validAnswers.map(async (a) => {
-        const correctAnswers = a.question.correctAnswer.split(",").map((s) => s.trim()).sort();
-        const userAnswerList = a.answer.split(",").map((s) => s.trim()).sort();
-        const isCorrect = JSON.stringify(correctAnswers) === JSON.stringify(userAnswerList);
+        const correctAnswers = a.question.correctAnswer
+          .split(",")
+          .map((s) => s.trim())
+          .sort();
+        const userAnswerList = a.answer
+          .split(",")
+          .map((s) => s.trim())
+          .sort();
+        const isCorrect =
+          JSON.stringify(correctAnswers) === JSON.stringify(userAnswerList);
         return prisma.userAnswer.update({
           where: { id: a.id },
-          data: { isCorrect, pointsEarned: isCorrect ? Math.round(campaign.basePoints / session.totalQuestions) : 0 },
+          data: {
+            isCorrect,
+            pointsEarned: isCorrect
+              ? Math.round(campaign.basePoints / session.totalQuestions)
+              : 0,
+          },
         });
       }),
     );
@@ -413,7 +455,10 @@ export async function completeCampaignQuiz(sessionId: string) {
       if (submittedAt > deadlineDate) {
         // Time bonus = 0 if past deadline
         // But penalty still applies
-        daysLate = Math.ceil((submittedAt.getTime() - deadlineDate.getTime()) / (1000 * 60 * 60 * 24));
+        daysLate = Math.ceil(
+          (submittedAt.getTime() - deadlineDate.getTime()) /
+            (1000 * 60 * 60 * 24),
+        );
         deadlinePenalty = Math.min(daysLate * 5, 40);
         penaltyPoints = Math.floor((rawPoints * deadlinePenalty) / 100);
         adjustedPoints = rawPoints - penaltyPoints;
@@ -453,7 +498,10 @@ export async function completeCampaignQuiz(sessionId: string) {
         if (deadlinePenalty > 0) {
           description += ` (Terlambat ${daysLate} hari, -${deadlinePenalty}%)`;
         }
-        if (timeBonus > 0 && (!campaign.deadline || submittedAt <= campaign.deadline)) {
+        if (
+          timeBonus > 0 &&
+          (!campaign.deadline || submittedAt <= campaign.deadline)
+        ) {
           description += ` (+${timeBonus} time bonus)`;
         }
 
@@ -478,7 +526,8 @@ export async function completeCampaignQuiz(sessionId: string) {
         correctCount,
         totalQuestions: session.totalQuestions,
         totalPoints: rawPoints,
-        timeBonus: (campaign.deadline && submittedAt > campaign.deadline) ? 0 : timeBonus,
+        timeBonus:
+          campaign.deadline && submittedAt > campaign.deadline ? 0 : timeBonus,
         penaltyPercent: deadlinePenalty,
         penaltyPoints,
         daysLate,

@@ -13,7 +13,7 @@ export default async function LeaderboardPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="space-y-2">
       <LeaderboardClient
         initialData={result.data}
         currentUserId={result.currentUserId ?? ""}

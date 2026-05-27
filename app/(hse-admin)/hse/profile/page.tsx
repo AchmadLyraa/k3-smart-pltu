@@ -5,7 +5,7 @@ export const metadata = {
   description: "View and manage your profile information",
 };
 
-export default function HseProfilePage() {
+export default function AdminProfilePage() {
   return (
     <div className="container py-6">
       <UserProfile />
