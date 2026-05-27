@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     "Platform pembelajaran keselamatan kerja interaktif dengan video, infografis, dan kuis",
   icons: {
     icon: "/favicon.ico",
-    shortcut: "/icon.png",
+    shortcut: "/favicon.ico",
     apple: "/apple-icon.png",
   },
 };
@@ -39,16 +39,10 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
         {/* Preload gambar hero login */}
-        <link
-          rel="preload"
-          href="/images/hero-login.png"
-          as="image"
-        />
+        <link rel="preload" href="/images/hero-login.png" as="image" />
       </head>
       <body className="font-sans antialiased">
-        <Providers>
-          {children}
-        </Providers>
+        <Providers>{children}</Providers>
         <Toaster />
         {process.env.NODE_ENV === "production" && <Analytics />}
       </body>

@@ -24,6 +24,7 @@ async function main() {
   await prisma.semesterSummary.deleteMany();
   await prisma.userStreak.deleteMany();
   await prisma.topic.deleteMany();
+  await prisma.QuestionBank.deleteMany();
 
   await prisma.user.deleteMany();
 

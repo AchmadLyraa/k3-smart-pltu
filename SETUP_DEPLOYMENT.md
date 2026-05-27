@@ -1,5 +1,7 @@
 ## Flow Deployment (Next.js + PM2 + Domainesia)
 
+Sudah login terlebih dahulu di domainesia.com lalu masuk ke cpanel
+
 ### 1. Build di lokal
 ```bash
 pnpm build
@@ -19,7 +21,7 @@ Yang **tidak perlu** di-upload:
 - `node_modules/`
 Atau kalau mau lebih simpel, zip dulu satu repo lalu upload via File Manager Domainesia.
 
-### 3. Di server, install dependencies
+### 3. Di server, install dependencies (lewat ssh atau terminal di cpanel)
 ```bash
 cd ~/k3-smart
 pnpm install --frozen-lockfile
@@ -35,6 +37,7 @@ npx prisma db seed
 ```bash
 npx pm2 stop server
 npx pm2 delete server
+npx pm2 list
 NODE_ENV=production npx pm2 start server.js --name server
 npx pm2 save
 ```

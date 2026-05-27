@@ -122,8 +122,12 @@ export default function RegisterForm() {
     <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-red-100 flex items-center justify-center px-4 py-10">
       <Card className="w-full max-w-2xl border-0 shadow-2xl rounded-3xl overflow-hidden">
         <CardHeader className="space-y-2 text-center pb-2 pt-8">
-          <div className="mx-auto w-16 h-16 rounded-2xl bg-red-500 flex items-center justify-center shadow-lg shadow-red-500/20">
-            <span className="text-white text-2xl font-bold">K3</span>
+          <div className="mx-auto w-16 h-16 rounded-2xl overflow-hidden shadow-lg shadow-red-500/20">
+            <img
+              src="/manifest/android-chrome-512x512.png"
+              alt="K3 SMART"
+              className="w-full h-full object-cover"
+            />
           </div>
 
           <CardTitle className="text-3xl font-bold tracking-tight text-gray-900">
