@@ -93,25 +93,107 @@ export default function RewardUsersPage() {
 
 	const totalRewards = useMemo(() => rewards.length, [rewards.length]);
 
-	if (!mounted) {
+	if (!mounted || loading) {
 		return (
-			<div className="space-y-4 animate-in fade-in duration-500 pb-16">
-				<div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+			<div className="space-y-6 animate-in fade-in duration-300 pb-16 px-2">
+				{/* Back Button skeleton */}
+				<div className="w-10 h-10 rounded-full bg-white border border-zinc-200/60 flex items-center justify-center shadow-sm">
+					<div className="w-5 h-5 rounded bg-zinc-200 animate-pulse" />
+				</div>
+
+				{/* Header Banner skeleton */}
+				<div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-zinc-900 to-zinc-800 p-6 md:p-7 text-white shadow-xl h-44 flex flex-col justify-between">
 					<div className="space-y-3">
-						<div className="h-5 w-40 rounded-full bg-muted animate-pulse" />
-						<div className="h-10 w-72 rounded-lg bg-muted animate-pulse" />
-						<div className="h-5 w-96 rounded-full bg-muted animate-pulse" />
+						<div className="flex items-center gap-2">
+							<div className="w-8 h-8 rounded-xl bg-zinc-700 animate-pulse" />
+							<div className="h-4 w-24 rounded bg-zinc-700 animate-pulse" />
+						</div>
+						<div className="h-7 w-56 rounded-lg bg-zinc-700 animate-pulse" />
+						<div className="h-4 w-96 rounded bg-zinc-700/80 animate-pulse max-w-full" />
 					</div>
-					<div className="h-9 w-24 rounded-md bg-muted animate-pulse" />
 				</div>
+
+				{/* Stats Grid skeleton */}
 				<div className="grid gap-4 md:grid-cols-3">
-					<div className="h-24 rounded-2xl border bg-muted/40 animate-pulse" />
-					<div className="h-24 rounded-2xl border bg-muted/40 animate-pulse" />
-					<div className="h-24 rounded-2xl border bg-muted/40 animate-pulse" />
+					{[1, 2, 3].map((i) => (
+						<div
+							key={i}
+							className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)] flex items-center justify-between"
+						>
+							<div className="space-y-2">
+								<div className="h-3.5 w-20 rounded bg-zinc-200/85 animate-pulse" />
+								<div className="h-7 w-24 rounded bg-zinc-200/85 animate-pulse" />
+							</div>
+							<div className="h-11 w-11 rounded-2xl bg-zinc-200/85 animate-pulse" />
+						</div>
+					))}
 				</div>
-				<div className="grid gap-6 lg:grid-cols-[1.4fr_0.9fr]">
-					<div className="h-[420px] rounded-3xl border bg-muted/30 animate-pulse" />
-					<div className="h-[420px] rounded-3xl border bg-muted/30 animate-pulse" />
+
+				{/* Catalog & History skeleton */}
+				<div className="grid gap-6 lg:grid-cols-[1.35fr_0.85fr]">
+					{/* Catalog skeleton */}
+					<div className="border border-zinc-200 bg-white rounded-3xl p-6 space-y-6">
+						<div className="space-y-2">
+							<div className="h-5 w-40 rounded bg-zinc-200 animate-pulse" />
+							<div className="h-4 w-80 rounded bg-zinc-200/80 animate-pulse" />
+						</div>
+						<div className="grid gap-5 md:grid-cols-2">
+							{[1, 2].map((i) => (
+								<div
+									key={i}
+									className="rounded-3xl border border-zinc-150 p-5 space-y-4 bg-white"
+								>
+									<div className="flex justify-between items-start">
+										<div className="h-5 w-32 rounded bg-zinc-200 animate-pulse" />
+										<div className="h-5 w-16 rounded-full bg-zinc-200 animate-pulse" />
+									</div>
+									<div className="space-y-2">
+										<div className="h-4 w-full rounded bg-zinc-200 animate-pulse" />
+										<div className="h-4 w-5/6 rounded bg-zinc-200 animate-pulse" />
+									</div>
+									<div className="grid grid-cols-2 gap-3 pt-2">
+										<div className="space-y-1">
+											<div className="h-3 w-10 rounded bg-zinc-200 animate-pulse" />
+											<div className="h-5 w-16 rounded bg-zinc-200 animate-pulse" />
+										</div>
+										<div className="space-y-1">
+											<div className="h-3 w-12 rounded bg-zinc-200 animate-pulse" />
+											<div className="h-5 w-12 rounded bg-zinc-200 animate-pulse" />
+										</div>
+									</div>
+									<div className="h-10 w-full rounded-2xl bg-zinc-200 animate-pulse" />
+								</div>
+							))}
+						</div>
+					</div>
+
+					{/* History skeleton */}
+					<div className="border border-zinc-200 bg-white rounded-3xl p-5 space-y-6">
+						<div className="space-y-2">
+							<div className="h-5 w-36 rounded bg-zinc-200 animate-pulse" />
+							<div className="h-4 w-60 rounded bg-zinc-200/80 animate-pulse" />
+						</div>
+						<div className="space-y-4">
+							{[1, 2, 3].map((i) => (
+								<div
+									key={i}
+									className="rounded-2xl border border-zinc-100 p-4 space-y-3 bg-zinc-50/50"
+								>
+									<div className="flex justify-between items-start gap-2">
+										<div className="flex-1 space-y-2">
+											<div className="h-4 w-3/4 rounded bg-zinc-200 animate-pulse" />
+											<div className="h-4 w-12 rounded bg-zinc-200/80 animate-pulse" />
+										</div>
+										<div className="flex flex-col items-end gap-1.5">
+											<div className="h-4.5 w-14 rounded-full bg-zinc-200/80 animate-pulse" />
+											<div className="h-4 w-20 rounded-full bg-zinc-200/80 animate-pulse" />
+										</div>
+									</div>
+									<div className="h-4 w-full rounded bg-zinc-200 animate-pulse" />
+								</div>
+							))}
+						</div>
+					</div>
 				</div>
 			</div>
 		);
@@ -156,11 +238,10 @@ export default function RewardUsersPage() {
 			{/* Top Header Banner */}
 			<div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-zinc-950 via-red-950 to-red-600 p-6 md:p-7 text-white shadow-xl border border-red-900/30">
 				<div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(239,68,68,0.25),transparent_45%)] pointer-events-none" />
-				<div className="absolute -right-10 -bottom-10 w-48 h-48 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
+				<div className="absolute -right-10 -bottom-10 w-48 h-48 bg-[radial-gradient(circle,rgba(239,68,68,0.15)_0%,transparent_70%)] rounded-full pointer-events-none" />
 				<div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
 					<Gift className="w-52 h-52 text-white" />
 				</div>
-				<div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
 
 				<div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
 					<div className="space-y-3">
@@ -202,7 +283,7 @@ export default function RewardUsersPage() {
 
 			{/* Stats Grid */}
 			<div className="grid gap-4 md:grid-cols-3">
-				<div className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)] flex items-center justify-between hover:shadow-[0_6px_25px_-6px_rgba(0,0,0,0.04)] transition-all duration-300">
+				<div className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)] flex items-center justify-between transition-colors duration-200">
 					<div className="space-y-1">
 						<span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Poin Tersedia</span>
 						<h3 className="text-2xl font-black text-zinc-950 font-mono tracking-tight" style={{ fontFamily: 'Buckin, sans-serif' }}>
@@ -214,7 +295,7 @@ export default function RewardUsersPage() {
 					</div>
 				</div>
 
-				<div className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)] flex items-center justify-between hover:shadow-[0_6px_25px_-6px_rgba(0,0,0,0.04)] transition-all duration-300">
+				<div className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)] flex items-center justify-between transition-colors duration-200">
 					<div className="space-y-1">
 						<span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Reward Aktif</span>
 						<h3 className="text-2xl font-black text-zinc-950 font-mono tracking-tight" style={{ fontFamily: 'Buckin, sans-serif' }}>
@@ -226,7 +307,7 @@ export default function RewardUsersPage() {
 					</div>
 				</div>
 
-				<div className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)] flex items-center justify-between hover:shadow-[0_6px_25px_-6px_rgba(0,0,0,0.04)] transition-all duration-300">
+				<div className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)] flex items-center justify-between transition-colors duration-200">
 					<div className="space-y-1">
 						<span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Riwayat Penukaran</span>
 						<h3 className="text-2xl font-black text-zinc-950 font-mono tracking-tight" style={{ fontFamily: 'Buckin, sans-serif' }}>
@@ -266,7 +347,7 @@ export default function RewardUsersPage() {
 									return (
 										<div
 											key={reward.id}
-											className="group flex flex-col justify-between rounded-3xl border border-zinc-150 bg-white p-5 shadow-sm transition-all duration-300 hover:border-red-200 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-8px_rgba(239,68,68,0.12)]"
+											className="group flex flex-col justify-between rounded-3xl border border-zinc-150 bg-white p-5 shadow-sm transition-colors duration-200"
 										>
 											<div>
 												<div className="flex items-start justify-between gap-3">
@@ -352,7 +433,7 @@ export default function RewardUsersPage() {
 								{redemptions.map((item) => (
 									<div 
 										key={item.id} 
-										className="group flex flex-col gap-3 rounded-2xl border border-zinc-100 bg-zinc-50/50 p-4 hover:bg-zinc-50 hover:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.04)] transition-all duration-300"
+										className="group flex flex-col gap-3 rounded-2xl border border-zinc-100 bg-zinc-50/50 p-4 transition-colors duration-200"
 									>
 										<div className="flex items-start justify-between gap-3">
 											<div className="min-w-0 flex-1">

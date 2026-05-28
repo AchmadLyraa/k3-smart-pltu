@@ -190,11 +190,11 @@ export default function WorkerQuizHistoryList({
       {/* ════ HEADER CARD (seperti Reward Center) ════ */}
       <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-zinc-950 via-red-950 to-red-600 p-6 md:p-7 text-white shadow-xl border border-red-900/30">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(239,68,68,0.25),transparent_45%)] pointer-events-none" />
-        <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-[radial-gradient(circle,rgba(239,68,68,0.15)_0%,transparent_70%)] rounded-full pointer-events-none" />
         <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
           <BrainCircuit className="w-52 h-52 text-white" />
         </div>
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
+
 
         <div className="relative z-10 space-y-3">
           <div className="flex items-center gap-2">
@@ -295,7 +295,7 @@ export default function WorkerQuizHistoryList({
           return (
             <div
               key={h.id}
-              className="bg-white rounded-[24px] border border-zinc-100 p-5 shadow-[0_1px_6px_rgba(0,0,0,0.02)] transition-all hover:shadow-md hover:border-zinc-200 active:scale-[0.995]"
+              className="bg-white rounded-[24px] border border-zinc-100 p-5 shadow-[0_1px_6px_rgba(0,0,0,0.02)] transition-colors duration-200 active:scale-[0.995]"
             >
               <div className="flex items-start justify-between gap-3">
                 {/* LEFT */}

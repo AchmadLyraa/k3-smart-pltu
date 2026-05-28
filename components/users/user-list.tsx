@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { getAllUsers } from "@/app/actions/users";
 import { Input } from "@/components/ui/input";
 import UserTable from "./user-table";
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { useDebounce } from "@/hooks/use-debounce";
 
 interface UserListProps {
   refreshTrigger?: number;
@@ -20,6 +21,7 @@ export default function UserList({ refreshTrigger = 0 }: UserListProps) {
   });
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 300);
 
   const loadUsers = useCallback(async (page: number = 1) => {
     setLoading(true);
@@ -40,12 +42,12 @@ export default function UserList({ refreshTrigger = 0 }: UserListProps) {
     loadUsers(1);
   }, [loadUsers, refreshTrigger]);
 
-  const filteredUsers = users.filter(
+  const filteredUsers = useMemo(() => users.filter(
     (user) =>
-      searchQuery === "" ||
-      user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+      debouncedSearch === "" ||
+      user.name?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+      user.email.toLowerCase().includes(debouncedSearch.toLowerCase()),
+  ), [users, debouncedSearch]);
 
   return (
     <div className="bg-white rounded-[24px] shadow-sm border border-slate-100 p-6">

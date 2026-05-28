@@ -52,7 +52,7 @@ export default function RewardRedemptionList() {
   });
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const debouncedSearch = useDebounce(search, 500);
+  const debouncedSearch = useDebounce(search, 300);
 
   const loadRedemptions = useCallback(async (targetPage: number = 1, searchTerm: string = "") => {
     setLoading(true);

@@ -22,6 +22,7 @@ interface SuperAdminHeaderProps {
 const BREADCRUMB_MAP: Record<string, Record<string, string>> = {
   SUPER_ADMIN: {
     "/admin/dashboard": "Dashboard / Dashboard",
+    "/admin/analisis-performa": "Dashboard / Analisis Performa",
     "/admin/users": "Dashboard / Kelola Pengguna",
     "/admin/reward-admin": "Dashboard / Kelola Hadiah",
     "/admin/cms": "Dashboard / CMS",
@@ -31,6 +32,7 @@ const BREADCRUMB_MAP: Record<string, Record<string, string>> = {
   },
   HSE_ADMIN: {
     "/hse/dashboard": "Dashboard / Dashboard",
+    "/hse/analisis-performa": "Dashboard / Analisis Performa",
     "/hse/cms": "Dashboard / CMS",
     "/hse/leaderboard": "Dashboard / Leaderboard",
     "/hse/profile": "Dashboard / Profile",

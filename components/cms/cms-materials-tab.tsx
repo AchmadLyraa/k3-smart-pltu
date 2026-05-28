@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/tabs";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { useDebounce } from "@/hooks/use-debounce";
 
 // Helper to extract YouTube video ID from URL
 const extractYouTubeId = (url: string): string | null => {
@@ -179,24 +180,9 @@ export default function CMSMaterialsTab({
     pages: 0,
   });
   const [materialSearch, setMaterialSearch] = useState("");
-  const [debouncedMaterialSearch, setDebouncedMaterialSearch] = useState("");
-  const materialSearchTimer = useRef<NodeJS.Timeout | null>(null);
+  const debouncedMaterialSearch = useDebounce(materialSearch, 300);
   const [materialLoading, setMaterialLoading] = useState(false);
 
-  // Debounce material search query
-  useEffect(() => {
-    if (materialSearchTimer.current) {
-      clearTimeout(materialSearchTimer.current);
-    }
-    materialSearchTimer.current = setTimeout(() => {
-      setDebouncedMaterialSearch(materialSearch);
-    }, 500);
-    return () => {
-      if (materialSearchTimer.current) {
-        clearTimeout(materialSearchTimer.current);
-      }
-    };
-  }, [materialSearch]);
   // Form state
   const [showForm, setShowForm] = useState(false);
   const [editMaterial, setEditMaterial] = useState<MaterialItem | null>(null);
@@ -214,42 +200,12 @@ export default function CMSMaterialsTab({
   });
   const [quizLoading, setQuizLoading] = useState(false);
   const [quizSearch, setQuizSearch] = useState("");
-  const [debouncedQuizSearch, setDebouncedQuizSearch] = useState("");
-  const quizSearchTimer = useRef<NodeJS.Timeout | null>(null);
-  // Debounce quiz search query
-  useEffect(() => {
-    if (quizSearchTimer.current) {
-      clearTimeout(quizSearchTimer.current);
-    }
-    quizSearchTimer.current = setTimeout(() => {
-      setDebouncedQuizSearch(quizSearch);
-    }, 500);
-    return () => {
-      if (quizSearchTimer.current) {
-        clearTimeout(quizSearchTimer.current);
-      }
-    };
-  }, [quizSearch]);
+  const debouncedQuizSearch = useDebounce(quizSearch, 300);
   const [showQuizForm, setShowQuizForm] = useState(false);
   // State for question selection and search
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   const [questionSearch, setQuestionSearch] = useState("");
-  const [debouncedQuestionSearch, setDebouncedQuestionSearch] = useState("");
-  const questionSearchTimer = useRef<NodeJS.Timeout | null>(null);
-  // Debounce question search query
-  useEffect(() => {
-    if (questionSearchTimer.current) {
-      clearTimeout(questionSearchTimer.current);
-    }
-    questionSearchTimer.current = setTimeout(() => {
-      setDebouncedQuestionSearch(questionSearch);
-    }, 500);
-    return () => {
-      if (questionSearchTimer.current) {
-        clearTimeout(questionSearchTimer.current);
-      }
-    };
-  }, [questionSearch]);
+  const debouncedQuestionSearch = useDebounce(questionSearch, 300);
   const [quizFormData, setQuizFormData] = useState({
     name: "",
     description: "",

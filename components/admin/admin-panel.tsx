@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useDebounce } from "@/hooks/use-debounce";
 
 import {
   CheckCircle2,
@@ -136,6 +137,7 @@ export default function AdminDashboard({
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 300);
   const [showValue, setShowValue] = useState(true);
   const [selectedPeriodId, setSelectedPeriodId] = useState(defaultPeriodId);
   const [workerPage, setWorkerPage] = useState(1);
@@ -281,14 +283,14 @@ export default function AdminDashboard({
 
   // Filter workers by search
   const filteredWorkers = useMemo(() => {
-    if (!searchQuery.trim()) return workers;
-    const q = searchQuery.toLowerCase();
+    if (!debouncedSearch.trim()) return workers;
+    const q = debouncedSearch.toLowerCase();
     return workers.filter(
       (w) =>
         w.name?.toLowerCase().includes(q) ||
         w.email?.toLowerCase().includes(q)
     );
-  }, [workers, searchQuery]);
+  }, [workers, debouncedSearch]);
 
   // Pagination for workers table
   const totalWorkerPages = Math.max(1, Math.ceil(filteredWorkers.length / WORKER_PAGE_SIZE));
@@ -297,10 +299,10 @@ export default function AdminDashboard({
     return filteredWorkers.slice(start, start + WORKER_PAGE_SIZE);
   }, [filteredWorkers, workerPage]);
 
-  // Reset to page 1 when search changes
+  // Reset to page 1 when debounced search changes
   useEffect(() => {
     setWorkerPage(1);
-  }, [searchQuery]);
+  }, [debouncedSearch]);
 
   // Calculate progress percentages
   const progressData = useMemo(() => {

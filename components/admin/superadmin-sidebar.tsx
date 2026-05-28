@@ -12,6 +12,7 @@ import {
   CalendarClock,
   ChevronLeft,
   ChevronRight,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +22,7 @@ const SIDEBAR_ITEMS_BY_ROLE: Record<
 > = {
   SUPER_ADMIN: [
     { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+    { label: "Analisis Performa", href: "/admin/analisis-performa", icon: BarChart3 },
     { label: "Kelola Pengguna", href: "/admin/users", icon: Users },
     { label: "Kelola Hadiah", href: "/admin/reward-admin", icon: Gift },
     { label: "CMS", href: "/admin/cms", icon: FileText },
@@ -29,6 +31,7 @@ const SIDEBAR_ITEMS_BY_ROLE: Record<
   ],
   HSE_ADMIN: [
     { label: "Dashboard", href: "/hse/dashboard", icon: LayoutDashboard },
+    { label: "Analisis Performa", href: "/hse/analisis-performa", icon: BarChart3 },
     { label: "CMS", href: "/hse/cms", icon: FileText },
     { label: "Leaderboard", href: "/hse/leaderboard", icon: Trophy },
   ],

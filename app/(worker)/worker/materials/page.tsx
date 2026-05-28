@@ -14,7 +14,7 @@ export default async function MaterialsPage() {
     : [];
 
   return (
-    <div className="mx-auto max-w-md h-auto bg-slate-50/50 pb-24 font-sans antialiased overflow-x-hidden">
+    <div className="mx-auto max-w-md h-auto pb-24 font-sans antialiased overflow-x-hidden">
       <WorkerMaterialList periods={periods} unassigned={[]} />
     </div>
   );

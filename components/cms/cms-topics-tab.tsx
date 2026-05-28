@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import { useDebounce } from "@/hooks/use-debounce";
 
 interface Topic {
   id: string;
@@ -45,6 +46,7 @@ export default function CMSTopicsTab({ initialTopics }: CMSTopicsTabProps) {
     setTopics(initialTopics);
   }, [initialTopics]);
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 300);
 
   // Create Form States
   const [name, setName] = useState("");
@@ -176,14 +178,14 @@ export default function CMSTopicsTab({ initialTopics }: CMSTopicsTabProps) {
   };
 
   // Filter topics based on search query
-  const filteredTopics = topics.filter((topic) => {
-    const query = searchQuery.toLowerCase().trim();
+  const filteredTopics = useMemo(() => topics.filter((topic) => {
+    const query = debouncedSearch.toLowerCase().trim();
     if (!query) return true;
     return (
       topic.name.toLowerCase().includes(query) ||
       (topic.description && topic.description.toLowerCase().includes(query))
     );
-  });
+  }), [topics, debouncedSearch]);
 
   const inputStyleClass =
     "w-full rounded-[24px] h-11 px-5 border-[#E2E8F0] focus-visible:border-[#FF4B4B] focus-visible:ring-[#FF4B4B]/20 focus-visible:ring-[3px] focus-visible:outline-none transition-all shadow-sm";

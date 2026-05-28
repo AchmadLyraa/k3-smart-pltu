@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -29,6 +29,7 @@ import QuestionForm from "./question-form";
 import { updateQuestion, deleteQuestion, getQuestions as fetchQuestions } from "@/app/actions/quiz";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { useDebounce } from "@/hooks/use-debounce";
 
 type QuestionItem = {
   id: string;
@@ -77,32 +78,13 @@ export default function CMSQuestionsTab({ questions: initialQuestions }: CMSQues
     pages: 0,
   });
   const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const [loading, setLoading] = useState(false);
-  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
   const [saving, setSaving] = useState(false);
-
   // Form state
   const [showForm, setShowForm] = useState(false);
   const [editQuestion, setEditQuestion] = useState<any>(null);
   const [editData, setEditData] = useState<any>(null);
-
-  // Debounce search query
-  useEffect(() => {
-    if (debounceTimer.current) {
-      clearTimeout(debounceTimer.current);
-    }
-
-    debounceTimer.current = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery);
-    }, 500);
-
-    return () => {
-      if (debounceTimer.current) {
-        clearTimeout(debounceTimer.current);
-      }
-    };
-  }, [searchQuery]);
 
   // Load questions dengan search
   const loadQuestions = useCallback(

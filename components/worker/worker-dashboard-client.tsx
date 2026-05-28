@@ -126,11 +126,11 @@ export default function WorkerDashboardClient({
   // Force height constraints on progress card via useRef + useEffect (bypasses any CSS override)
   useEffect(() => {
     if (progressCardRef.current) {
-      progressCardRef.current.style.setProperty('max-height', '360px', 'important');
+      progressCardRef.current.style.setProperty('max-height', '245px', 'important');
       progressCardRef.current.style.setProperty('overflow', 'hidden', 'important');
     }
     if (progressScrollRef.current) {
-      progressScrollRef.current.style.setProperty('max-height', '280px', 'important');
+      progressScrollRef.current.style.setProperty('max-height', '165px', 'important');
       progressScrollRef.current.style.setProperty('overflow-y', 'auto', 'important');
     }
   }, [currentPeriod?.materials]);
@@ -140,7 +140,7 @@ export default function WorkerDashboardClient({
 
   return (
     /* PERBAIKAN DI SINI: min-h-screen diganti h-auto, pb-28 dikurangi jadi pb-24 agar fit pas layar */
-    <div className="mx-auto max-w-md h-auto bg-slate-50/50 pb-30 font-sans antialiased overflow-x-hidden">
+    <div className="mx-auto max-w-md h-auto pb-30 font-sans antialiased overflow-x-hidden">
       <div className="px-2 space-y-6 pt-0">
         
         {/* 1. WELCOME CARD */}
@@ -240,15 +240,15 @@ export default function WorkerDashboardClient({
           <div
             ref={progressCardRef}
             className="bg-white rounded-[28px] p-5 shadow-sm border border-zinc-100 relative"
-            style={{ maxHeight: 360, overflow: 'hidden' }}
+            style={{ maxHeight: 245, overflow: 'hidden' }}
           >
-            <div className="absolute left-[29px] top-8 bottom-12 w-0.5 bg-zinc-100" />
             {/* ─── Container scroll dengan max-height tetap ─── */}
             <div
               ref={progressScrollRef}
-              className="space-y-2"
-              style={{ maxHeight: 280, overflowY: 'auto' }}
+              className="space-y-2 relative"
+              style={{ maxHeight: 165, overflowY: 'auto' }}
             >
+              <div className="absolute left-[9px] top-3 bottom-3 w-0.5 bg-zinc-100 z-0" />
               {/* Progress Timeline Items */}
               {(() => {
                 const currentMaterials = currentPeriod?.materials || [];

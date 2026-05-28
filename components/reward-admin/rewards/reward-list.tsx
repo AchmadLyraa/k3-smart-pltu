@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { getRewards } from "@/app/actions/rewards";
 import RewardTable from "./reward-table";
 import { Spinner } from "@/components/ui/spinner";
 import { Input } from "@/components/ui/input";
 import { Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { useDebounce } from "@/hooks/use-debounce";
 
 interface RewardListProps {
   refreshTrigger?: number;
@@ -18,6 +19,7 @@ export default function RewardList({ refreshTrigger = 0 }: RewardListProps) {
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 300);
 
   const fetchRewards = async () => {
     setLoading(true);
@@ -46,10 +48,10 @@ export default function RewardList({ refreshTrigger = 0 }: RewardListProps) {
     fetchRewards();
   }, [page, refreshTrigger]);
 
-  const filteredRewards = rewards.filter((reward) =>
-    searchQuery === "" ||
-    reward.name?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredRewards = useMemo(() => rewards.filter((reward) =>
+    debouncedSearch === "" ||
+    reward.name?.toLowerCase().includes(debouncedSearch.toLowerCase())
+  ), [rewards, debouncedSearch]);
 
   if (error) {
     return (
